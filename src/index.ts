@@ -144,6 +144,14 @@ export async function startMcpServer(args: string[]): Promise<void> {
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 
+  // MCP clients that die without signaling this child (crash, force-quit, a
+  // closed terminal window) leave it running as an orphan: StdioServerTransport
+  // only wires 'data'/'error' on process.stdin, never 'end', so nothing here
+  // ever reacted to the pipe closing. 'end' fires once the client's write end
+  // closes and this stream has been fully drained, which is the reliable EOF
+  // signal on both a pipe and a TTY — treat it the same as a shutdown signal.
+  process.stdin.on('end', () => gracefulShutdown('stdin-end'));
+
   server.run().catch((error: unknown) => {
     const msg = error instanceof Error ? error.message : 'Unknown error';
     getLogger().error('godot-mcp', 'Failed to run server', { error: msg });
