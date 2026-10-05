@@ -37,7 +37,7 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'animtree',
       description:
-        '查询、控制和编辑 AnimationTree。支持创建节点、添加状态、添加转换、设置混合参数、播放状态、编辑状态属性。' +
+        'Query, control and edit AnimationTree: create the node, add states and transitions, set blend parameters, play a state, edit state properties. ' +
         NON_PERSIST,
       inputSchema: {
         type: 'object' as const,
@@ -46,50 +46,50 @@ export function getToolDefinitions(): Tool[] {
             type: 'string',
             enum: [...ACTIONS],
             description:
-              '操作类型：animtree_create 创建 AnimationTree 节点；animtree_add_state 添加状态；' +
-              'animtree_add_transition 添加转换；animtree_set_blend 设置混合参数；' +
-              'animtree_play 播放状态；animtree_state_edit 编辑状态属性',
+              'Operation: animtree_create creates an AnimationTree node; animtree_add_state adds a state; ' +
+              'animtree_add_transition adds a transition; animtree_set_blend sets a blend parameter; ' +
+              'animtree_play plays a state; animtree_state_edit edits state properties',
           },
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
-          node_path: { type: 'string', description: 'AnimationTree 节点路径' },
-          name: { type: 'string', description: 'AnimationTree 节点名称（animtree_create 时使用）' },
-          parent: { type: 'string', description: '父节点路径（animtree_create 时使用，默认 root）' },
-          animation_player_path: { type: 'string', description: 'AnimationPlayer 的 NodePath（animtree_create 时使用）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
+          node_path: { type: 'string', description: 'AnimationTree node path' },
+          name: { type: 'string', description: 'AnimationTree node name (animtree_create)' },
+          parent: { type: 'string', description: 'Parent node path (animtree_create, default root)' },
+          animation_player_path: { type: 'string', description: 'AnimationPlayer NodePath (animtree_create)' },
           tree_root_type: {
             type: 'string',
             enum: [...TREE_ROOT_TYPES],
-            description: '根节点类型（animtree_create 时使用，默认 AnimationNodeStateMachine）',
+            description: 'Root node type (animtree_create, default AnimationNodeStateMachine)',
           },
-          state_name: { type: 'string', description: '状态名称' },
-          animation: { type: 'string', description: '关联的 Animation 名称（animtree_add_state 时使用）' },
+          state_name: { type: 'string', description: 'State name' },
+          animation: { type: 'string', description: 'Linked Animation name (animtree_add_state)' },
           position: {
             type: 'object',
             properties: { x: { type: 'number' }, y: { type: 'number' } },
-            description: '位置 {x, y}',
+            description: 'Position {x, y}',
           },
-          from_state: { type: 'string', description: '源状态名称（animtree_add_transition 时使用）' },
-          to_state: { type: 'string', description: '目标状态名称（animtree_add_transition 时使用）' },
-          xfade_time: { type: 'number', description: '交叉淡入淡出时间（秒，animtree_add_transition 时使用）' },
+          from_state: { type: 'string', description: 'Source state name (animtree_add_transition)' },
+          to_state: { type: 'string', description: 'Target state name (animtree_add_transition)' },
+          xfade_time: { type: 'number', description: 'Cross-fade time in seconds (animtree_add_transition)' },
           conditions: {
             type: 'array',
             items: {
               type: 'object',
               properties: {
                 name: { type: 'string' },
-                value: { description: '条件值（number 或 boolean）' },
+                value: { description: 'Condition value (number or boolean)' },
               },
               required: ['name', 'value'],
             },
-            description: '转换条件列表（animtree_add_transition 时使用）',
+            description: 'Transition conditions (animtree_add_transition)',
           },
-          parameter_name: { type: 'string', description: '参数名称' },
-          value: { description: '参数值（float 用于 blends，{x,y} 用于 blend spaces）' },
+          parameter_name: { type: 'string', description: 'Parameter name' },
+          value: { description: 'Parameter value (float for blends, {x,y} for blend spaces)' },
           sub_action: {
             type: 'string',
             enum: ['set_position', 'set_blend'],
-            description: 'animtree_state_edit 的子操作：set_position 设置状态位置(需 state_name + position)；set_blend 设置混合参数(需 parameter_name + value)',
+            description: 'Sub-action of animtree_state_edit: set_position sets a state\'s position (needs state_name + position); set_blend sets a blend parameter (needs parameter_name + value)',
           },
-          load_autoloads: { type: 'boolean', description: '是否加载 Autoload 上下文（默认 true）' },
+          load_autoloads: { type: 'boolean', description: 'Load the Autoload context (default true)' },
         },
         required: ['action'],
       },

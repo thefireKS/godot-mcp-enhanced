@@ -157,21 +157,21 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'recording',
-      description: `录制、保存、加载、回放输入事件（键盘/鼠标）。需要 Game Bridge 连接。运行时操作，仅影响当前执行上下文。如需持久化，请编辑 .tscn 文件。${NON_PERSIST}`,
+      description: `Record, save, load and replay input events (keyboard/mouse). Needs a Game Bridge connection. ${NON_PERSIST}`,
       inputSchema: {
         type: 'object' as const,
         properties: {
           action: {
             type: 'string',
             enum: ['recording_start', 'recording_stop', 'recording_save', 'recording_load', 'recording_play'],
-            description: '操作类型',
+            description: 'Operation',
           },
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
-          events_json: { type: 'string', description: 'JSON 格式的事件序列字符串' },
-          file_name: { type: 'string', description: '录制文件名（仅接受 recording_*.json 格式）' },
-          speed: { type: 'number', description: '回放速度倍率（默认 1.0）' },
-          load_autoloads: { type: 'boolean', description: '是否加载 Autoload 上下文（默认 true）' },
-          godot_path: { type: 'string', description: '覆盖 Godot 二进制路径（可选，优先于项目配置和环境变量）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
+          events_json: { type: 'string', description: 'Event sequence as a JSON string' },
+          file_name: { type: 'string', description: 'Recording file name (recording_*.json only)' },
+          speed: { type: 'number', description: 'Replay speed multiplier (default 1.0)' },
+          load_autoloads: { type: 'boolean', description: 'Load the Autoload context (default true)' },
+          godot_path: { type: 'string', description: 'Override the Godot binary path (optional; takes precedence over project config and env vars)' },
         },
         required: ['action'],
       },

@@ -1,15 +1,15 @@
 # ui
 
-> UI 操作。节点: ui_create_control, ui_container_add, ui_build_layout。布局: ui_set_layout, ui_get_layout, ui_anchor_preset。原型: ui_import_prototype(几何 JSON 一次调用翻译+构建+测量+校验+持久化;bg/fill/borderRadius/border→StyleBoxFlat,落盘 theme_override_styles/<slot>;返回 style_verify 逐槽位样式 diff/flow_verify flow 直接子层 rect diff)。像素终验: ui_pixel_verify(bg 节点截图采样 vs 目标色 RGB 距离;Windows 窗口模式会弹窗,几何+style_verify 全绿后跑一次)。主题: ui_set_theme, theme_create, theme_set_property。绘图: ui_draw_recipe。运行时操作，仅影响当前执行上下文。如需持久化，请编辑 .tscn 文件。 专属参数(additionalProperties): ui_set_theme→theme_action/theme_path/params; theme_create→theme_create_action/source_node_path/save_path; theme_set_property→theme_node_path/item_type/prop_name/theme_type/value; ui_build_layout→tree({type,name,properties,anchor_preset,layout,flex,children}); ui_draw_recipe→ops([{kind,...}]); ui_measure_layout→node_path(可选,默认整场景)/max_depth; ui_import_prototype→geometry({viewport,nodes} 内联 JSON,与 geometry_path 二选一;bg/fill/borderRadius/border→StyleBoxFlat)/geometry_path(几何 JSON 文件路径,支持 res://)/tolerance(默认 2)→ 返回 style_verify/flow_verify; ui_pixel_verify→geometry/geometry_path+scene_path(必填,已构建场景;bg 节点截图采样 vs 目标色,Windows 窗口模式弹窗;终验——几何+style_verify 全绿后跑一次)
+> UI operations. Nodes: ui_create_control, ui_container_add, ui_build_layout. Layout: ui_set_layout, ui_get_layout, ui_anchor_preset. Prototype: ui_import_prototype (geometry JSON → translate + build + measure + check + persist in one call; bg/fill/borderRadius/border→StyleBoxFlat saved as theme_override_styles/<slot>; returns style_verify per-slot style diff / flow_verify rect diff of a flow's direct children). Final pixel check: ui_pixel_verify (samples bg node screenshots vs target colour RGB distance; opens a window on Windows; run once after geometry + style_verify are all green). Theme: ui_set_theme, theme_create, theme_set_property. Drawing: ui_draw_recipe. Runtime operation, affects only the current execution context. To persist, edit the .tscn file. Extra params (additionalProperties): ui_set_theme→theme_action/theme_path/params; theme_create→theme_create_action/source_node_path/save_path; theme_set_property→theme_node_path/item_type/prop_name/theme_type/value; ui_build_layout→tree({type,name,properties,anchor_preset,layout,flex,children}); ui_draw_recipe→ops([{kind,...}]); ui_measure_layout→node_path(optional, default whole scene)/max_depth; ui_import_prototype→geometry({viewport,nodes} inline JSON, or geometry_path; bg/fill/borderRadius/border→StyleBoxFlat)/geometry_path(geometry JSON file path, res:// supported)/tolerance(default 2) → returns style_verify/flow_verify; ui_pixel_verify→geometry/geometry_path+scene_path(required, an already built scene; samples bg node screenshots vs target colour, opens a window on Windows; final check — run once after geometry + style_verify are all green)
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 所属层 | headless |
-| 安全级别 | danger-api |
-| 需要 Godot | 是 |
-| 需要编辑器 | 否 |
-| 只读 | 否 |
-| 长耗时 | 否 |
+| Layer | headless |
+| Safety level | danger-api |
+| Needs Godot | yes |
+| Needs editor | no |
+| Read-only | no |
+| Long-running | no |
 
 ## Actions
 
@@ -29,36 +29,36 @@
 
 ## Parameters
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| `action` | enum (13 项) | ✓ | 操作类型 |
-| `project_path` | string |  | Godot 项目目录路径 |
-| `scene_path` | string |  | 场景路径（相对项目路径）。ui_set_theme/theme_set_property 可选;ui_pixel_verify: 必填,已构建场景(ui_import_prototype persist 产物) |
-| `node_path` | string |  | 节点路径（ui_set_layout/ui_get_layout/ui_anchor_preset/ui_set_theme/ui_container_add/ui_draw_recipe） |
-| `node_type` | enum (29 项) |  | ui_create_control/ui_container_add: Control 子类类型 |
-| `node_name` | string |  | ui_create_control: 新节点名称 |
-| `parent_node_path` | string |  | ui_create_control: 父节点路径（默认 root） |
-| `properties` | object |  | ui_create_control: 可选属性（支持 string/number/bool/null） |
-| `anchors` | object |  | ui_set_layout: 锚点 {left, right, top, bottom}，值 0-1 |
-| `offsets` | object |  | ui_set_layout: 边距 {left, right, top, bottom}，像素值 |
-| `min_size` | object |  | ui_set_layout: 最小尺寸 {x, y} |
-| `custom_minimum_size` | object |  | ui_set_layout: 自定义最小尺寸 {x, y} |
-| `grow_direction` | enum (5 项) |  | ui_set_layout: 增长方向 |
-| `preset` | enum (16 项) |  | ui_anchor_preset: 锚点预设名称 |
-| `child_type` | enum (29 项) |  | ui_container_add: 子节点 Control 类型 |
-| `child_name` | string |  | ui_container_add: 子节点名称 |
-| `child_properties` | object |  | ui_container_add: 子节点属性（支持 string/number/bool/null） |
-| `max_depth` | number |  | ui_measure_layout: 最大遍历深度(默认 16,上限 64) |
-| `expect_tree` | object |  | ui_measure_layout: 可选目标树(同 ui_build_layout tree,含 rect);提供时输出逐节点 diff/重叠/越界 |
-| `tolerance` | number |  | ui_import_prototype: layout_verify 容差(px,默认 2) |
-| `parent_path` | string |  | ui_build_layout: 父节点路径;ui_import_prototype: 须为原点对齐(global_position≈0,0)的节点,默认 root——非原点挂载时 layout_verify 根级条目期望按视口原点求解,根级 diff 恒误报 |
-| `load_autoloads` | boolean |  | 是否加载 Autoload 上下文（默认 true） |
-| `viewport` | object |  | ui_build_layout: 根节点 rect 的求解基准 {w, h}(默认 1280x720,须为正数;与项目 display/window/size 一致时根 rect 即视口绝对几何);ui_import_prototype: 可选,默认取 geometry.viewport |
-| `persist` | boolean |  | ui_build_layout: 持久化到 .tscn（原子写；默认 false 运行时） |
+| `action` | enum (13 values) | ✓ | Operation |
+| `project_path` | string |  | Godot project directory |
+| `scene_path` | string |  | Scene path (project-relative). Optional for ui_set_theme/theme_set_property; required for ui_pixel_verify — an already built scene (the output of ui_import_prototype persist) |
+| `node_path` | string |  | Node path (ui_set_layout/ui_get_layout/ui_anchor_preset/ui_set_theme/ui_container_add/ui_draw_recipe) |
+| `node_type` | enum (29 values) |  | ui_create_control/ui_container_add: Control subclass type |
+| `node_name` | string |  | ui_create_control: new node name |
+| `parent_node_path` | string |  | ui_create_control: parent node path (default root) |
+| `properties` | object |  | ui_create_control: optional properties (string/number/bool/null) |
+| `anchors` | object |  | ui_set_layout: anchors {left, right, top, bottom}, values 0-1 |
+| `offsets` | object |  | ui_set_layout: offsets {left, right, top, bottom} in pixels |
+| `min_size` | object |  | ui_set_layout: minimum size {x, y} |
+| `custom_minimum_size` | object |  | ui_set_layout: custom minimum size {x, y} |
+| `grow_direction` | enum (5 values) |  | ui_set_layout: grow direction |
+| `preset` | enum (16 values) |  | ui_anchor_preset: anchor preset name |
+| `child_type` | enum (29 values) |  | ui_container_add: child Control type |
+| `child_name` | string |  | ui_container_add: child node name |
+| `child_properties` | object |  | ui_container_add: child properties (string/number/bool/null) |
+| `max_depth` | number |  | ui_measure_layout: max traversal depth (default 16, max 64) |
+| `expect_tree` | object |  | ui_measure_layout: optional target tree (same as the ui_build_layout tree, with rects); when given, outputs per-node diffs / overlaps / out-of-bounds |
+| `tolerance` | number |  | ui_import_prototype: layout_verify tolerance (px, default 2) |
+| `parent_path` | string |  | ui_build_layout: parent node path; ui_import_prototype: must be a node aligned to the origin (global_position≈0,0), default root — when mounted elsewhere, layout_verify solves root-level entries against the viewport origin and root-level diffs are always false alarms |
+| `load_autoloads` | boolean |  | Load the Autoload context (default true) |
+| `viewport` | object |  | ui_build_layout: reference size {w, h} for solving the root rect (default 1280x720, must be positive; when it matches the project's display/window/size the root rect is the viewport's absolute geometry); ui_import_prototype: optional, defaults to geometry.viewport |
+| `persist` | boolean |  | ui_build_layout: persist to .tscn (atomic write; default false = runtime only) |
 
-## 风险分布
+## Risk breakdown
 
-读 2 / 写 11
+read 2 / write 11
 
 ---
-<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.8. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->
+<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.11. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->

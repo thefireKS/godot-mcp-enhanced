@@ -34,18 +34,18 @@ export const TOOL_META = {
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'self_update',
-    description: '检查/更新 enhanced 自身。check：查 npm 最新版 + 各项目 addon 版本漂移（只读）。update：更新指定项目 addon 到包版本（覆盖安装，需确认）。',
+    description: 'Check/update enhanced itself. check: latest npm version + addon version drift per project (read-only). update: update a project\'s addon to the package version (overwrite install, needs confirmation).',
     inputSchema: {
       type: 'object' as const,
       properties: {
         action: {
           type: 'string',
           enum: ['check', 'update'],
-          description: 'check=查版本状态（只读）/ update=更新项目 addon（破坏性，需确认）',
+          description: 'check = version status (read-only) / update = update the project addon (destructive, needs confirmation)',
         },
         project_path: {
           type: 'string',
-          description: '目标 Godot 项目路径（update 必填；check 可选，缺省扫 ALLOWED_PROJECT_PATHS 全部）',
+          description: 'Target Godot project path (required for update; optional for check, defaults to scanning everything in ALLOWED_PROJECT_PATHS)',
         },
       },
       required: ['action'],

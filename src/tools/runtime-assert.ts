@@ -29,20 +29,20 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'runtime_assert',
-      description: '运行时断言：在运行中的游戏上验证节点状态/场景结构/屏幕文本/性能/截图对比。agent 可任意时刻调用，不必走 workflow.dev_loop。全部依赖 game-bridge（需先 game_bridge_install + 游戏运行中）。',
+      description: 'Runtime assertions: check node state / scene structure / on-screen text / performance / screenshot diff in the running game. The agent can call it at any time without going through workflow.dev_loop. Everything needs the game bridge (game_bridge_install first + game running).',
       inputSchema: {
         type: 'object' as const,
         properties: {
           action: {
             type: 'string',
             enum: ['node_state', 'scene_structure', 'screen_text', 'perf', 'screenshot_diff'],
-            description: '断言类型',
+            description: 'Assertion type',
           },
-          project_path: { type: 'string', description: '项目路径（screenshot_diff 必填：解析 user:// 截图落盘位置）' },
+          project_path: { type: 'string', description: 'Project path (required for screenshot_diff: resolves where user:// screenshots land)' },
           // node_state
-          path: { type: 'string', description: 'node_state: 节点路径（如 /root/Main/Player）' },
-          expect: { type: 'object', description: 'node_state: 期望的属性键值对（如 {"health": 100, "position": {"x": 0}}）' },
-          tolerance: { type: 'number', description: 'node_state/perf: 数值容差（默认 0，精确匹配）' },
+          path: { type: 'string', description: 'node_state: node path (e.g. /root/Main/Player)' },
+          expect: { type: 'object', description: 'node_state: expected property key/values (e.g. {"health": 100, "position": {"x": 0}})' },
+          tolerance: { type: 'number', description: 'node_state/perf: numeric tolerance (default 0, exact match)' },
           // scene_structure
           nodes: {
             type: 'array',
@@ -50,21 +50,21 @@ export function getToolDefinitions(): Tool[] {
               type: 'object',
               properties: {
                 path: { type: 'string' },
-                type: { type: 'string', description: '期望的节点类型（可选）' },
-                absent: { type: 'boolean', description: 'true = 断言节点不存在' },
+                type: { type: 'string', description: 'Expected node type (optional)' },
+                absent: { type: 'boolean', description: 'true = assert the node does not exist' },
               },
             },
-            description: 'scene_structure: 期望的节点列表',
+            description: 'scene_structure: expected nodes',
           },
           // screen_text
-          text: { type: 'string', description: 'screen_text: 要查找的文本' },
-          present: { type: 'boolean', description: 'screen_text: true=断言文本存在（默认），false=断言不存在' },
+          text: { type: 'string', description: 'screen_text: text to find' },
+          present: { type: 'boolean', description: 'screen_text: true = assert the text is present (default), false = assert it is absent' },
           // perf
-          baseline: { type: 'object', description: 'perf: 期望的性能基线（如 {"fps": 60}）' },
+          baseline: { type: 'object', description: 'perf: expected performance baseline (e.g. {"fps": 60})' },
           // screenshot_diff(B-1:差异容忍语义,禁用"相似度"措辞;引擎=screenshot 工具 action=diff)
-          reference: { type: 'string', description: 'screenshot_diff: 参考截图路径（res://、项目相对或绝对路径；须在白名单内）' },
-          threshold: { type: 'number', description: 'screenshot_diff: 像素差异容忍阈值（0-1，默认 0.12）。per-pixel 归一化 RGB 距离严格大于此值才计为差异像素；值越小越严格' },
-          max_diff_ratio: { type: 'number', description: 'screenshot_diff: 允许的差异像素占比上限（0-1，默认 0.05）。严格像素回归传 0；常规视觉回归建议以同布局好图对校准（本仓实测同布局好图对 ≈0.176，勿低于该量级）' },
+          reference: { type: 'string', description: 'screenshot_diff: reference screenshot path (res://, project-relative or absolute; must be whitelisted)' },
+          threshold: { type: 'number', description: 'screenshot_diff: per-pixel difference threshold (0-1, default 0.12). A pixel counts as different only when its normalised RGB distance is strictly greater; smaller is stricter' },
+          max_diff_ratio: { type: 'number', description: 'screenshot_diff: max share of differing pixels (0-1, default 0.05). Pass 0 for strict pixel regression; for ordinary visual regression calibrate against a known-good pair with the same layout (measured ≈0.176 for such a pair in this repo, don\'t go below that order)' },
         },
         required: ['action'],
       },

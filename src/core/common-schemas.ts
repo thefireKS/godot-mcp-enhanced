@@ -5,23 +5,23 @@
 export const COMMON_SCHEMAS = {
   project_path: {
     type: 'string' as const,
-    description: '项目目录路径（可选，默认 GODOT_PROJECT_PATH 环境变量或当前目录）',
+    description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)',
   },
   scene_path: {
     type: 'string' as const,
-    description: '场景文件路径（相对项目，如 res://scenes/main.tscn）',
+    description: 'Scene file path (project-relative, e.g. res://scenes/main.tscn)',
   },
   node_path: {
     type: 'string' as const,
-    description: '节点路径（root/Player/Sprite2D）',
+    description: 'Node path (root/Player/Sprite2D)',
   },
   animation_name: {
     type: 'string' as const,
-    description: '动画名称',
+    description: 'Animation name',
   },
   load_autoloads: {
     type: 'boolean' as const,
-    description: '是否加载 Autoload 上下文（默认 true）',
+    description: 'Load the Autoload context (default true)',
   },
 } as const;
 

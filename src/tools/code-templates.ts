@@ -33,7 +33,7 @@ export interface CodeTemplate {
 const cameraSetup: CodeTemplate = {
   id: "T001",
   name: "camera3d_setup",
-  description: "Camera3D + look_at，保证 add_child 在前",
+  description: "Camera3D + look_at, with add_child first",
   relatedRules: ["L001"],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -87,7 +87,7 @@ add_child(rb)
 const area3dDetection: CodeTemplate = {
   id: "T003",
   name: "area3d_detection",
-  description: "Area3D 子节点用于碰撞检测",
+  description: "Area3D child node for collision detection",
   relatedRules: ["L013"],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -116,7 +116,7 @@ func _on_body_exited(body: Node3D) -> void:
 const environmentAdjustments: CodeTemplate = {
   id: "T004",
   name: "environment_adjustments",
-  description: "WorldEnvironment + 色彩校正（正确属性名）",
+  description: "WorldEnvironment + colour correction (correct property names)",
   relatedRules: ["L004", "L005", "L011"],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -141,7 +141,7 @@ add_child(world_env)
 const softbodySetup: CodeTemplate = {
   id: "T005",
   name: "softbody3d_setup",
-  description: "SoftBody3D（正确属性名 total_mass/damping_coefficient）",
+  description: "SoftBody3D (correct property names total_mass/damping_coefficient)",
   relatedRules: ["L006"],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -160,7 +160,7 @@ add_child(softbody)
 const astarGridSetup: CodeTemplate = {
   id: "T006",
   name: "astar_grid_setup",
-  description: "AStarGrid2D（先 update 再 set_point_solid）",
+  description: "AStarGrid2D (update first, then set_point_solid)",
   relatedRules: ["L014"],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -200,7 +200,7 @@ add_child(line)
 const characterBody2dMovement: CodeTemplate = {
   id: "T008",
   name: "character_body_2d_movement",
-  description: "CharacterBody2D move_and_slide() + 输入处理",
+  description: "CharacterBody2D move_and_slide() + input handling",
   relatedRules: [],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -234,7 +234,7 @@ func _physics_process(delta):
 const timerPattern: CodeTemplate = {
   id: "T009",
   name: "timer_pattern",
-  description: "Timer one-shot/重复计时器模式",
+  description: "Timer in one-shot / repeating mode",
   relatedRules: [],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -258,7 +258,7 @@ func _on_timer_timeout():
 const stateMachineSimple: CodeTemplate = {
   id: "T010",
   name: "state_machine_simple",
-  description: "简单 enum + match 状态管理",
+  description: "Simple enum + match state handling",
   relatedRules: [],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -289,7 +289,7 @@ func transition_to(new_state: State):
 const tilesetAtlasSetup: CodeTemplate = {
   id: "T011",
   name: "tileset_atlas_setup",
-  description: "TileSet + TileSetAtlasSource + 碰撞层（正确调用顺序）",
+  description: "TileSet + TileSetAtlasSource + collision layer (correct call order)",
   relatedRules: ["L018"],
   verifiedGodotVersion: "4.7",
   lastVerified: "2026-08-19",
@@ -437,7 +437,7 @@ export const ARCHITECTURE_TEMPLATES: Record<string, ArchTemplate> = {
   'observer-pattern': {
     id: 'A001',
     name: 'observer_pattern',
-    description: '信号驱动的观察者模式',
+    description: 'Signal-driven observer pattern',
     params: [
       { name: 'signal_name', type: 'string', default: 'health_changed' },
       { name: 'class_name', type: 'string', default: 'Player' },
@@ -466,7 +466,7 @@ func take_damage(amount: int) -> void:
   'state-machine': {
     id: 'A002',
     name: 'state_machine',
-    description: '枚举驱动的状态机模式',
+    description: 'Enum-driven state machine pattern',
     params: [
       { name: 'states', type: 'string', default: 'idle,run,jump' },
       { name: 'class_name', type: 'string', default: 'Character' },
@@ -503,7 +503,7 @@ func _process_${states[0]!.toLowerCase()}(_delta: float) -> void: pass
   'component-system': {
     id: 'A003',
     name: 'component_system',
-    description: 'Node 组合的组件系统',
+    description: 'Component system built from Nodes',
     params: [
       { name: 'class_name', type: 'string', default: 'Entity' },
     ],
@@ -539,7 +539,7 @@ func remove_component(name: String) -> void:
   'event-bus': {
     id: 'A004',
     name: 'event_bus',
-    description: 'Autoload 单例事件总线',
+    description: 'Autoload singleton event bus',
     params: [],
     generate: (_p) => `extends Node
 class_name EventBus
@@ -739,7 +739,7 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'templates',
-      description: '代码模板操作。list: 列出可用模板（内置 + 用户自定义），支持按标签或适用类过滤。apply: 将模板应用到指定脚本路径，支持变量替换。',
+      description: 'Code templates. list: available templates (built-in + user-defined), filterable by tag or target class. apply: apply a template to a script path with variable substitution.',
       inputSchema: {
         type: 'object' as const,
         properties: {
@@ -747,7 +747,7 @@ export function getToolDefinitions(): Tool[] {
           action: {
             type: 'string',
             enum: ['list', 'apply'],
-            description: '操作类型',
+            description: 'Operation',
           },
           tag: { type: 'string', description: 'list: Filter by tag keyword' },
           applies_to: { type: 'string', description: 'list: Filter by applicable class name' },

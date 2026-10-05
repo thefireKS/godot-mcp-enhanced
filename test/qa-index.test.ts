@@ -86,8 +86,8 @@ describe('qa handleTool 入口校验', () => {
     const bytes = Buffer.byteLength(def.description!, 'utf8');
     expect(bytes).toBeLessThan(600);
     // 新 description 关键词锁定(改坏措辞时测试报警)
-    expect(def.description).toContain('QA 测试套件编排');
-    expect(def.description).toContain('回归 diff');
+    expect(def.description).toContain('QA test suite orchestration');
+    expect(def.description).toContain('regression diff');
     expect(def.description).toContain('watch_start');      // Task 2 新步骤类型已进索引级概述
     expect(def.description).toContain('monitor_start');
     expect(def.description).not.toContain('options:');     // 选项说明移入字段 description

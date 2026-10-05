@@ -276,14 +276,14 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: "game_design",
-      description: "游戏设计工具。validate_gdd: 验证游戏设计文档（GDD）markdown 文件。chain_verify: 对结论运行 Chain-of-Verification 自我挑战，评估置信度。",
+      description: "Game design tools. validate_gdd: validate a game design document (GDD) markdown file. chain_verify: run Chain-of-Verification self-challenge on a conclusion and estimate confidence.",
       inputSchema: {
         type: "object" as const,
         properties: {
           action: {
             type: "string",
             enum: ["validate_gdd", "chain_verify"],
-            description: "操作类型",
+            description: "Operation",
           },
           project_path: {
             type: "string",

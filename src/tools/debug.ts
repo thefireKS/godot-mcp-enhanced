@@ -39,12 +39,12 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'debug',
       description: [
-        '交互式调试器 — 断点管理 + Phase 2/3 调试器集成（editor-only）。',
-        'Phase 1: set/clear/list breakpoint（走 CodeEdit gutter，CMP-14 后支持自动打开脚本）。',
-        'Phase 2: stack_trace（读调用栈+变量）/ inspect_frame（切帧+读变量）/ evaluate（断点上下文 REPL）。',
-        'Phase 3: step（into/over 单步）/ continue（继续到下断点）/ pause（请求中断）/ reload_scripts（热重载）。',
-        '⚠️ editor-only：需 GODOT_MCP_MODE=editor + 安装 Godot 插件 + 运行中游戏(F5)。',
-        '⚠️ Phase 2/3 需游戏暂停在断点(step/inspect/evaluate)或运行中(pause/reload)。',
+        'Interactive debugger — breakpoint management + Phase 2/3 debugger integration (editor-only).',
+        'Phase 1: set/clear/list breakpoint (via the CodeEdit gutter; scripts open automatically since CMP-14).',
+        'Phase 2: stack_trace (call stack + variables) / inspect_frame (switch frame + read variables) / evaluate (REPL in the breakpoint context).',
+        'Phase 3: step (into/over) / continue (run to the next breakpoint) / pause (request a break) / reload_scripts (hot reload).',
+        '⚠️ editor-only: needs GODOT_MCP_MODE=editor + the Godot plugin installed + the game running (F5).',
+        '⚠️ Phase 2/3 need the game paused at a breakpoint (step/inspect/evaluate) or running (pause/reload).',
       ].join(' '),
       inputSchema: {
         type: 'object' as const,
@@ -56,37 +56,37 @@ export function getToolDefinitions(): Tool[] {
           },
           path: {
             type: 'string',
-            description: 'set/clear/list: res:// 路径的 .gd 脚本（CMP-14 后自动打开，无需预先激活 tab）',
+            description: 'set/clear/list: res:// path of the .gd script (opened automatically since CMP-14, no need to activate the tab first)',
           },
           line: {
             type: 'number',
-            description: 'set/clear: 1-based 行号',
+            description: 'set/clear: 1-based line number',
           },
           frame_index: {
             type: 'number',
-            description: 'inspect_frame: 要查看的栈帧索引（0=最内层，默认 0）',
+            description: 'inspect_frame: stack frame index to inspect (0 = innermost, default 0)',
           },
           expression: {
             type: 'string',
-            description: 'evaluate: 要在断点上下文求值的 GDScript 表达式',
+            description: 'evaluate: GDScript expression to evaluate in the breakpoint context',
           },
           mode: {
             type: 'string',
             enum: ['into', 'over'],
-            description: 'step: 单步模式（into=进入函数, over=跨过函数；注：Godot wire 协议不支持 out）',
+            description: 'step: step mode (into = step into, over = step over; note: Godot\'s wire protocol has no step out)',
           },
           paths: {
             type: 'array',
             items: { type: 'string' },
-            description: 'reload_scripts: 要热重载的 res:// 脚本路径数组',
+            description: 'reload_scripts: array of res:// script paths to hot-reload',
           },
           all_vars: {
             type: 'boolean',
-            description: 'stack_trace/inspect_frame: true=返回全部变量（默认截断 100 个）',
+            description: 'stack_trace/inspect_frame: true = return every variable (truncated to 100 by default)',
           },
           filter: {
             type: 'string',
-            description: 'stack_trace/inspect_frame: 变量名子串过滤',
+            description: 'stack_trace/inspect_frame: variable name substring filter',
           },
         },
         required: ['action'],

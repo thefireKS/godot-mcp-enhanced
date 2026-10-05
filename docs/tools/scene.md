@@ -1,15 +1,15 @@
 # scene
 
-> 场景操作。读取/创建: read_scene, create_scene, quick_scene。节点: add_node, batch_add_nodes, edit_node, remove_node。保存/资源: save_scene, load_sprite。查询: query_scene_tree, inspect_node。实例: instance_scene, set_instance_property, detach_instance。
+> Scene operations. Read/create: read_scene, create_scene, quick_scene. Nodes: add_node, batch_add_nodes, edit_node, remove_node. Save/resources: save_scene, load_sprite. Query: query_scene_tree, inspect_node. Instances: instance_scene, set_instance_property, detach_instance.
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 所属层 | headless |
-| 安全级别 | danger-api |
-| 需要 Godot | 是 |
-| 需要编辑器 | 否 |
-| 只读 | 否 |
-| 长耗时 | 是 |
+| Layer | headless |
+| Safety level | danger-api |
+| Needs Godot | yes |
+| Needs editor | no |
+| Read-only | no |
+| Long-running | yes |
 
 ## Actions
 
@@ -35,42 +35,42 @@
 
 ## Parameters
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| `action` | enum (19 项) | ✓ | 操作类型 |
-| `project_path` | string |  | Godot 项目目录路径 |
-| `scene_path` | string |  | 场景路径（read_scene 用绝对路径，其余用相对项目路径） |
-| `summary_only` | boolean |  | read_scene: 返回摘要而非完整 JSON |
-| `root_node_type` | string |  | create_scene/quick_scene: 根节点类型（默认 Node2D） |
-| `root_node_name` | string |  | quick_scene: 根节点名称（默认从文件名推导 PascalCase） |
-| `script_path` | string |  | quick_scene: 脚本路径（可选） |
-| `script_content` | string |  | quick_scene: 脚本内容（脚本不存在时自动创建） |
-| `node_type` | string |  | add_node: 节点类型（如 Sprite2D, Camera2D） |
-| `node_name` | string |  | add_node: 节点名称 |
-| `parent_node_path` | string |  | add_node/instance_scene: 父节点路径（默认 root） |
-| `properties` | object |  | add_node/edit_node/instance_scene: 属性对象 |
-| `new_path` | string |  | save_scene: 新保存路径（可选）/ merge_scene: theirs 场景路径（必需） |
-| `texture_path` | string |  | load_sprite: 纹理路径（如 res://assets/player.png） |
-| `node_path` | string |  | inspect_node/edit_node/remove_node/load_sprite/detach_instance/set_instance_property: 节点路径 |
-| `max_depth` | number |  | query_scene_tree/inspect_node: 最大遍历深度 |
-| `include_signals` | boolean |  | inspect_node: 包含信号连接（默认 true） |
-| `include_properties` | boolean |  | inspect_node: 包含属性值（默认 true） |
-| `nodes` | array |  | batch_add_nodes: 节点定义数组 |
-| `instance_path` | string |  | 要实例化的场景（res://…tscn） |
-| `property` | string |  | set_instance_property: 属性名 |
-| `value` | any |  | 属性值（set_instance_property） |
-| `load_autoloads` | boolean |  | 是否加载 Autoload 上下文（默认 true） |
-| `type` | string |  | 类型（create_3d_node，白名单） |
-| `name` | string |  | 名称（create_3d_node） |
-| `parent` | string |  | create_3d_node: 父节点路径（默认 root） |
-| `operations` | array |  | commit: 批量操作列表（enum 见 op 字段；铺设/TileSet 层配置/节点） |
-| `save` | boolean |  | commit: 是否保存到文件（默认 true） |
-| `stop_on_error` | boolean |  | 遇错是否停止（默认 true;false 时失败不阻止后续与 .tres 写盘） |
-| `godot_path` | string |  | 覆盖 Godot 二进制路径（可选，优先于项目配置和环境变量） |
+| `action` | enum (19 values) | ✓ | Operation |
+| `project_path` | string |  | Godot project directory |
+| `scene_path` | string |  | Scene path (absolute for read_scene, project-relative for everything else) |
+| `summary_only` | boolean |  | read_scene: return a summary instead of the full JSON |
+| `root_node_type` | string |  | create_scene/quick_scene: root node type (default Node2D) |
+| `root_node_name` | string |  | quick_scene: root node name (default: PascalCase of the file name) |
+| `script_path` | string |  | quick_scene: script path (optional) |
+| `script_content` | string |  | quick_scene: script content (the script is created if missing) |
+| `node_type` | string |  | add_node: node type (e.g. Sprite2D, Camera2D) |
+| `node_name` | string |  | add_node: node name |
+| `parent_node_path` | string |  | add_node/instance_scene: parent node path (default root) |
+| `properties` | object |  | add_node/edit_node/instance_scene: properties object |
+| `new_path` | string |  | save_scene: new save path (optional) / merge_scene: path of the theirs scene (required) |
+| `texture_path` | string |  | load_sprite: texture path (e.g. res://assets/player.png) |
+| `node_path` | string |  | inspect_node/edit_node/remove_node/load_sprite/detach_instance/set_instance_property: node path |
+| `max_depth` | number |  | query_scene_tree/inspect_node: max traversal depth |
+| `include_signals` | boolean |  | inspect_node: include signal connections (default true) |
+| `include_properties` | boolean |  | inspect_node: include property values (default true) |
+| `nodes` | array |  | batch_add_nodes: array of node definitions |
+| `instance_path` | string |  | Scene to instance (res://…tscn) |
+| `property` | string |  | set_instance_property: property name |
+| `value` | any |  | Property value (set_instance_property) |
+| `load_autoloads` | boolean |  | Load the Autoload context (default true) |
+| `type` | string |  | Type (create_3d_node, whitelisted) |
+| `name` | string |  | Name (create_3d_node) |
+| `parent` | string |  | create_3d_node: parent node path (default root) |
+| `operations` | array |  | commit: list of batch operations (enum in the op field; painting / TileSet layer config / nodes) |
+| `save` | boolean |  | commit: save to file (default true) |
+| `stop_on_error` | boolean |  | Stop on error (default true; with false a failure doesn't block later ops or writing the .tres) |
+| `godot_path` | string |  | Override the Godot binary path (optional; takes precedence over project config and env vars) |
 
-## 风险分布
+## Risk breakdown
 
-读 4 / 写 13 / 破坏性 2
+read 4 / write 13 / destructive 2
 
 ---
-<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.8. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->
+<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.11. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->

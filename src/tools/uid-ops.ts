@@ -330,22 +330,22 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'uid',
-      description: `文件 UID 管理(Godot 4.4+)。scan: 扫描缺 .uid 资源与孤儿 .uid。get: 查文件 UID(批量)。set: 写 .uid(指定 uid/generate 单文件/fix_missing 批量修复)。check_refs: 检测 uid:// 悬空引用(仅对照项目 .uid 集合;uid 悬空但 ext_resource 另有 path fallback 的引用引擎可正常加载,计入 dangling 属诊断提示,非断链)。${NON_PERSIST}`,
+      description: `File UID management (Godot 4.4+). scan: find resources missing .uid and orphan .uid files. get: look up file UIDs (batch). set: write .uid (a given uid / generate for one file / fix_missing in batch). check_refs: detect dangling uid:// references (checked against the project's .uid set only; a reference whose uid dangles but whose ext_resource has a path fallback still loads fine — it is counted as dangling as a diagnostic hint, not a broken link). ${NON_PERSIST}`,
       inputSchema: {
         type: 'object' as const,
         properties: {
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
           action: {
             type: 'string',
             enum: [...ACTIONS],
-            description: '操作类型',
+            description: 'Operation',
           },
-          paths: { type: 'array', items: { type: 'string' }, description: 'get: 文件路径列表(res:// 相对,支持批量)' },
-          path: { type: 'string', description: 'set: 单文件路径(res:// 相对)' },
-          uid: { type: 'string', description: 'set: 指定 UID 文本(uid://xxxx);省略则按路径确定性生成(与编辑器一致)' },
-          fix_missing: { type: 'boolean', description: 'set: 批量修复全部缺 .uid 的资源' },
-          extensions: { type: 'array', items: { type: 'string' }, description: `scan/set 参与的资源扩展(小写,默认 ${DEFAULT_UID_EXTENSIONS.length} 个常见类型)` },
-          limit: { type: 'number', description: 'scan/check_refs 明细截断上限(默认 100,最大 500)' },
+          paths: { type: 'array', items: { type: 'string' }, description: 'get: file paths (res://-relative, batch supported)' },
+          path: { type: 'string', description: 'set: single file path (res://-relative)' },
+          uid: { type: 'string', description: 'set: explicit UID text (uid://xxxx); when omitted it is generated deterministically from the path (same as the editor)' },
+          fix_missing: { type: 'boolean', description: 'set: fix every resource missing a .uid in one go' },
+          extensions: { type: 'array', items: { type: 'string' }, description: `Resource extensions covered by scan/set (lowercase, default ${DEFAULT_UID_EXTENSIONS.length} common types)` },
+          limit: { type: 'number', description: 'Max detail entries for scan/check_refs (default 100, max 500)' },
         },
         required: ['action'],
       },

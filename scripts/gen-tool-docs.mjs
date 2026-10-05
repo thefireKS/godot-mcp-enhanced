@@ -48,7 +48,7 @@ export function extractParamRows(tool) {
     // enum 类参数:action 值已在上方 Actions section 列出;其余 enum 超 3 项也只标 enum 不全列(避免长行)
     const enumCount = p.enum?.length || 0;
     const type = p.enum
-      ? (name === 'action' || enumCount > 3 ? `enum (${enumCount} 项)` : `enum: ${p.enum.join(' | ')}`)
+      ? (name === 'action' || enumCount > 3 ? `enum (${enumCount} values)` : `enum: ${p.enum.join(' | ')}`)
       : (p.type || 'any');
     rows.push({
       name,
@@ -75,16 +75,16 @@ export function generateToolDoc(tool, matrixVersion) {
   const lines = [];
   lines.push(`# ${tool.name}`);
   lines.push('');
-  lines.push(`> ${tool.description || '(无描述)'}`);
+  lines.push(`> ${tool.description || '(no description)'}`);
   lines.push('');
-  lines.push('| 属性 | 值 |');
+  lines.push('| Property | Value |');
   lines.push('|------|-----|');
-  lines.push(`| 所属层 | ${layer} |`);
-  lines.push(`| 安全级别 | ${securityLevel} |`);
-  lines.push(`| 需要 Godot | ${tool.needsGodot ? '是' : '否'} |`);
-  lines.push(`| 需要编辑器 | ${tool.needsEditor ? '是' : '否'} |`);
-  lines.push(`| 只读 | ${tool.readonly ? '是' : '否'} |`);
-  lines.push(`| 长耗时 | ${tool.longRunning ? '是' : '否'} |`);
+  lines.push(`| Layer | ${layer} |`);
+  lines.push(`| Safety level | ${securityLevel} |`);
+  lines.push(`| Needs Godot | ${tool.needsGodot ? 'yes' : 'no'} |`);
+  lines.push(`| Needs editor | ${tool.needsEditor ? 'yes' : 'no'} |`);
+  lines.push(`| Read-only | ${tool.readonly ? 'yes' : 'no'} |`);
+  lines.push(`| Long-running | ${tool.longRunning ? 'yes' : 'no'} |`);
   lines.push('');
 
   if (actions.length > 0) {
@@ -97,7 +97,7 @@ export function generateToolDoc(tool, matrixVersion) {
   if (paramRows.length > 0) {
     lines.push('## Parameters');
     lines.push('');
-    lines.push('| 参数 | 类型 | 必填 | 说明 |');
+    lines.push('| Parameter | Type | Required | Description |');
     lines.push('|------|------|------|------|');
     for (const r of paramRows) {
       lines.push(`| \`${r.name}\` | ${r.type} | ${r.required} | ${r.description || ''} |`);
@@ -106,15 +106,15 @@ export function generateToolDoc(tool, matrixVersion) {
   }
 
   if (tool.riskDistribution) {
-    lines.push('## 风险分布');
+    lines.push('## Risk breakdown');
     lines.push('');
     const rd = tool.riskDistribution;
     const parts = [];
-    if (rd.read) parts.push(`读 ${rd.read}`);
-    if (rd.write) parts.push(`写 ${rd.write}`);
-    if (rd.destructive) parts.push(`破坏性 ${rd.destructive}`);
-    if (rd.process) parts.push(`进程 ${rd.process}`);
-    lines.push(parts.length > 0 ? parts.join(' / ') : '无风险数据');
+    if (rd.read) parts.push(`read ${rd.read}`);
+    if (rd.write) parts.push(`write ${rd.write}`);
+    if (rd.destructive) parts.push(`destructive ${rd.destructive}`);
+    if (rd.process) parts.push(`process ${rd.process}`);
+    lines.push(parts.length > 0 ? parts.join(' / ') : 'no risk data');
     lines.push('');
   }
 

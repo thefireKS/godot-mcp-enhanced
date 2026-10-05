@@ -34,18 +34,18 @@ export const TOOL_META: Record<string, { readonly: boolean; long_running: boolea
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'blender',
-    description: 'Blender 程序化建模。action=execute_bpy：AI 写 bpy 片段，headless 跑，自动导 glb 到 res://。'
-      + '（⚠️ bpy 是全功能 Python，威胁面=宿主 RCE，高于 execute_gdscript 沙箱一个量级。'
-      + 'bpy 代码经沙箱扫描（已知危险 API 模式，清单不列举，防沙箱边界被侦察）+ 双 opt-in 旁路，对齐 execute_gdscript 哲学；'
-      + 'glb 导出落点另有 resolveWithinRoot 约束。本地单用户信任模型。）',
+    description: 'Procedural modeling in Blender. action=execute_bpy: the AI writes a bpy snippet, it runs headless and the result is exported as glb into res://. '
+      + '(⚠️ bpy is full Python: the threat surface is host RCE, an order of magnitude above the execute_gdscript sandbox. '
+      + 'bpy code goes through a sandbox scan (known dangerous API patterns, list not published so the boundary can\'t be probed) + a double opt-in bypass, same philosophy as execute_gdscript; '
+      + 'the glb export target is additionally constrained by resolveWithinRoot. Local single-user trust model.)',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        project_path: { type: 'string', description: 'Godot 项目目录路径' },
-        action: { type: 'string', enum: ['execute_bpy'], description: '操作类型' },
-        export_path: { type: 'string', description: '相对项目根的 glb 导出路径，可带可选 res:// 前缀（如 assets/models/rock.glb）' },
-        code: { type: 'string', description: 'bpy 建模片段（无需 import/export，godot-mcp 自动包装）' },
-        timeout: { type: 'number', description: '超时秒数（默认 60）', default: 60 },
+        project_path: { type: 'string', description: 'Godot project directory' },
+        action: { type: 'string', enum: ['execute_bpy'], description: 'Operation' },
+        export_path: { type: 'string', description: 'glb export path relative to the project root, optional res:// prefix (e.g. assets/models/rock.glb)' },
+        code: { type: 'string', description: 'bpy modeling snippet (no import/export needed, godot-mcp wraps it)' },
+        timeout: { type: 'number', description: 'Timeout in seconds (default 60)', default: 60 },
       },
       required: ['action', 'export_path', 'code'],
     },

@@ -20,25 +20,25 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'cpp',
-      description: 'GDExtension (C++) 脚手架生成。scaffold_gdextension: 在 project_path 下生成完整可编译的 godot-cpp GDExtension 工程骨架（src/类.cpp/.h + register_types + SConstruct + .gdextension + .gitignore + README），不联网/不编译，对齐 godot-cpp 官方 example。',
+      description: 'GDExtension (C++) scaffolding. scaffold_gdextension: generates a complete, buildable godot-cpp GDExtension project under project_path (src/Class.cpp/.h + register_types + SConstruct + .gdextension + .gitignore + README); no network, no compiling; follows the official godot-cpp example.',
       inputSchema: {
         type: 'object' as const,
         properties: {
           action: {
             type: 'string',
             enum: ['scaffold_gdextension'],
-            description: '操作类型',
+            description: 'Operation',
           },
-          project_path: { type: 'string', description: 'GDExtension 工程生成根目录（须在 ALLOWED_PROJECT_PATHS 内）' },
-          class_name: { type: 'string', description: '主类名（PascalCase，默认 Example）', default: 'Example' },
-          parent_class: { type: 'string', description: '父类（Godot 内置类白名单，默认 Node）', default: 'Node' },
+          project_path: { type: 'string', description: 'Root directory of the generated GDExtension project (must be inside ALLOWED_PROJECT_PATHS)' },
+          class_name: { type: 'string', description: 'Main class name (PascalCase, default Example)', default: 'Example' },
+          parent_class: { type: 'string', description: 'Parent class (whitelist of Godot built-in classes, default Node)', default: 'Node' },
           godot_version: {
             type: 'string',
-            description: 'Godot 版本（4.4–4.7。决定 godot-cpp clone ref 与 SConstruct api_version、.gdextension compatibility_minimum；4.6/4.7 走 godot-cpp master(v10)+api_version（无 godot-4.x-stable ref），4.4/4.5 用 godot-4.x-stable 分支。默认 4.7）',
+            description: 'Godot version (4.4–4.7; picks the godot-cpp clone ref, SConstruct api_version and .gdextension compatibility_minimum; 4.6/4.7 use godot-cpp master (v10) + api_version (no godot-4.x-stable ref), 4.4/4.5 use the godot-4.x-stable branch. Default 4.7)',
             default: '4.7',
             enum: ['4.4', '4.5', '4.6', '4.7'],
           },
-          force: { type: 'boolean', description: '目标已存在且非空时是否覆盖（默认 false）', default: false },
+          force: { type: 'boolean', description: 'Overwrite if the target exists and is not empty (default false)', default: false },
         },
         required: ['action', 'project_path'],
       },

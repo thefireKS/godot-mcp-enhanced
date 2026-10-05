@@ -33,7 +33,7 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'godot_list_instances',
-      description: '列出所有发现的 Godot 实例（id/项目/端口/状态）。需要 GODOT_MCP_MULTI_INSTANCE=true。',
+      description: 'List every discovered Godot instance (id/project/port/state). Needs GODOT_MCP_MULTI_INSTANCE=true.',
       inputSchema: {
         type: 'object' as const,
         properties: {},
@@ -41,17 +41,17 @@ export function getToolDefinitions(): Tool[] {
     },
     {
       name: 'godot_select_instance',
-      description: '选择 Godot 实例（id 或 project_path），后续调用路由到该实例。需要 GODOT_MCP_MULTI_INSTANCE=true。',
+      description: 'Select a Godot instance (id or project_path); later calls are routed to it. Needs GODOT_MCP_MULTI_INSTANCE=true.',
       inputSchema: {
         type: 'object' as const,
         properties: {
           instance_id: {
             type: 'string',
-            description: '实例 ID（从 godot_list_instances 获取）',
+            description: 'Instance ID (from godot_list_instances)',
           },
           project_path: {
             type: 'string',
-            description: '项目路径（二选一，优先 instance_id）',
+            description: 'Project path (alternative; instance_id wins)',
           },
         },
         required: [],

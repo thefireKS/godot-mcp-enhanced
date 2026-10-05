@@ -164,20 +164,20 @@ export interface ToolGroupDef {
 
 /** Tool groups for fine-grained profile configuration. Count verified by test/tool-groups.test.js (number omitted here to avoid drift as groups are added). */
 export const TOOL_GROUPS: Record<string, ToolGroupDef> = {
-  core:       { description: '核心工具', tools: ['project', 'scene', 'script', 'runtime', 'validation', 'confirm_and_execute', 'godot_get_context', 'runtime_assert', 'help', 'audit'], requires: [], protected: true },
-  editor:     { description: '编辑器', tools: ['editor'], requires: ['editor'] },
+  core:       { description: 'Core tools', tools: ['project', 'scene', 'script', 'runtime', 'validation', 'confirm_and_execute', 'godot_get_context', 'runtime_assert', 'help', 'audit'], requires: [], protected: true },
+  editor:     { description: 'Editor', tools: ['editor'], requires: ['editor'] },
   bridge:     { description: 'Game Bridge', tools: ['game', 'qa'], requires: ['bridge'] },
-  animation:  { description: '动画系统', tools: ['animation', 'animtree', 'animation_track'], requires: [] },
-  audio:      { description: '音频', tools: ['audio'], requires: [] },
-  visual:     { description: '视觉', tools: ['material', 'screenshot', 'particles'], requires: [] },
-  physics:    { description: '物理', tools: ['physics'], requires: [] },
-  navigation: { description: '导航', tools: ['nav'], requires: [] },
+  animation:  { description: 'Animation', tools: ['animation', 'animtree', 'animation_track'], requires: [] },
+  audio:      { description: 'Audio', tools: ['audio'], requires: [] },
+  visual:     { description: 'Visual', tools: ['material', 'screenshot', 'particles'], requires: [] },
+  physics:    { description: 'Physics', tools: ['physics'], requires: [] },
+  navigation: { description: 'Navigation', tools: ['nav'], requires: [] },
   ui:         { description: 'UI', tools: ['ui'], requires: [] },
   tilemap:    { description: 'TileMap', tools: ['tilemap'], requires: [] },
-  signal:     { description: '信号', tools: ['signal'], requires: [] },
-  profiler:   { description: '性能分析', tools: ['profiler', 'workflow'], requires: [] },
-  test:       { description: '测试（已并入 validation）', tools: [], requires: [] },
-  code:       { description: '代码工具', tools: ['docs', 'load_skill', 'cpp', 'analysis'], requires: [] },
+  signal:     { description: 'Signals', tools: ['signal'], requires: [] },
+  profiler:   { description: 'Profiling', tools: ['profiler', 'workflow'], requires: [] },
+  test:       { description: 'Testing (merged into validation)', tools: [], requires: [] },
+  code:       { description: 'Code tools', tools: ['docs', 'load_skill', 'cpp', 'analysis'], requires: [] },
   // v0.18.0 合并说明:
   // ik → animation (ik_modifier_create/get/set/list_bones)
   // recording → runtime (record_start/stop/save/load/play)
@@ -187,15 +187,15 @@ export const TOOL_GROUPS: Record<string, ToolGroupDef> = {
   // batch → workflow (create_files/run_verify/diff_scenes)
   // game_design → validation (validate_gdd/chain_verify)
   // templates → project (list/apply)
-  blender:     { description: 'Blender 建模', tools: ['blender'], requires: [] },
-  multi_instance: { description: '多实例', tools: ['godot_list_instances', 'godot_select_instance'], requires: [] },
-  asset: { description: '资源操作（asset-forge）', tools: ['asset'], requires: ['editor'] },
-  debug: { description: '调试器（断点管理）', tools: ['debug'], requires: ['editor'] },
-  engine: { description: '引擎内省（实时 ClassDB）', tools: ['engine'], requires: ['editor'] },
+  blender:     { description: 'Blender modeling', tools: ['blender'], requires: [] },
+  multi_instance: { description: 'Multiple instances', tools: ['godot_list_instances', 'godot_select_instance'], requires: [] },
+  asset: { description: 'Asset operations (asset-forge)', tools: ['asset'], requires: ['editor'] },
+  debug: { description: 'Debugger (breakpoint management)', tools: ['debug'], requires: ['editor'] },
+  engine: { description: 'Engine introspection (live ClassDB)', tools: ['engine'], requires: ['editor'] },
   android: { description: 'Android deploy', tools: ['android'], requires: [] },
-  selfupdate: { description: '自更新', tools: ['self_update'], requires: [] },
-  resources: { description: '资源管理(UID/翻译)', tools: ['uid', 'translation'], requires: [] },
-  dynamic: { description: '动态工具（Godot 端注册但 MCP 侧未定义）', tools: ['godot_advanced_tool', 'godot_list_dynamic_routes'], requires: [] },
+  selfupdate: { description: 'Self-update', tools: ['self_update'], requires: [] },
+  resources: { description: 'Resource management (UID/translation)', tools: ['uid', 'translation'], requires: [] },
+  dynamic: { description: 'Dynamic tools (registered on the Godot side but not defined in MCP)', tools: ['godot_advanced_tool', 'godot_list_dynamic_routes'], requires: [] },
 };
 
 /** 7 preset profiles. Each maps to an array of group names. */

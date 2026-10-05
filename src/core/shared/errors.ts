@@ -13,7 +13,7 @@ export const COMMON_ERROR_CODES = {
   INVALID_VALUE: 'INVALID_VALUE',
 } as const;
 
-export const NON_PERSIST = '运行时操作，仅影响当前执行上下文。如需持久化，请编辑 .tscn 文件。';
+export const NON_PERSIST = 'Runtime operation, affects only the current execution context. To persist, edit the .tscn file.';
 
 export function opsSuccess(data: unknown, warnings: string[] = []) {
   return { success: true, data, warnings };

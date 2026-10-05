@@ -29,13 +29,13 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'engine',
       description: [
-        '实时 ClassDB 内省 + 节点方法调用（editor-only）：查询运行中引擎的实际可用类/方法/属性/信号/枚举，或调用编辑器场景树节点的实例方法。',
-        'class_info: 查单个类的完整结构（属性/方法/信号/枚举/继承），默认 no_inherit=true 只看本类 own 成员。',
-        'search: substring 匹配类名（返回 {name, parent} 列表，上限 100 条）。搜到类名后用 class_info 查具体成员。',
-        'get_inheritance: 返回类的继承链（从本类到 Object）。',
-        'call_method: 调用编辑器场景树节点的实例方法（对标竞品 node.call）。参数 args 按方法声明类型自动强转（传 [1,2,3] 给 Vector3 参数会正确转换）。deny-list 默认挡危险方法（free/queue_free/set_script/call/emit_signal 等），env GODOT_MCP_EDITOR_CALL_DENYLIST_OVERRIDE 可追加（∪ 默认表，只能加不能减；显式空串=放开）。call 不可 undo（response 显式 undoable=false）。',
-        '⚠️ 补 docs 工具的缺口：docs 是静态 4.7 快照（不含第三方 addon/自定义类/4.6/4.8 差异），engine 是运行中引擎的真实 ClassDB。',
-        '⚠️ editor-only：headless 模式返回 EDITOR_ONLY（ClassDB 在沙箱里被拦，走 editor 层直调）。',
+        'Live ClassDB introspection + node method calls (editor-only): query the classes/methods/properties/signals/enums the running engine actually has, or call an instance method on a node in the editor scene tree.',
+        'class_info: full structure of one class (properties/methods/signals/enums/inheritance); default no_inherit=true shows only its own members.',
+        'search: substring match on class names (returns a {name, parent} list, max 100). Then use class_info for the members.',
+        'get_inheritance: the class inheritance chain (from the class up to Object).',
+        'call_method: call an instance method on a node in the editor scene tree (like node.call). args are coerced to the declared parameter types ([1,2,3] becomes a Vector3). The deny-list blocks dangerous methods by default (free/queue_free/set_script/call/emit_signal etc.); env GODOT_MCP_EDITOR_CALL_DENYLIST_OVERRIDE adds to it (union with the default list, can only add; an explicit empty string lifts it). Calls cannot be undone (the response says undoable=false).',
+        '⚠️ Fills the gap in the docs tool: docs is a static 4.7 snapshot (no third-party addons/custom classes/4.6/4.8 differences), engine is the running engine\'s real ClassDB.',
+        '⚠️ editor-only: headless mode returns EDITOR_ONLY (ClassDB is blocked in the sandbox, so it goes through the editor layer).',
       ].join(' '),
       inputSchema: {
         type: 'object' as const,
@@ -47,27 +47,27 @@ export function getToolDefinitions(): Tool[] {
           },
           class: {
             type: 'string',
-            description: 'class_info/get_inheritance: 类名（如 Node、Sprite2D、RigidBody3D，或第三方 addon 注册的类名）',
+            description: 'class_info/get_inheritance: class name (e.g. Node, Sprite2D, RigidBody3D, or a class registered by a third-party addon)',
           },
           query: {
             type: 'string',
-            description: 'search: substring 匹配类名（大小写不敏感）',
+            description: 'search: substring match on class names (case-insensitive)',
           },
           no_inherit: {
             type: 'boolean',
-            description: 'class_info: true=只看本类 own 成员（默认，翻继承链会淹没新 API）；false=含继承链合并',
+            description: 'class_info: true = own members only (default; walking the inheritance chain buries new APIs); false = merge the inheritance chain',
           },
           node_path: {
             type: 'string',
-            description: 'call_method: 目标节点路径（如 "root/Player"、"Player/Sprite2D"，相对编辑器场景树根）',
+            description: 'call_method: target node path (e.g. "root/Player", "Player/Sprite2D", relative to the editor scene tree root)',
           },
           method: {
             type: 'string',
-            description: 'call_method: 要调用的方法名（方法不存在时返回 did-you-mean 建议；deny-list 默认挡 free/queue_free/set_script/call 等危险方法）',
+            description: 'call_method: method to call (unknown methods get did-you-mean suggestions; the deny-list blocks free/queue_free/set_script/call and other dangerous methods by default)',
           },
           args: {
             type: 'array',
-            description: 'call_method: 位置参数数组（按方法声明类型自动强转，如 [1,2,3] 给 Vector3 参数）。最多 8 个参数',
+            description: 'call_method: positional argument array (coerced to the declared parameter types, e.g. [1,2,3] for a Vector3). At most 8 arguments',
             items: {},
           },
         },

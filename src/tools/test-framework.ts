@@ -50,7 +50,7 @@ export function getToolDefinitions(): Tool[] {
           name: { type: 'string', description: 'export_get_preset: Export preset name' },
           preset: { type: 'string', description: 'export_build: Export preset name' },
           output_path: { type: 'string', description: 'export_build: Output directory for the build' },
-          godot_path: { type: 'string', description: '覆盖 Godot 二进制路径（可选，优先于项目配置和环境变量）' },
+          godot_path: { type: 'string', description: 'Override the Godot binary path (optional; takes precedence over project config and env vars)' },
         },
         required: ['action'],
       },

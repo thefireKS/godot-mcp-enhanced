@@ -298,22 +298,22 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'translation',
-      description: `翻译文件管理。read: 读 CSV/PO 翻译条目(语言/键值对)。write: 写/创建 Godot 兼容 CSV 翻译表(key + 每语言一列;CSV→.translation 编译由编辑器导入完成)。register: 把 .translation/.po 注册进 project.godot(translations 数组,remove=true 反向移除)。`,
+      description: `Translation files. read: read CSV/PO translation entries (languages/key-values). write: write/create a Godot-compatible CSV translation table (key + one column per language; CSV→.translation compilation is done by the editor import). register: register .translation/.po files in project.godot (translations array; remove=true removes them).`,
       inputSchema: {
         type: 'object' as const,
         properties: {
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
           action: {
             type: 'string',
             enum: [...ACTIONS],
-            description: '操作类型',
+            description: 'Operation',
           },
-          path: { type: 'string', description: 'read/write: 翻译文件路径(res:// 相对,read 支持 .csv/.po,write 仅 .csv)' },
-          languages: { type: 'array', items: { type: 'string' }, description: 'write: 语言代码列表(如 [en, zh_CN],与 entries 键对应)' },
-          entries: { type: 'object', description: 'write: {key: {语言: 文本}} 条目对象' },
-          paths: { type: 'array', items: { type: 'string' }, description: 'register: 翻译资源路径列表(res:// 相对,支持 .translation/.po)' },
-          remove: { type: 'boolean', description: 'register: true=从注册表移除(默认 false=注册)' },
-          limit: { type: 'number', description: 'read: 条目返回上限(默认 200,防大文件撑爆上下文)' },
+          path: { type: 'string', description: 'read/write: translation file path (res://-relative; read supports .csv/.po, write .csv only)' },
+          languages: { type: 'array', items: { type: 'string' }, description: 'write: language codes (e.g. [en, zh_CN], matching the entries keys)' },
+          entries: { type: 'object', description: 'write: entries object {key: {language: text}}' },
+          paths: { type: 'array', items: { type: 'string' }, description: 'register: translation resource paths (res://-relative, .translation/.po)' },
+          remove: { type: 'boolean', description: 'register: true = remove from the registry (default false = register)' },
+          limit: { type: 'number', description: 'read: max entries returned (default 200, keeps big files from flooding the context)' },
         },
         required: ['action'],
       },

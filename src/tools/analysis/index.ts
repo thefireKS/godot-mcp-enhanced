@@ -24,27 +24,27 @@ const DEFAULT_LIMIT = 200;
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'analysis',
-    description: '理解层静态分析（零 Godot 依赖）。action=signal_map 列全项目信号连接'
-      + '（.tscn [connection] 声明 + .gd 代码 connect/emit 引用，两来源分开标注）；'
-      + 'action=impact_check 改动前影响面评估——改信号列出全部连接方/发射方/监听方，'
-      + '改脚本列出引用它的场景与节点，改场景列出其连接/脚本/被实例化处。'
-      + '盲区诚实标注：运行时动态信号名/autoload 间连接不可见。',
+    description: 'Static understanding-layer analysis (no Godot needed). action=signal_map lists all signal connections in the project '
+      + '(.tscn [connection] declarations + .gd connect/emit references, sources labelled separately); '
+      + 'action=impact_check assesses blast radius before a change — for a signal, lists all connectors/emitters/listeners; '
+      + 'for a script, the scenes and nodes that reference it; for a scene, its connections/scripts/where it is instanced. '
+      + 'Known blind spots: runtime-built signal names and autoload-to-autoload connections are invisible.',
     inputSchema: {
       type: 'object' as const,
       properties: {
         action: {
           type: 'string',
           enum: ['signal_map', 'impact_check'],
-          description: 'signal_map=信号连接全景；impact_check=改动影响面',
+          description: 'signal_map = full signal connection map; impact_check = blast radius of a change',
         },
-        project_path: { type: 'string', description: '项目路径' },
+        project_path: { type: 'string', description: 'Project path' },
         // signal_map 过滤
-        signal: { type: 'string', description: '信号名过滤（signal_map 精确匹配；impact_check 必填三选一）' },
-        scene: { type: 'string', description: 'signal_map: 场景路径子串过滤（如 scenes/ui）' },
+        signal: { type: 'string', description: 'Signal name filter (exact match for signal_map; impact_check needs one of three)' },
+        scene: { type: 'string', description: 'signal_map: scene path substring filter (e.g. scenes/ui)' },
         // impact_check 目标（三选一）
-        script_path: { type: 'string', description: 'impact_check: 脚本路径（res:// 或绝对）' },
-        scene_path: { type: 'string', description: 'impact_check: 场景路径（res:// 或绝对）' },
-        limit: { type: 'number', description: `每列表截断上限（默认 ${DEFAULT_LIMIT}）` },
+        script_path: { type: 'string', description: 'impact_check: script path (res:// or absolute)' },
+        scene_path: { type: 'string', description: 'impact_check: scene path (res:// or absolute)' },
+        limit: { type: 'number', description: `Max entries per list (default ${DEFAULT_LIMIT})` },
       },
       required: ['action', 'project_path'],
     },

@@ -35,7 +35,7 @@ describe('slimSchema pass（P2-11，超阈值工具瘦身）', () => {
   it('ui description 追加 descHint（def.description + config.descHint）', () => {
     registerAllModules();
     const ui = getToolDefinition('ui');
-    expect(ui!.description).toContain('专属参数(additionalProperties)');
+    expect(ui!.description).toContain('Extra params (additionalProperties)');
   });
 
   it('ui inputSchema 字节数 < SLIM_THRESHOLD_BYTES（瘦身触发条件反向验证）', () => {
@@ -64,7 +64,7 @@ describe('slimSchema pass（P2-11，超阈值工具瘦身）', () => {
     const scene = getToolDefinition('scene');
     expect(scene, 'scene tool 应注册').toBeDefined();
     // scene 未配 SLIM_CONFIG → description 无 slim hint
-    expect(scene!.description).not.toContain('专属参数(additionalProperties)');
+    expect(scene!.description).not.toContain('Extra params (additionalProperties)');
     // properties 完整（非空，未被移除）
     expect(Object.keys(scene!.inputSchema.properties ?? {}).length, 'scene properties 完整').toBeGreaterThan(5);
   });

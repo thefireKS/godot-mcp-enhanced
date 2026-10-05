@@ -39,7 +39,7 @@ describe('P2-4 game_playtest tool registration', () => {
   });
 
   it('工具描述含 P2-4 确定性 playtest', () => {
-    expect(tool.description).toContain('确定性 playtest');
+    expect(tool.description).toContain('deterministic playtest');
     expect(tool.description).toContain('game_playtest');
   });
 });
@@ -91,7 +91,7 @@ describe('G-3: computePlaytestTimeoutMs — step_until TS 超时 = wall_budget +
   it('wall_budget_ms 描述对齐 GD 侧 clamp(1000-50000,批 D 移交描述漂移)', () => {
     const tools = getToolDefinitions();
     const paramsDesc = (tools[0].inputSchema.properties.params as { description: string }).description;
-    expect(paramsDesc).toContain('wall_budget_ms?:int(1000-50000,默认30000)');
+    expect(paramsDesc).toContain('wall_budget_ms?:int(1000-50000, default 30000)');
     expect(paramsDesc).not.toContain('1000-60000');
   });
 });

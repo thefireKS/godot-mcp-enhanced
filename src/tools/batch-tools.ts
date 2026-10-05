@@ -18,7 +18,7 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'batch',
-      description: '批量操作。create_files: 批量创建文件（支持自动验证 .gd）。run_verify: 批量运行 headless 验证场景。diff_scenes: 比较两个场景文件差异。',
+      description: 'Batch operations. create_files: create many files (auto-validates .gd). run_verify: run headless verification for many scenes. diff_scenes: diff two scene files.',
       inputSchema: {
         type: 'object' as const,
         properties: {
@@ -26,7 +26,7 @@ export function getToolDefinitions(): Tool[] {
           action: {
             type: 'string',
             enum: [...ACTIONS],
-            description: '操作类型',
+            description: 'Operation',
           },
           files: {
             type: 'array',

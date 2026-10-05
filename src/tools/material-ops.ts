@@ -32,7 +32,7 @@ const ALLOWED_MATERIAL_TYPES = ['ShaderMaterial', 'StandardMaterial3D', 'CanvasI
 
 const SHADER_TEMPLATES: Record<string, { description: string; uniforms: string[]; code: string }> = {
   dissolve: {
-    description: '2D/3D 通用溶解效果',
+    description: 'Dissolve effect for 2D/3D',
     uniforms: ['edge_color: Color', 'edge_width: float', 'progress: float'],
     code: `shader_type canvas_item;
 
@@ -51,7 +51,7 @@ void fragment() {
 }`,
   },
   outline: {
-    description: '2D 描边效果',
+    description: '2D outline effect',
     uniforms: ['outline_color: Color', 'outline_width: float'],
     code: `shader_type canvas_item;
 
@@ -70,7 +70,7 @@ void fragment() {
 }`,
   },
   blur: {
-    description: '2D 模糊效果',
+    description: '2D blur effect',
     uniforms: ['blur_amount: float', 'direction: vec2'],
     code: `shader_type canvas_item;
 
@@ -91,7 +91,7 @@ void fragment() {
 }`,
   },
   glow: {
-    description: '2D 发光效果',
+    description: '2D glow effect',
     uniforms: ['glow_color: Color', 'glow_intensity: float'],
     code: `shader_type canvas_item;
 
@@ -112,7 +112,7 @@ void fragment() {
 }`,
   },
   water: {
-    description: '3D 水面效果',
+    description: '3D water surface effect',
     uniforms: ['wave_speed: float', 'wave_scale: float', 'deep_color: Color', 'shallow_color: Color'],
     code: `shader_type spatial;
 
@@ -136,7 +136,7 @@ void fragment() {
 }`,
   },
   gradient_map: {
-    description: '2D/3D 通用色调映射',
+    description: 'Tone mapping for 2D/3D',
     uniforms: ['gradient_texture: Texture', 'intensity: float'],
     code: `shader_type canvas_item;
 

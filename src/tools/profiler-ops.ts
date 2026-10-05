@@ -49,27 +49,27 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'profiler',
       description:
-        '性能分析工具。snapshot: 快照（FPS/内存/绘制调用/物理统计）。start/stop: 开始/停止分析会话。get_data: 收集帧级数据，含多维度采样、p99百分位、趋势退化检测、内存趋势、渲染统计。get_active_processes: 遍历场景树查找有 _process/_physics_process 的节点。get_signal_connections: 列出子树所有信号连接。' +
+        'Profiling. snapshot: FPS/memory/draw calls/physics stats. start/stop: start/stop a profiling session. get_data: frame-level data with multi-dimension sampling, p99 percentiles, regression trend detection, memory trend and render stats. get_active_processes: walk the scene tree for nodes with _process/_physics_process. get_signal_connections: list all signal connections in a subtree. ' +
         NON_PERSIST,
       inputSchema: {
         type: 'object' as const,
         properties: {
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
           action: {
             type: 'string',
             enum: ['snapshot', 'start', 'stop', 'get_data', 'get_active_processes', 'get_signal_connections'],
-            description: '操作类型',
+            description: 'Operation',
           },
-          target_fps: { type: 'number', description: '目标帧率，用于帧预算分析（get_data，默认 60）' },
-          frame_count: { type: 'number', description: '采样帧数（get_data，默认 60）' },
+          target_fps: { type: 'number', description: 'Target FPS for frame budget analysis (get_data, default 60)' },
+          frame_count: { type: 'number', description: 'Frames to sample (get_data, default 60)' },
           dimensions: {
             type: 'array',
             items: { type: 'string' },
-            description: '采样维度列表（get_data，默认 ["process"]）。有效值: process, physics, nav_process',
+            description: 'Sampling dimensions (get_data, default ["process"]). Valid: process, physics, nav_process',
           },
-          leak_threshold_mb: { type: 'number', description: '内存泄漏嫌疑阈值 MB（get_data，默认 2.0）' },
-          node_path: { type: 'string', description: '子树根节点路径（get_active_processes/get_signal_connections，默认 root）' },
-          load_autoloads: { type: 'boolean', description: '是否加载 Autoload 上下文（默认 true）' },
+          leak_threshold_mb: { type: 'number', description: 'Suspected memory leak threshold in MB (get_data, default 2.0)' },
+          node_path: { type: 'string', description: 'Subtree root node path (get_active_processes/get_signal_connections, default root)' },
+          load_autoloads: { type: 'boolean', description: 'Load the Autoload context (default true)' },
         },
         required: ['action'],
       },

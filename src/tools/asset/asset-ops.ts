@@ -43,54 +43,54 @@ const ACTIONS = ['create', 'path', 'batch', 'undo', 'save', 'list_shapes', 'list
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'asset',
-    description: '参数化 3D shape 生成（11 shape）+ 路径阵列 + batch + undo + save 预制件。'
-      + 'create/path/batch/undo/save 经 editor 持久化（视口可见、可 undo）；'
-      + 'list_shapes/list_materials 静态返回。',
+    description: 'Parametric 3D shape generation (11 shapes) + path arrays + batch + undo + save as prefab. '
+      + 'create/path/batch/undo/save persist through the editor (visible in the viewport, undoable); '
+      + 'list_shapes/list_materials return static data.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        project_path: { type: 'string', description: 'Godot 项目目录' },
+        project_path: { type: 'string', description: 'Godot project directory' },
         action: {
           type: 'string',
           enum: [...ACTIONS],
-          description: '操作类型',
+          description: 'Operation',
         },
         shape: {
           type: 'string',
           enum: [...SHAPE_NAMES],
-          description: 'create/path: shape 名（见 list_shapes）',
+          description: 'create/path: shape name (see list_shapes)',
         },
-        params: { type: 'object', description: 'shape 参数（见 list_shapes 默认值）' },
+        params: { type: 'object', description: 'Shape parameters (defaults in list_shapes)' },
         material: {
           type: ['string', 'object', 'null'],
-          description: '预设名 / PBR dict（color(hex),alpha,emissive,metallic,roughness）/ res://.tres / null',
+          description: 'Preset name / PBR dict (color(hex),alpha,emissive,metallic,roughness) / res://.tres / null',
         },
-        name: { type: 'string', description: '节点名（碰撞自增 _001）' },
-        parent: { type: 'string', description: '父节点路径（绝对 /Root/X 或相对 X/Y）' },
+        name: { type: 'string', description: 'Node name (auto-suffixed _001 on collision)' },
+        parent: { type: 'string', description: 'Parent node path (absolute /Root/X or relative X/Y)' },
         position: { type: 'array', items: { type: 'number' }, description: '[x,y,z]' },
-        rotation: { type: 'array', items: { type: 'number' }, description: '[x,y,z] 弧度' },
+        rotation: { type: 'array', items: { type: 'number' }, description: '[x,y,z] in radians' },
         scale: { type: 'array', items: { type: 'number' }, description: '[x,y,z]' },
         items: { type: 'array', description: 'batch: [{shape,params,material,name,...}] ≤64' },
-        path: { type: 'array', description: 'path: [[x,y,z],...] ≥2 点（与 path_node 互斥）' },
-        path_node: { type: 'string', description: 'path: 场景 Path3D 节点路径（与 path 互斥）' },
+        path: { type: 'array', description: 'path: [[x,y,z],...] with ≥2 points (exclusive with path_node)' },
+        path_node: { type: 'string', description: 'path: Path3D node path in the scene (exclusive with path)' },
         mode: {
           type: 'string',
           enum: ['discrete', 'continuous'],
-          description: 'path 采样模式',
+          description: 'path sampling mode',
         },
-        spacing: { type: 'number', description: 'path discrete: 等间距（与 count 互斥）' },
-        count: { type: 'number', description: 'path discrete: 等数量（与 spacing 互斥）' },
+        spacing: { type: 'number', description: 'path discrete: equal spacing (exclusive with count)' },
+        count: { type: 'number', description: 'path discrete: equal count (exclusive with spacing)' },
         align: {
           type: 'string',
           enum: ['none', 'path', 'normal'],
-          description: 'path 朝向（默认 path）',
+          description: 'path orientation (default path)',
         },
         align_vertices: {
           type: 'boolean',
-          description: 'path continuous+spacing: 折线顶点段边界对齐',
+          description: 'path continuous+spacing: align to polyline segment boundaries',
         },
-        node_path: { type: 'string', description: 'save: 要存的子树节点路径' },
-        resource_path: { type: 'string', description: 'save: res://xxx.tscn 输出路径' },
+        node_path: { type: 'string', description: 'save: node path of the subtree to save' },
+        resource_path: { type: 'string', description: 'save: output path res://xxx.tscn' },
       },
       required: ['action'],
     },

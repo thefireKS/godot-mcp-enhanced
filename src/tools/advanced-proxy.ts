@@ -97,11 +97,11 @@ export function getToolDefinitions(): Tool[] {
         properties: {
           tool_name: {
             type: 'string',
-            description: '要调用的目标工具名',
+            description: 'Name of the target tool to call',
           },
           arguments: {
             type: 'object',
-            description: '传给目标工具的参数',
+            description: 'Arguments passed to the target tool',
           },
         },
         required: ['tool_name'],
@@ -109,25 +109,25 @@ export function getToolDefinitions(): Tool[] {
     },
     {
       name: 'godot_list_dynamic_routes',
-      description: '三级 lazy discovery:查询可用工具(静态注册 + 动态发现)。无参返回 category 计数;search 模糊匹配;category 查某类工具清单;tool 查单工具完整 schema。',
+      description: 'Three-level lazy discovery: query available tools (static registry + dynamic discovery). No args returns category counts; search does fuzzy matching; category lists one category\'s tools; tool returns one tool\'s full schema.',
       inputSchema: {
         type: 'object' as const,
         properties: {
           category: {
             type: 'string',
-            description: '类别名 → 返回该类工具清单(brief + 参数名,lean 视图)。配合 includeSchemas=true 可一次性返回完整 schema。',
+            description: 'Category name → that category\'s tool list (brief + param names, lean view). With includeSchemas=true returns the full schemas in one go.',
           },
           search: {
             type: 'string',
-            description: '关键词(空格分隔),全部命中才匹配;名字命中排名优先。上限 20 条,不带 schema。',
+            description: 'Keywords (space-separated); all must match; name matches rank first. Max 20 results, no schemas.',
           },
           tool: {
             type: 'string',
-            description: '工具名 → 返回单工具完整 schema(优先级最高,覆盖 search/category)。',
+            description: 'Tool name → that tool\'s full schema (highest priority, overrides search/category).',
           },
           includeSchemas: {
             type: 'boolean',
-            description: '配合 category 使用:一次性返回该类所有工具的完整 schema(体积大,慎用)。',
+            description: 'Use with category: return full schemas of every tool in the category at once (large, use sparingly).',
           },
         },
       },

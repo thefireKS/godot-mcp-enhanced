@@ -26,11 +26,11 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'testing',
       description: [
-        'McpTestSuite 测试框架（editor-only）：跑 AI 编写的 GDScript 测试套件（`extends McpTestSuite`，放 `res://tests/` 或 `addons/godot_mcp_server/testing/suites/`）。',
-        'run: 发现并运行套件，返回 passed/failed/skipped/total/failures 结构化结果。',
-        'manage: op="results_get" 取回上次运行的部分结果（超时/中断后用）。',
-        '⚠️ P2-12 二期：async coroutine 执行，suite 内每 test 后让出主循环（heartbeat 照常 ping），支持长套件（总预算 290s，超时用 suite= 过滤分批）。',
-        '⚠️ editor-only：headless 模式返回 EDITOR_ONLY。需 `GODOT_MCP_MODE=editor` 并安装 Godot 插件。',
+        'McpTestSuite test framework (editor-only): runs GDScript test suites written by the AI (`extends McpTestSuite`, placed in `res://tests/` or `addons/godot_mcp_server/testing/suites/`).',
+        'run: discover and run suites; returns structured passed/failed/skipped/total/failures.',
+        'manage: op="results_get" fetches the partial results of the last run (after a timeout/interruption).',
+        '⚠️ P2-12 phase 2: runs as an async coroutine, yielding the main loop after each test (heartbeat keeps pinging), so long suites work (total budget 290s; on timeout split the run with suite=).',
+        '⚠️ editor-only: headless mode returns EDITOR_ONLY. Needs `GODOT_MCP_MODE=editor` and the Godot plugin installed.',
       ].join(' '),
       inputSchema: {
         type: 'object' as const,
@@ -43,29 +43,29 @@ export function getToolDefinitions(): Tool[] {
           // run params
           suite: {
             type: 'string',
-            description: 'run: 套件名过滤（精确匹配 suite_name()，空=全部）',
+            description: 'run: suite name filter (exact match on suite_name(), empty = all)',
           },
           test_name: {
             type: 'string',
-            description: 'run: 测试方法名过滤（子串匹配，空=全部）',
+            description: 'run: test method name filter (substring, empty = all)',
           },
           exclude_test_name: {
             type: 'string',
-            description: 'run: 排除测试方法（逗号分隔子串列表）',
+            description: 'run: excluded test methods (comma-separated substrings)',
           },
           verbose: {
             type: 'boolean',
-            description: 'run/manage: 返回每条测试详情（默认只返回聚合 + failures）',
+            description: 'run/manage: return per-test details (default: aggregate + failures only)',
           },
           // manage params
           op: {
             type: 'string',
             enum: ['results_get'],
-            description: 'manage: 操作类型（一期仅 results_get）',
+            description: 'manage: operation (only results_get for now)',
           },
           project_path: {
             type: 'string',
-            description: 'Path to Godot project directory（editor 模式可省略，用当前打开的项目）',
+            description: 'Path to Godot project directory (can be omitted in editor mode to use the open project)',
           },
         },
         required: ['action'],

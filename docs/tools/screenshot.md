@@ -2,14 +2,14 @@
 
 > Screenshot capture and image analysis handoff. capture: capture a Godot scene screenshot in headless mode (experimental). analyze: return the image as MCP image content (base64) for the client vision capability to examine — returns image data, NOT a text description.
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 所属层 | headless |
-| 安全级别 | safe |
-| 需要 Godot | 是 |
-| 需要编辑器 | 否 |
-| 只读 | 是 |
-| 长耗时 | 否 |
+| Layer | headless |
+| Safety level | safe |
+| Needs Godot | yes |
+| Needs editor | no |
+| Read-only | yes |
+| Long-running | no |
 
 ## Actions
 
@@ -19,34 +19,34 @@
 
 ## Parameters
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| `action` | enum (3 项) | ✓ | Action type: capture (take a screenshot), analyze (AI visual analysis of an image), or diff (pixel-level comparison of two PNG images) |
+| `action` | enum (3 values) | ✓ | Action type: capture (take a screenshot), analyze (AI visual analysis of an image), or diff (pixel-level comparison of two PNG images) |
 | `project_path` | string |  | Path to Godot project directory |
 | `scene` | string |  | capture: Scene file path relative to project (res://scenes/main.tscn). If omitted, captures the default scene or an empty viewport. |
 | `output_path` | string |  | capture: Output PNG path (absolute). Defaults to <project_path>/screenshot.png |
 | `frame_delay` | number |  | capture: Frames to wait before capture (default: 15) |
 | `viewport_width` | number |  | capture: Viewport width in pixels (default: 1280) |
 | `viewport_height` | number |  | capture: Viewport height in pixels (default: 720) |
-| `wait_node` | string |  | capture: 等待该节点(名或 /root/... 路径)出现在场景树再截图。对分帧构建/异步初始化场景,优先于 frame_delay 生效;超时(固定 300 帧≈5s@60fps,独立于 max_frames)后放弃等待直接截图 |
-| `wait_text` | string |  | capture: 等待任一 Label/RichTextLabel 的 text 包含该子串再截图;超时同 wait_node(固定 300 帧≈5s@60fps,独立于 max_frames) |
+| `wait_node` | string |  | capture: wait for this node (name or /root/... path) to appear in the scene tree before capturing. For scenes built over several frames or initialised asynchronously; takes precedence over frame_delay; on timeout (fixed 300 frames ≈5s@60fps, independent of max_frames) captures anyway |
+| `wait_text` | string |  | capture: wait until some Label/RichTextLabel's text contains this substring before capturing; same timeout as wait_node (fixed 300 frames ≈5s@60fps, independent of max_frames) |
 | `image_path` | string |  | analyze: Absolute path to the image file (PNG or JPG) |
 | `question` | string |  | analyze: Question for the AI to answer about the image. Default: "Describe what you see in this game screenshot." |
-| `vision_route` | boolean |  | Phase 2 Vision Routing:开启时调视觉模型(groq)把图片翻译成文字描述,返回纯文本(不含 image block),让纯文本模型(DeepSeek 等)也能"看懂"截图。失败时 fallback 到 detail 分层 + 追加 note。需 GODOT_MCP_VISION_KEY 环境变量。 |
-| `vision_question` | string |  | vision_route=true 时传给视觉模型的上下文(可选,如"我在调试 Player 走路动画")。 |
-| `detail` | enum: full | thumbnail | ascii |  | P1-5 视觉成本层级:full(完整 base64 图像,高 token) / thumbnail(缩放至 thumbnail_width 的 PNG,中 token) / ascii(ASCII art 文本,低 token)。默认 full。 |
-| `thumbnail_width` | number |  | detail=thumbnail: 目标宽度像素(默认 256,保持纵横比) |
-| `ascii_cols` | number |  | detail=ascii: 字符列数(默认 80) |
-| `ascii_rows` | number |  | detail=ascii: 字符行数(默认 40) |
-| `image_a` | string |  | diff: 基准图(a 图)路径。相对路径需 project_path;两图尺寸必须一致。 |
-| `image_b` | string |  | diff: 对比图(b 图)路径。路径策略同 analyze 的 image_path(白名单校验)。 |
-| `threshold` | number |  | diff: per-pixel 归一化欧氏距离阈值 sqrt(Δr²+Δg²+Δb²)/(√3×255),0-1,默认 0.12。恰好等于阈值不计差(严格大于才计)。忽略 alpha 只比 RGB。 |
-| `diff_path` | string |  | diff: 可选,差异图输出路径。差异像素染纯红 (255,0,0),其余保留 a 图原色。不提供则不写文件。 |
-| `godot_path` | string |  | 覆盖 Godot 二进制路径（可选，优先于项目配置和环境变量） |
+| `vision_route` | boolean |  | Phase 2 Vision Routing: when on, a vision model (groq) turns the image into a text description and returns plain text (no image block), so text-only models (DeepSeek etc.) can "see" screenshots. On failure falls back to the detail levels + a note. Needs the GODOT_MCP_VISION_KEY env var. |
+| `vision_question` | string |  | Context passed to the vision model when vision_route=true (optional, e.g. "I'm debugging the Player walk animation"). |
+| `detail` | enum: full | thumbnail | ascii |  | P1-5 vision cost level: full (full base64 image, many tokens) / thumbnail (PNG scaled to thumbnail_width, medium) / ascii (ASCII art text, few tokens). Default full. |
+| `thumbnail_width` | number |  | detail=thumbnail: target width in pixels (default 256, keeps aspect ratio) |
+| `ascii_cols` | number |  | detail=ascii: columns (default 80) |
+| `ascii_rows` | number |  | detail=ascii: rows (default 40) |
+| `image_a` | string |  | diff: baseline image (a) path. Relative paths need project_path; both images must be the same size. |
+| `image_b` | string |  | diff: comparison image (b) path. Same path policy as analyze's image_path (whitelist check). |
+| `threshold` | number |  | diff: per-pixel normalised Euclidean distance threshold sqrt(Δr²+Δg²+Δb²)/(√3×255), 0-1, default 0.12. Exactly equal doesn't count (strictly greater only). Alpha ignored, RGB only. |
+| `diff_path` | string |  | diff: optional output path for a diff image. Differing pixels are painted pure red (255,0,0), the rest keep image a's colours. Nothing is written when omitted. |
+| `godot_path` | string |  | Override the Godot binary path (optional; takes precedence over project config and env vars) |
 
-## 风险分布
+## Risk breakdown
 
-读 3
+read 3
 
 ---
-<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.8. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->
+<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.11. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->

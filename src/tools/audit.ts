@@ -21,22 +21,22 @@ export { TOOL_NAMES };
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'audit',
-    description: '操作审计日志查询(G3)。action=get_log 读 {project}/.godot/mcp_audit.jsonl 统计回放'
-      + '(操作计数/风险高亮/最近条目/时间范围);action=suggest_rollback 对指定条目给诚实回滚建议'
-      + '(create 类可删/project.godot before_values/其余靠 Git)。write/destructive 操作经 audit '
-      + 'after middleware 自动落盘(changed_files 为项目相对路径,PII 护栏)。',
+    description: 'Operation audit log (G3). action=get_log reads {project}/.godot/mcp_audit.jsonl as stats and replay '
+      + '(operation counts / risk highlights / recent entries / time range); action=suggest_rollback gives an honest rollback suggestion for one entry '
+      + '(created files can be deleted / project.godot before_values / everything else via Git). Write/destructive operations are logged automatically by the audit '
+      + 'after-middleware (changed_files are project-relative, PII guarded).',
     inputSchema: {
       type: 'object' as const,
       properties: {
         action: {
           type: 'string',
           enum: ['get_log', 'suggest_rollback'],
-          description: 'get_log=读统计回放;suggest_rollback=对指定条目给回滚建议',
+          description: 'get_log = stats and replay; suggest_rollback = rollback suggestion for one entry',
         },
-        project_path: { type: 'string', description: '项目路径(默认 resolveProjectPath 自动解析)' },
-        limit: { type: 'number', description: 'get_log:取末尾 N 条(默认全部)' },
-        since: { type: 'string', description: 'get_log:ISO 时间过滤(只看此后)' },
-        entry_index: { type: 'number', description: 'suggest_rollback:条目序号(从 get_log entries[].index)' },
+        project_path: { type: 'string', description: 'Project path (default: auto-resolved by resolveProjectPath)' },
+        limit: { type: 'number', description: 'get_log: take the last N entries (default all)' },
+        since: { type: 'string', description: 'get_log: ISO time filter (only entries after it)' },
+        entry_index: { type: 'number', description: 'suggest_rollback: entry index (from get_log entries[].index)' },
       },
       required: ['action'],
     },

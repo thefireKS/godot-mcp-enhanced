@@ -73,7 +73,7 @@ describe('profiler-ops getToolDefinitions', () => {
     const schema = defs[0].inputSchema;
     expect(schema.properties.dimensions).toBeDefined();
     expect(schema.properties.dimensions.type).toBe('array');
-    expect(schema.properties.dimensions.description).toContain('维度');
+    expect(schema.properties.dimensions.description).toContain('dimensions');
   });
 
   it('has leak_threshold_mb parameter in get_data schema', () => {
@@ -81,7 +81,7 @@ describe('profiler-ops getToolDefinitions', () => {
     const schema = defs[0].inputSchema;
     expect(schema.properties.leak_threshold_mb).toBeDefined();
     expect(schema.properties.leak_threshold_mb.type).toBe('number');
-    expect(schema.properties.leak_threshold_mb.description).toContain('泄漏');
+    expect(schema.properties.leak_threshold_mb.description).toContain('leak');
   });
 });
 

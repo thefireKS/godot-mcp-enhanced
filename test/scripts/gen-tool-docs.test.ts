@@ -68,7 +68,7 @@ describe('gen-tool-docs — extractParamRows', () => {
       },
     };
     const rows = extractParamRows(tool);
-    expect(rows[0].type).toBe('enum (5 项)');
+    expect(rows[0].type).toBe('enum (5 values)');
   });
 
   it('enum ≤ 3 项全列(非 action 参数)', () => {
@@ -99,8 +99,8 @@ describe('gen-tool-docs — generateToolDoc', () => {
   it('含属性表(层/安全/Godot/editor/只读/长耗时)', () => {
     expect(doc).toContain('headless');
     expect(doc).toContain('guarded');
-    expect(doc).toContain('需要 Godot');
-    expect(doc).toContain('长耗时');
+    expect(doc).toContain('Needs Godot');
+    expect(doc).toContain('Long-running');
   });
 
   it('含 Actions section(从 action enum)', () => {
@@ -117,9 +117,9 @@ describe('gen-tool-docs — generateToolDoc', () => {
   });
 
   it('含风险分布', () => {
-    expect(doc).toContain('## 风险分布');
-    expect(doc).toContain('读 1');
-    expect(doc).toContain('写 1');
+    expect(doc).toContain('## Risk breakdown');
+    expect(doc).toContain('read 1');
+    expect(doc).toContain('write 1');
   });
 
   it('含 AUTO-GENERATED 页脚 + matrix 版本', () => {

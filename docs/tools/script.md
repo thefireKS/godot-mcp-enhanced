@@ -1,15 +1,15 @@
 # script
 
-> 脚本操作。读写: read_script, write_script。编辑: edit_script（行号/search_and_replace）。执行: execute_gdscript（⚠️ 沙箱仅防误操作，不可用于不可信输入。高安全场景请用 ALLOW_EXECUTE_GDSCRIPT=false 或容器隔离）。⚠️ write_script/edit_script 写入 .gd 前也走沙箱扫描（防 @tool 脚本加载即执行等已知危险 API 模式（清单不列举，防沙箱边界被侦察）;与 execute_gdscript 同威胁面）。测试: generate_test, create_test_scene。批量替换: project_replace。💡 execute_gdscript 最佳实践:分步执行、每步验证（把复杂逻辑拆成小块逐一跑,每步用 read_script/edit_script 迭代,避免一次性大脚本出错难定位）。
+> Script operations. Read/write: read_script, write_script. Edit: edit_script (line numbers / search_and_replace). Execute: execute_gdscript (⚠️ the sandbox only guards against mistakes, not untrusted input; for high-security setups use ALLOW_EXECUTE_GDSCRIPT=false or container isolation). ⚠️ write_script/edit_script also sandbox-scan .gd content before writing (against @tool scripts that run on load and other known dangerous API patterns (list not published so the boundary can't be probed); same threat surface as execute_gdscript). Tests: generate_test, create_test_scene. Bulk replace: project_replace. 💡 execute_gdscript best practice: run in small steps and verify each (split complex logic into small pieces, iterate with read_script/edit_script, avoid one big script whose failure is hard to locate).
 
-| 属性 | 值 |
+| Property | Value |
 |------|-----|
-| 所属层 | headless |
-| 安全级别 | danger-api |
-| 需要 Godot | 否 |
-| 需要编辑器 | 否 |
-| 只读 | 否 |
-| 长耗时 | 否 |
+| Layer | headless |
+| Safety level | danger-api |
+| Needs Godot | no |
+| Needs editor | no |
+| Read-only | no |
+| Long-running | no |
 
 ## Actions
 
@@ -23,33 +23,33 @@
 
 ## Parameters
 
-| 参数 | 类型 | 必填 | 说明 |
+| Parameter | Type | Required | Description |
 |------|------|------|------|
-| `action` | enum (7 项) | ✓ | 操作类型 |
-| `project_path` | string |  | Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录） |
-| `script_path` | string |  | read_script 用绝对路径；write_script/edit_script/generate_test 用绝对或相对项目路径 |
-| `content` | string |  | write_script: GDScript 内容 |
-| `overwrite` | boolean |  | write_script: 覆盖已有文件（默认 false） |
-| `start_line` | number |  | edit_script: 替换起始行（1-based） |
-| `end_line` | number |  | edit_script: 替换结束行（1-based，含） |
-| `new_content` | string |  | edit_script: 替换内容 |
-| `indent_mode` | enum: raw | smart |  | edit_script: 缩进模式（默认 raw） |
-| `verify_content` | string |  | edit_script: 期望内容守卫（不匹配则中止） |
-| `auto_validate` | boolean |  | edit_script: 自动验证语法并在失败时回滚（默认 true） |
-| `search_and_replace` | object |  | edit_script: 内容搜索替换模式（提供时忽略 start_line/end_line） |
-| `code` | string |  | execute_gdscript: 要执行的 GDScript 代码 |
-| `timeout` | number |  | execute_gdscript: 超时秒数（默认 30） |
-| `load_autoloads` | boolean |  | execute_gdscript: 省略时自动检测 autoload 引用；显式 true/false 覆盖自动检测 |
-| `search` | string |  | project_replace: 搜索文本 |
-| `replace` | string |  | project_replace: 替换文本 |
-| `extensions` | array |  | project_replace: 文件扩展名（默认 [".gd"]） |
-| `exclude_dirs` | array |  | project_replace: 排除目录（默认 [".godot", ".import"]） |
-| `dry_run` | boolean |  | project_replace: 仅预览不写入（默认 false） |
-| `godot_path` | string |  | 覆盖 Godot 二进制路径（可选，优先于项目配置和环境变量） |
+| `action` | enum (7 values) | ✓ | Operation |
+| `project_path` | string |  | Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory) |
+| `script_path` | string |  | Absolute path for read_script; absolute or project-relative for write_script/edit_script/generate_test |
+| `content` | string |  | write_script: GDScript content |
+| `overwrite` | boolean |  | write_script: overwrite an existing file (default false) |
+| `start_line` | number |  | edit_script: first line to replace (1-based) |
+| `end_line` | number |  | edit_script: last line to replace (1-based, inclusive) |
+| `new_content` | string |  | edit_script: replacement content |
+| `indent_mode` | enum: raw | smart |  | edit_script: indent mode (default raw) |
+| `verify_content` | string |  | edit_script: expected-content guard (aborts on mismatch) |
+| `auto_validate` | boolean |  | edit_script: validate syntax automatically and roll back on failure (default true) |
+| `search_and_replace` | object |  | edit_script: search-and-replace mode (start_line/end_line are ignored when given) |
+| `code` | string |  | execute_gdscript: GDScript code to run |
+| `timeout` | number |  | execute_gdscript: timeout in seconds (default 30) |
+| `load_autoloads` | boolean |  | execute_gdscript: autoload references are auto-detected when omitted; explicit true/false overrides detection |
+| `search` | string |  | project_replace: search text |
+| `replace` | string |  | project_replace: replacement text |
+| `extensions` | array |  | project_replace: file extensions (default [".gd"]) |
+| `exclude_dirs` | array |  | project_replace: excluded directories (default [".godot", ".import"]) |
+| `dry_run` | boolean |  | project_replace: preview only, write nothing (default false) |
+| `godot_path` | string |  | Override the Godot binary path (optional; takes precedence over project config and env vars) |
 
-## 风险分布
+## Risk breakdown
 
-读 1 / 写 4 / 破坏性 1 / 进程 1
+read 1 / write 4 / destructive 1 / process 1
 
 ---
-<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.8. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->
+<!-- AUTO-GENERATED by scripts/gen-tool-docs.mjs from capability-matrix.json v0.32.11. DO NOT edit manually; re-run npm run gen:tool-docs after tool changes. -->

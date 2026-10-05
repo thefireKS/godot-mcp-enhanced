@@ -267,24 +267,24 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'csv_to_resources',
-      description: 'CSV→Resource 批量生成。读取 CSV(class_path 指向的 GDScript Resource 类),按 filename_column 列命名,批量生成 .tres 到 output_dir。CSV 行数据走 GDScript FileAccess.get_csv_line(零进脚本字符串,防注入)。output_dir 经 resolveWithinRoot 沙箱(TS pre);filename 白名单(GDScript 正则 + .. 段级拒)。',
+      description: 'CSV → Resource batch generation. Reads a CSV (class_path points at a GDScript Resource class), names files by filename_column, writes .tres files into output_dir. CSV rows are read with GDScript FileAccess.get_csv_line (never spliced into script source, injection-safe). output_dir goes through the resolveWithinRoot sandbox (TS pre-check); filename whitelist (GDScript regex + rejects .. segments).',
       inputSchema: {
         type: 'object' as const,
         properties: {
           action: {
             type: 'string',
             enum: [...ACTIONS],
-            description: '操作类型',
+            description: 'Operation',
           },
           project_path: { type: 'string', description: 'Path to Godot project directory' },
-          class_path: { type: 'string', description: 'GDScript Resource 类路径(如 res://item.gd),CSV 每行实例化此类' },
-          output_dir: { type: 'string', description: '输出目录(项目内,res:// 或相对路径,经沙箱校验)' },
-          filename_column: { type: 'string', description: 'CSV 中作为输出文件名的列名' },
-          csv_content: { type: 'string', description: 'CSV 文本内容(与 csv_path 二选一)' },
-          csv_path: { type: 'string', description: 'CSV 文件路径(项目内,与 csv_content 二选一)' },
+          class_path: { type: 'string', description: 'GDScript Resource class path (e.g. res://item.gd); each CSV row instantiates this class' },
+          output_dir: { type: 'string', description: 'Output directory (inside the project, res:// or relative, sandbox-checked)' },
+          filename_column: { type: 'string', description: 'CSV column used as the output file name' },
+          csv_content: { type: 'string', description: 'CSV text content (or csv_path)' },
+          csv_path: { type: 'string', description: 'CSV file path (inside the project; or csv_content)' },
           timeout: {
             type: 'number',
-            description: 'GDScript 执行超时秒数(大批量 CSV 可调大,默认 60)',
+            description: 'GDScript execution timeout in seconds (raise for big CSVs, default 60)',
             optional: true,
             default: 60,
           },

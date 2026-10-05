@@ -47,13 +47,13 @@ export function setEditorSceneProvider(provider: (() => Promise<SceneSnapshot | 
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'godot_get_context',
-    description: '一次返回会话全景（模式/项目/连接/场景快照/最近调用统计/工具组/推荐 workflow/规则/性能），减少反复探路。headless 模式 scene=null。',
+    description: 'One-shot session overview (mode/project/connections/scene snapshot/recent call stats/tool groups/recommended workflows/rules/performance) to save repeated probing. In headless mode scene=null.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        project_path: { type: 'string', description: '项目路径（可选；传了补 project/rules 字段，没传降级 null/[]）' },
-        include_scene: { type: 'boolean', description: '是否采集场景快照（默认 true；headless 恒 null）' },
-        include_performance: { type: 'boolean', description: '是否采集性能（默认 true；仅 bridge 有效）' },
+        project_path: { type: 'string', description: 'Project path (optional; when given, fills the project/rules fields, otherwise they fall back to null/[])' },
+        include_scene: { type: 'boolean', description: 'Capture a scene snapshot (default true; always null in headless)' },
+        include_performance: { type: 'boolean', description: 'Collect performance (default true; bridge only)' },
       },
     },
   }];

@@ -44,35 +44,35 @@ export { TOOL_NAMES };
 export function getToolDefinitions(): Tool[] {
   return [{
     name: 'qa',
-    description: 'QA 测试套件编排：结构化测试规范 → 自动安装 bridge → 运行游戏 → 逐步执行 → 聚合报告 + 回归 diff。'
-      + '步骤类型：input/wait/wait_frames/freeze/unfreeze/step_until/snapshot/restore/set/call/'
-      + 'watch_start|stop/monitor_start|stop/assert/screenshot/sleep；断言 8 种与各字段语义见 schema 字段 description。'
-      + 'run 支持 mode:async 后台执行(qa status/cancel 管理)。'
-      + '报告落 ~/.godot-mcp/qa-reports/<run_id>.{json,md}。',
+    description: 'QA test suite orchestration: structured test spec → auto-install the bridge → run the game → execute step by step → aggregated report + regression diff. '
+      + 'Step types: input/wait/wait_frames/freeze/unfreeze/step_until/snapshot/restore/set/call/ '
+      + 'watch_start|stop/monitor_start|stop/assert/screenshot/sleep; the 8 assertion kinds and each field\'s meaning are in the schema field descriptions. '
+      + 'run supports mode:async for background runs (managed with qa status/cancel). '
+      + 'Reports go to ~/.godot-mcp/qa-reports/<run_id>.{json,md}.',
     inputSchema: {
       type: 'object' as const,
       properties: {
         action: {
           type: 'string',
           enum: ['run', 'report', 'diff', 'status', 'cancel'],
-          description: 'run=执行套件；report=读报告；diff=对比两份报告找回归；status=查运行注册表(进度/终态)；cancel=取消进行中的 run',
+          description: 'run = run a suite; report = read a report; diff = compare two reports for regressions; status = run registry (progress/final state); cancel = cancel a run in progress',
         },
         // run
         mode: {
           type: 'string',
           enum: ['sync', 'async'],
-          description: 'run: sync=同步等完整结果;async=立即返回 run_id 后台执行(用 qa status 轮询/qa cancel 取消)。默认:未显式指定时,客户端声明 MCP tasks 能力则自动 async,否则 sync',
+          description: 'run: sync = wait for the full result; async = return run_id immediately and run in the background (poll with qa status, cancel with qa cancel). Default when unspecified: async if the client declares the MCP tasks capability, otherwise sync',
         },
-        run_id: { type: 'string', description: 'status/cancel: 目标 run_id(status 省略=列出全部注册 run)' },
+        run_id: { type: 'string', description: 'status/cancel: target run_id (omitted for status = list all registered runs)' },
         // assert 8 种(node_state/scene_structure/screen_text/perf/screenshot_diff/signal/errors/monitor)
         // 的字段级语义在 spec.ts zod 注释与 runtime-assert schema description(Task 6),此处只做索引级概述,避免双份维护
-        spec: { type: 'object', description: 'run: inline 套件 spec 对象。步骤为 discriminated union(type 字段决定形态)：input(method+params,bridge 原生参数)、wait(wait_for_node/wait_for_property 轮询)、wait_frames(1-60 帧确定性推进)、freeze/unfreeze、step_until(结构化条件{path,property,op,value}[]，规避 RCE)、snapshot/restore、set(写节点属性)、call(bridge 只读白名单方法，写方法需 GODOT_MCP_BRIDGE_EXTRA_METHODS)、watch_start(node_path+signal_name，单套件单 watch)、watch_stop、monitor_start(node_path+properties[]，单套件单 monitor)、monitor_stop、screenshot(证据落报告目录)、sleep。步骤带 label 便于 diff 对齐' },
-        spec_path: { type: 'string', description: 'run: spec 文件路径(.json 或含 ```qa-spec 围栏的 .md)，大套件建议用文件避免 token 截断；须在 ALLOWED_PROJECT_PATHS 白名单内' },
-        project_path: { type: 'string', description: 'run: 项目路径(覆盖 spec 内的 project_path；spec 未写时必填)' },
+        spec: { type: 'object', description: 'run: inline suite spec object. Steps are a discriminated union (the type field decides the shape): input (method+params, native bridge params), wait (polls wait_for_node/wait_for_property), wait_frames (deterministic 1-60 frame advance), freeze/unfreeze, step_until (structured conditions {path,property,op,value}[], avoids RCE), snapshot/restore, set (write node properties), call (bridge read-only whitelist; write methods need GODOT_MCP_BRIDGE_EXTRA_METHODS), watch_start (node_path+signal_name, one watch per suite), watch_stop, monitor_start (node_path+properties[], one monitor per suite), monitor_stop, screenshot (evidence saved to the report directory), sleep. Give steps a label so diffs line up' },
+        spec_path: { type: 'string', description: 'run: spec file path (.json, or .md with a ```qa-spec fence); use a file for big suites to avoid token truncation; must be inside the ALLOWED_PROJECT_PATHS whitelist' },
+        project_path: { type: 'string', description: 'run: project path (overrides project_path in the spec; required if the spec has none)' },
         // report / diff
-        report_path: { type: 'string', description: 'report: 报告路径或 run_id；latest=最新，prev=次新' },
-        base_path: { type: 'string', description: 'diff: 基线报告(默认 prev)' },
-        head_path: { type: 'string', description: 'diff: 对比报告(默认 latest)' },
+        report_path: { type: 'string', description: 'report: report path or run_id; latest = newest, prev = second newest' },
+        base_path: { type: 'string', description: 'diff: baseline report (default prev)' },
+        head_path: { type: 'string', description: 'diff: report to compare (default latest)' },
       },
       required: ['action'],
     },

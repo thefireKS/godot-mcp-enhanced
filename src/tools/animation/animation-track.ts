@@ -20,42 +20,42 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'animation_track',
       description:
-        '动画轨道与关键帧操作。轨道: add_track, remove_track。关键帧: add_keyframe, remove_keyframe, update_keyframe。曲线: set_curve。' +
+        'Animation track and keyframe operations. Tracks: add_track, remove_track. Keyframes: add_keyframe, remove_keyframe, update_keyframe. Curves: set_curve. ' +
         NON_PERSIST,
       inputSchema: {
         type: 'object' as const,
         properties: {
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
           action: {
             type: 'string',
             enum: ['add_track', 'remove_track', 'add_keyframe', 'remove_keyframe', 'update_keyframe', 'set_curve'],
-            description: '操作类型',
+            description: 'Operation',
           },
-          node_path: { type: 'string', description: 'AnimationPlayer 节点路径' },
-          animation_name: { type: 'string', description: '动画名称' },
+          node_path: { type: 'string', description: 'AnimationPlayer node path' },
+          animation_name: { type: 'string', description: 'Animation name' },
           track_type: {
             type: 'string',
             enum: [...TRACK_TYPES],
-            description: '轨道类型（add_track 时必填）',
+            description: 'Track type (required for add_track)',
           },
-          track_path: { type: 'string', description: '轨道路径，如 "Sprite2D:frame"（add_track 时可选）' },
-          track_index: { type: 'number', description: '轨道索引' },
-          insert_at: { type: 'number', description: '轨道插入位置，-1 为末尾（add_track 时可选）' },
-          keyframe_index: { type: 'number', description: '关键帧索引（remove_keyframe/update_keyframe/set_curve 时必填）' },
-          time: { type: 'number', description: '关键帧时间（秒）（add_keyframe 时必填）' },
-          value: { description: '关键帧值（add_keyframe/update_keyframe）' },
-          transition: { type: 'number', description: '过渡曲线，1.0=线性' },
+          track_path: { type: 'string', description: 'Track path, e.g. "Sprite2D:frame" (optional for add_track)' },
+          track_index: { type: 'number', description: 'Track index' },
+          insert_at: { type: 'number', description: 'Track insert position, -1 = end (optional for add_track)' },
+          keyframe_index: { type: 'number', description: 'Keyframe index (required for remove_keyframe/update_keyframe/set_curve)' },
+          time: { type: 'number', description: 'Keyframe time in seconds (required for add_keyframe)' },
+          value: { description: 'Keyframe value (add_keyframe/update_keyframe)' },
+          transition: { type: 'number', description: 'Transition curve, 1.0 = linear' },
           in_handle: {
             type: 'object',
             properties: { x: { type: 'number' }, y: { type: 'number' } },
-            description: '入控制柄坐标（set_curve）',
+            description: 'In-handle coordinates (set_curve)',
           },
           out_handle: {
             type: 'object',
             properties: { x: { type: 'number' }, y: { type: 'number' } },
-            description: '出控制柄坐标（set_curve）',
+            description: 'Out-handle coordinates (set_curve)',
           },
-          load_autoloads: { type: 'boolean', description: '是否加载 Autoload 上下文（默认 true）' },
+          load_autoloads: { type: 'boolean', description: 'Load the Autoload context (default true)' },
         },
         required: ['action'],
       },

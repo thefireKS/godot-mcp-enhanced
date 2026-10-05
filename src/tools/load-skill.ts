@@ -10,17 +10,17 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'load_skill',
       description:
-        '从本地知识库(GodotPrompter/gd-agentic 等)按关键词检索 SKILL.md。两级检索:name/description 高精度→全文 fallback。返回带来源标注(source/path)和相关性 score 的匹配。缺失库进 missing_libraries 不报错。',
+        'Search SKILL.md files in local knowledge bases (GodotPrompter/gd-agentic etc.) by keyword. Two-level search: high-precision name/description first, full-text fallback. Returns matches with source labels (source/path) and a relevance score. Missing libraries go to missing_libraries instead of failing.',
       inputSchema: {
         type: 'object' as const,
         properties: {
-          query: { type: 'string', description: '检索关键词(必填)' },
+          query: { type: 'string', description: 'Search keywords (required)' },
           libraries: {
             type: 'array',
             items: { type: 'string' },
-            description: '知识库目录绝对路径数组。省略时读 GODOT_SKILL_LIBRARIES 环境变量(逗号分隔)',
+            description: 'Absolute paths of knowledge base directories. When omitted, reads the GODOT_SKILL_LIBRARIES env var (comma-separated)',
           },
-          limit: { type: 'number', description: '返回上限(默认 10)' },
+          limit: { type: 'number', description: 'Max results (default 10)' },
         },
         required: ['query'],
       },

@@ -363,7 +363,7 @@ describe('ui_import_prototype 登记契约', () => {
     expect(schema.properties.geometry_path).toBeTruthy();
     expect(schema.properties.tolerance).toBeTruthy();
     // I-2:parent_path schema 声明原点对齐限制(ui_build_layout 与 ui_import_prototype 共用参数)
-    expect(String((schema.properties.parent_path as { description?: string }).description)).toContain('原点对齐');
+    expect(String((schema.properties.parent_path as { description?: string }).description)).toContain('aligned to the origin');
   });
 
   it('TOOL_META actionRisks: ui_import_prototype 为 write(satisfies 护卫)', () => {
@@ -378,7 +378,7 @@ describe('ui_import_prototype 登记契约', () => {
   });
 
   it('SLIM_CONFIG descHint: ui_import_prototype 段提及 style_verify/flow_verify 返回(PR-2)', () => {
-    expect(SLIM_CONFIG['ui']!.descHint).toContain('返回 style_verify/flow_verify');
+    expect(SLIM_CONFIG['ui']!.descHint).toContain('returns style_verify/flow_verify');
   });
 });
 

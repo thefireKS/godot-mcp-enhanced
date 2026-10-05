@@ -30,14 +30,14 @@ export function getToolDefinitions(): Tool[] {
   return [
     {
       name: 'help',
-      description: `获取任意工具的完整文档。可用工具名：${names.join(', ')}。传 tool_name 获取该工具的详细用法、参数、action 列表。拼写纠错自动提示最接近的工具名。`,
+      description: `Full documentation for any tool. Available tool names: ${names.join(', ')}. Pass tool_name for that tool's detailed usage, parameters and action list. Misspellings get the closest tool name suggested.`,
       inputSchema: {
         type: 'object' as const,
         properties: {
           tool_name: {
             type: 'string',
             enum: names,
-            description: '要查询的工具名',
+            description: 'Tool name to look up',
           },
         },
         required: ['tool_name'],

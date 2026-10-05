@@ -57,20 +57,20 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'manage_tools',
       description:
-        '动态管理工具组的启用/停用状态。始终可用，不可被禁用。' +
-        '支持 list_groups（列出所有组）、activate（启用组）、deactivate（停用组）、sync（同步连接状态）、reconnect（手动重连）。',
+        'Enable/disable tool groups dynamically. Always available, cannot be disabled. ' +
+        'Supports list_groups (list all groups), activate (enable groups), deactivate (disable groups), sync (sync connection state), reconnect (reconnect manually).',
       inputSchema: {
         type: 'object' as const,
         properties: {
           action: {
             type: 'string',
             enum: [...ACTIONS],
-            description: '操作类型',
+            description: 'Operation',
           },
           groups: {
             type: 'array',
             items: { type: 'string' },
-            description: '目标组名数组（activate/deactivate 时使用）',
+            description: 'Target group names (activate/deactivate)',
           },
         },
         required: ['action'],
@@ -226,7 +226,7 @@ function handleMigrate(): ToolResult {
 
   return textResult(JSON.stringify(opsSuccess({
     version: '0.18.0',
-    description: '旧工具名到新 (tool, action) 的迁移映射',
+    description: 'Migration map from old tool names to new (tool, action)',
     mapping,
     renamed,
     removed,

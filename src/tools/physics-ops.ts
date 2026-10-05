@@ -308,50 +308,50 @@ export function getToolDefinitions(): Tool[] {
     {
       name: 'physics',
       description:
-        '物理系统统一工具。支持 5 种操作：raycast（3D 射线检测）、body_info（物理体碰撞信息）、' +
-        'diagnose（物理诊断，含速度/接触点/碰撞形状/ConcavePolygonShape3D 警告）、' +
-        'query_spatial（空间范围查询碰撞体）、collision_overlay（碰撞形状可视化覆盖层）。' +
+        'Unified physics tool. 5 operations: raycast (3D ray cast), body_info (physics body collision info), ' +
+        'diagnose (physics diagnosis: velocity/contacts/collision shapes/ConcavePolygonShape3D warnings), ' +
+        'query_spatial (colliders within a radius), collision_overlay (collision shape visualisation overlay). ' +
         NON_PERSIST,
       inputSchema: {
         type: 'object' as const,
         properties: {
-          project_path: { type: 'string', description: 'Godot 项目目录路径（可选，默认使用 GODOT_PROJECT_PATH 环境变量或当前目录）' },
+          project_path: { type: 'string', description: 'Godot project directory (optional; defaults to the GODOT_PROJECT_PATH env var or the current directory)' },
           action: {
             type: 'string',
             enum: [...ACTIONS],
-            description: '操作类型：raycast | body_info | diagnose | query_spatial | collision_overlay',
+            description: 'Operation: raycast | body_info | diagnose | query_spatial | collision_overlay',
           },
           // raycast 参数
           from: {
             type: 'object',
-            description: '射线起点 {x,y,z}（raycast 必填）',
+            description: 'Ray start {x,y,z} (required for raycast)',
             properties: { x: { type: 'number' }, y: { type: 'number' }, z: { type: 'number' } },
             required: ['x', 'y', 'z'],
           },
           to: {
             type: 'object',
-            description: '射线终点 {x,y,z}（raycast 必填）',
+            description: 'Ray end {x,y,z} (required for raycast)',
             properties: { x: { type: 'number' }, y: { type: 'number' }, z: { type: 'number' } },
             required: ['x', 'y', 'z'],
           },
           // body_info / diagnose 参数
-          body_path: { type: 'string', description: '物理体节点路径（body_info / diagnose 必填）' },
+          body_path: { type: 'string', description: 'Physics body node path (required for body_info / diagnose)' },
           // query_spatial 参数
           center: {
             type: 'object',
-            description: '查询中心点 {x,y,z}（query_spatial 必填）',
+            description: 'Query centre {x,y,z} (required for query_spatial)',
             properties: { x: { type: 'number' }, y: { type: 'number' }, z: { type: 'number' } },
             required: ['x', 'y', 'z'],
           },
-          radius: { type: 'number', description: '查询半径（query_spatial，默认 10.0）', default: 10.0 },
+          radius: { type: 'number', description: 'Query radius (query_spatial, default 10.0)', default: 10.0 },
           // raycast / query_spatial 通用参数
-          collision_mask: { type: 'number', description: '碰撞掩码（raycast / query_spatial 可选）' },
-          exclude_paths: { type: 'array', description: '排除节点路径数组（raycast 可选）', items: { type: 'string' } },
+          collision_mask: { type: 'number', description: 'Collision mask (optional for raycast / query_spatial)' },
+          exclude_paths: { type: 'array', description: 'Node paths to exclude (optional for raycast)', items: { type: 'string' } },
           // collision_overlay 参数
-          parent_path: { type: 'string', description: '父节点路径（collision_overlay，默认 root）' },
-          color_override: { type: 'string', description: '统一颜色，如 "1,0,0,0.5"（collision_overlay 可选）' },
+          parent_path: { type: 'string', description: 'Parent node path (collision_overlay, default root)' },
+          color_override: { type: 'string', description: 'Single colour, e.g. "1,0,0,0.5" (optional for collision_overlay)' },
           // 通用参数
-          load_autoloads: { type: 'boolean', description: '是否加载 Autoload 上下文（默认 true）' },
+          load_autoloads: { type: 'boolean', description: 'Load the Autoload context (default true)' },
         },
         required: ['action'],
       },
