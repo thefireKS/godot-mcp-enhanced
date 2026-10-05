@@ -168,88 +168,88 @@ const RULES: LintRule[] = [
     id: "L003",
     severity: "error",
     pattern: /CylinderMesh\w*\.radius\s*=/,
-    message: "CylinderMesh.radius 在 Godot 4 中不存在，需分别设置 top_radius 和 bottom_radius",
-    suggestion: "使用 mesh.top_radius = 0.5 和 mesh.bottom_radius = 0.5 分别设置",
+    message: "CylinderMesh.radius doesn't exist in Godot 4; set top_radius and bottom_radius separately",
+    suggestion: "Use mesh.top_radius = 0.5 and mesh.bottom_radius = 0.5",
   },
   // L004: Environment.adjustments_*
   {
     id: "L004",
     severity: "error",
     pattern: /\.adjustments_\w+\s*=/,
-    message: "Environment 的 adjustments_* 属性在 Godot 4 中不带 s，应为 adjustment_*",
-    suggestion: "将 adjustments_enabled → adjustment_enabled, adjustments_brightness → adjustment_brightness 等",
+    message: "Environment's adjustments_* properties have no s in Godot 4: adjustment_*",
+    suggestion: "Rename adjustments_enabled → adjustment_enabled, adjustments_brightness → adjustment_brightness, etc.",
   },
   // L005: Environment.tone_mapper
   {
     id: "L005",
     severity: "error",
     pattern: /\.tone_mapper\s*=/,
-    message: "Environment.tone_mapper 在 Godot 4 中已重命名为 tonemap_mode",
-    suggestion: "使用 env.tonemap_mode = Environment.TONE_MAPPER_LINEAR",
+    message: "Environment.tone_mapper is renamed to tonemap_mode in Godot 4",
+    suggestion: "Use env.tonemap_mode = Environment.TONE_MAPPER_LINEAR",
   },
   // L006: SoftBody3D.mass
   {
     id: "L006",
     severity: "error",
     pattern: /SoftBody3D\w*\.mass\s*=/,
-    message: "SoftBody3D.mass 在 Godot 4 中已重命名为 total_mass",
-    suggestion: "使用 softbody.total_mass = 2.0",
+    message: "SoftBody3D.mass is renamed to total_mass in Godot 4",
+    suggestion: "Use softbody.total_mass = 2.0",
   },
   // L008: ArrayMesh.create_triangle_shape
   {
     id: "L008",
     severity: "error",
     pattern: /\.create_triangle_shape\s*\(/,
-    message: "ArrayMesh.create_triangle_shape() 在 Godot 4 中不存在，应为 create_triangle_mesh()",
-    suggestion: "使用 mesh.create_triangle_mesh()",
+    message: "ArrayMesh.create_triangle_shape() doesn't exist in Godot 4; it is create_triangle_mesh()",
+    suggestion: "Use mesh.create_triangle_mesh()",
   },
   // L009: Node.get_child_or_null
   {
     id: "L009",
     severity: "error",
     pattern: /\bget_child_or_null\s*\(/,
-    message: "Node.get_child_or_null() 在 Godot 4.x 中已移除，使用 get_child() 或 find_child()",
-    suggestion: "使用 get_child(index) 或 find_child(\"name\")",
+    message: "Node.get_child_or_null() is removed in Godot 4.x; use get_child() or find_child()",
+    suggestion: "Use get_child(index) or find_child(\"name\")",
   },
   // L010: FogMaterial.albedo_color
   {
     id: "L010",
     severity: "error",
     pattern: /FogMaterial\w*\.albedo_color\s*=/,
-    message: "FogMaterial.albedo_color 在 Godot 4 中已重命名为 albedo",
-    suggestion: "使用 fog.albedo = Color.RED",
+    message: "FogMaterial.albedo_color is renamed to albedo in Godot 4",
+    suggestion: "Use fog.albedo = Color.RED",
   },
   // L011: Environment.physically_based_lights_enabled
   {
     id: "L011",
     severity: "error",
     pattern: /\.physically_based_lights_enabled\s*=/,
-    message: "Environment.physically_based_lights_enabled 在 Godot 4 中已移除",
-    suggestion: "此属性已移除，无直接替代方案",
+    message: "Environment.physically_based_lights_enabled is removed in Godot 4",
+    suggestion: "This property is removed, no direct replacement",
   },
   // L012: Line2D.dash_pattern non-typed array
   {
     id: "L012",
     severity: "error",
     pattern: /\.dash_pattern\s*=\s*\[/,
-    message: "Line2D.dash_pattern 需要 PackedFloat32Array 类型，不能使用普通数组字面量",
-    suggestion: "使用 line.dash_pattern = PackedFloat32Array([1.0, 2.0])",
+    message: "Line2D.dash_pattern needs a PackedFloat32Array, a plain array literal won't do",
+    suggestion: "Use line.dash_pattern = PackedFloat32Array([1.0, 2.0])",
   },
   // L013: CharacterBody3D.body_entered
   {
     id: "L013",
     severity: "error",
     pattern: /CharacterBody\w*\.body_entered/,
-    message: "CharacterBody3D 不提供 body_entered 信号，应使用 Area3D 子节点进行碰撞检测",
-    suggestion: "添加 Area3D 子节点并连接其 body_entered/body_exited 信号",
+    message: "CharacterBody3D has no body_entered signal; use an Area3D child for collision detection",
+    suggestion: "Add an Area3D child and connect its body_entered/body_exited signals",
   },
   // L002: RigidBody3D.bounce
   {
     id: "L002",
     severity: "error",
     pattern: /\.bounce\s*=/,
-    message: "RigidBody3D.bounce 在 Godot 4 中不存在，需使用 PhysicsMaterial",
-    suggestion: "使用 PhysicsMaterial:\n  var mat := PhysicsMaterial.new()\n  mat.bounce = 0.4\n  body.physics_material_override = mat",
+    message: "RigidBody3D.bounce doesn't exist in Godot 4; use a PhysicsMaterial",
+    suggestion: "Use a PhysicsMaterial:\n  var mat := PhysicsMaterial.new()\n  mat.bounce = 0.4\n  body.physics_material_override = mat",
     requiresSemanticValidation: true,
     contextFilter: (_match, context): boolean => {
       if (hasTypeContext(context.precedingLines, ['PhysicsMaterial'])) return false;
@@ -261,8 +261,8 @@ const RULES: LintRule[] = [
     id: "L007",
     severity: "error",
     pattern: /\.visibility_range_\w+\s*=/,
-    message: "visibility_range_* 属性位于 GeometryInstance3D，不在 Node3D 上",
-    suggestion: "确保使用的是 MeshInstance3D/GPUParticles3D 等 GeometryInstance3D 子类",
+    message: "visibility_range_* properties live on GeometryInstance3D, not Node3D",
+    suggestion: "Make sure it is a GeometryInstance3D subclass such as MeshInstance3D/GPUParticles3D",
     requiresSemanticValidation: true,
     contextFilter: (_match, context): boolean => {
       const geoSubclasses = ['MeshInstance3D', 'GPUParticles3D', 'CPUParticles3D',
@@ -274,39 +274,39 @@ const RULES: LintRule[] = [
   },
   // L001: look_at before add_child
   { id: "L001", severity: "error", pattern: /^$/m, isCallOrder: true,
-    message: "look_at() 在 add_child() 之前调用，节点不在场景树中",
-    suggestion: "先调用 add_child() 将节点加入场景树，再调用 look_at()" },
+    message: "look_at() is called before add_child(); the node is not in the scene tree",
+    suggestion: "Call add_child() first to put the node in the scene tree, then look_at()" },
   // L014: AStarGrid2D update clears point data
   { id: "L014", severity: "warning", pattern: /^$/m, isCallOrder: true,
-    message: "set_point_solid() 在 update() 之前调用，update() 会清除所有 point data",
-    suggestion: "先调用 grid.update()，再调用 grid.set_point_solid()" },
+    message: "set_point_solid() is called before update(); update() clears all point data",
+    suggestion: "Call grid.update() first, then grid.set_point_solid()" },
   // L015: RigidBody3D.look_at in _process
   { id: "L015", severity: "error", pattern: /^$/m, isCallOrder: true,
-    message: "在 _process/_physics_process 内对 RigidBody3D 调用 look_at() 会破坏物理模拟",
-    suggestion: "在 _integrate_forces() 中实现跟随逻辑" },
+    message: "Calling look_at() on a RigidBody3D inside _process/_physics_process breaks the physics simulation",
+    suggestion: "Implement the follow logic in _integrate_forces()" },
   // L016: add_child followed by immediate method call
   { id: "L016", severity: "warning", pattern: /^$/m, isCallOrder: true,
-    message: "add_child() 后同函数内立即访问子节点方法，可能因 _ready 未触发而失败",
-    suggestion: "使用 await get_tree().process_frame 等待一帧后再访问" },
+    message: "Child methods are accessed right after add_child() in the same function; may fail because _ready hasn't fired yet",
+    suggestion: "Wait a frame with await get_tree().process_frame before accessing it" },
   // L017: _unhandled_input with full-rect Control risk
   { id: "L017", severity: "warning", pattern: /_unhandled_input/,
-    message: "使用了 _unhandled_input — 如果场景中有全屏 Control（默认 mouse_filter=STOP），输入事件可能被拦截",
-    suggestion: "在覆盖视口的 Control 上显式设置 mouse_filter = Control.MOUSE_FILTER_IGNORE，或改用 _input()" },
+    message: "_unhandled_input is used — if the scene has a full-screen Control (default mouse_filter=STOP), input events may be swallowed",
+    suggestion: "Set mouse_filter = Control.MOUSE_FILTER_IGNORE explicitly on Controls covering the viewport, or use _input() instead" },
   // L018: TileSet add_source must precede TileData operations
   { id: "L018", severity: "error", pattern: /^$/m, isCallOrder: true,
-    message: "TileData 操作在 add_source() 之前调用，source_id 尚未注册",
-    suggestion: "先调用 tileset.add_source(atlas_source) 获取 source_id，再操作 TileData" },
+    message: "TileData is touched before add_source(); the source_id is not registered yet",
+    suggestion: "Call tileset.add_source(atlas_source) first to get the source_id, then work with TileData" },
   // L019: class_name cross-file resolution in headless
   { id: "L019", severity: "warning", pattern: /\bclass_name\s+\w+/,
-    message: "class_name 在 headless/MCP 环境中跨文件不可解析，其他文件无法通过类型名引用此类",
-    suggestion: "替代方案：\n  1. 使用方文件添加 const MyClass := preload('res://my_class.gd') 并用 MyClass 作类型注解\n  2. 导出函数用基类类型：func spawn() -> Node:（而非自定义类名）\n  3. 如需全局类型注册，可在 _ready 中用 Engine.register_script_class()（Godot 4.4+）" },
+    message: "class_name can't be resolved across files in a headless/MCP environment; other files can't reference this class by its type name",
+    suggestion: "Alternatives:\n  1. In the using file add const MyClass := preload('res://my_class.gd') and use MyClass as the type annotation\n  2. Type exported functions with the base class: func spawn() -> Node: (not the custom class name)\n  3. For global type registration, use Engine.register_script_class() in _ready (Godot 4.4+)" },
   // L020: AnimationPlayer.add_animation() removed in Godot 4
   {
     id: "L020",
     severity: "error",
     pattern: /\.add_animation\s*\(/,
-    message: "AnimationPlayer.add_animation() 在 Godot 4 中已移除，不能直接向 AnimationPlayer 添加动画",
-    suggestion: "使用 get_animation_library(\"\").add_animation(name, anim) 或创建 AnimationLibrary:\n  var lib := AnimationLibrary.new()\n  lib.add_animation(name, anim)\n  player.add_animation_library(\"\", lib)",
+    message: "AnimationPlayer.add_animation() is removed in Godot 4; animations can't be added to an AnimationPlayer directly",
+    suggestion: "Use get_animation_library(\"\").add_animation(name, anim) or create an AnimationLibrary:\n  var lib := AnimationLibrary.new()\n  lib.add_animation(name, anim)\n  player.add_animation_library(\"\", lib)",
     requiresSemanticValidation: true,
     contextFilter: (_match, context): boolean => {
       return hasTypeContext(context.precedingLines, ['AnimationPlayer', 'animation_player', 'anim_player', 'player']);
@@ -317,8 +317,8 @@ const RULES: LintRule[] = [
     id: "L021",
     severity: "warning",
     pattern: /^(\s*)var\s+(\w+)\s*[:=]/m,
-    message: "成员变量可能与父类成员同名，导致意外覆盖",
-    suggestion: "检查 extends 的基类是否有同名成员，如有请重命名此变量",
+    message: "A member variable may share its name with a parent class member and shadow it",
+    suggestion: "Check whether the extended base class has a member with this name; if so, rename the variable",
     requiresSemanticValidation: true,
     contextFilter: (match, context): boolean => {
       const varName = match[2]!;
@@ -342,8 +342,8 @@ const RULES: LintRule[] = [
     id: "L022",
     severity: "warning",
     pattern: /^(\s*)var\s+\w+\s*=\s*get_node\s*\(/m,
-    message: "_process 内使用 get_node() 轮询节点引用，每帧重复查找效率低",
-    suggestion: "在 _ready() 中缓存节点引用：onready var node = %NodeName 或 onready var node = $Path",
+    message: "get_node() polling inside _process looks the node up again every frame, which is slow",
+    suggestion: "Cache the node reference in _ready(): onready var node = %NodeName or onready var node = $Path",
     requiresSemanticValidation: true,
     contextFilter: (_match, context): boolean => {
       const recent = context.precedingLines.slice(-5).join('\n');
@@ -355,24 +355,24 @@ const RULES: LintRule[] = [
     id: "L023",
     severity: "error",
     pattern: /ImageUpdateMask\.UPDATE_WIDTH_IN_PERCENT/,
-    message: "RichTextLabel.ImageUpdateMask.UPDATE_WIDTH_IN_PERCENT 在 Godot 4.7 已重命名为 UPDATE_WIDTH_UNIT",
-    suggestion: "使用 ImageUpdateMask.UPDATE_WIDTH_UNIT(Godot 4.7+)",
+    message: "RichTextLabel.ImageUpdateMask.UPDATE_WIDTH_IN_PERCENT is renamed to UPDATE_WIDTH_UNIT in Godot 4.7",
+    suggestion: "Use ImageUpdateMask.UPDATE_WIDTH_UNIT (Godot 4.7+)",
   },
   // L024: AudioEffectSpectrumAnalyzer.tap_back_pos 移除 (Godot 4.7, GH-114355)
   {
     id: "L024",
     severity: "error",
     pattern: /\.tap_back_pos\b/,
-    message: "AudioEffectSpectrumAnalyzer.tap_back_pos 在 Godot 4.7 已移除",
-    suggestion: "移除 tap_back_pos 用法(Godot 4.7 迁移指南 GH-114355)",
+    message: "AudioEffectSpectrumAnalyzer.tap_back_pos is removed in Godot 4.7",
+    suggestion: "Remove tap_back_pos usage (Godot 4.7 migration guide GH-114355)",
   },
   // L025: DisplayServer accessibility API moved to AccessibilityServer in Godot 4.7 (GH-116839)
   {
     id: "L025",
     severity: "warning",
     pattern: /DisplayServer\.(accessibility_|AccessibilityLiveMode)/,
-    message: "DisplayServer 的 accessibility 方法/枚举在 Godot 4.7 移到 AccessibilityServer 单例（GH-116839）",
-    suggestion: "4.7 迁移：DisplayServer.accessibility_xxx() → AccessibilityServer.xxx()；枚举 DisplayServer.AccessibilityLiveMode → AccessibilityServer.AccessibilityLiveMode（accessibility_live 取值 LIVE_OFF/LIVE_POLITE/LIVE_ASSERTIVE）",
+    message: "DisplayServer's accessibility methods/enums moved to the AccessibilityServer singleton in Godot 4.7 (GH-116839)",
+    suggestion: "4.7 migration: DisplayServer.accessibility_xxx() → AccessibilityServer.xxx(); enum DisplayServer.AccessibilityLiveMode → AccessibilityServer.AccessibilityLiveMode (accessibility_live values LIVE_OFF/LIVE_POLITE/LIVE_ASSERTIVE)",
   },
 ];
 

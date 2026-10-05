@@ -41,7 +41,7 @@ export async function listClients(projectDir: string): Promise<void> {
 
 /** 客户端配置完成后的后续步骤提示(仅对有审批闸的客户端有意义) */
 const POST_CONFIG_HINTS: Record<string, string> = {
-  Warp: 'Warp 对项目级 .warp/.mcp.json 有审批闸:在 Warp Settings > Agents > MCP servers 手动开启 godot server(防恶意仓库自动执行)。',
+  Warp: 'Warp gates project-level .warp/.mcp.json behind approval: enable the godot server manually in Warp Settings > Agents > MCP servers (protects against malicious repos auto-running).',
 };
 
 export async function runConfigure(args: string[]): Promise<void> {
@@ -73,8 +73,8 @@ export async function runConfigure(args: string[]): Promise<void> {
   // 在非 Godot 项目目录运行会精确复现使用指南-Warp §5 的坑——前置警告不阻断
   const projectDir = process.cwd();
   if (adapter.scope === 'project' && !existsSync(join(projectDir, 'project.godot'))) {
-    console.warn(`  ⚠ 当前目录不是 Godot 项目(无 project.godot)——project scope 配置将指向 ${projectDir}。`);
-    console.warn('    建议在 Godot 项目根目录运行,或确认这是你有意的目标。');
+    console.warn(`  ⚠ The current directory is not a Godot project (no project.godot) — the project scope config will point at ${projectDir}.`);
+    console.warn('    Run it from the Godot project root, or confirm this is the target you intended.');
   }
 
   // 1. 未检测到:默认拒绝(--force 可越过 —— 配置写文件无害,客户端装好后即生效)

@@ -67,9 +67,9 @@ export async function handleTool(
       return textResult(
         JSON.stringify(
           opsSuccess(summary, [
-            `audit 文件: ${join(projectPath, ...AUDIT_LOG_REL)}`,
-            'changed_files 为项目相对路径(PII 护栏);riskHighlights 标 destructive/delete/failed',
-            '回滚用 suggest_rollback + entry_index',
+            `audit file: ${join(projectPath, ...AUDIT_LOG_REL)}`,
+            'changed_files are project-relative (PII guard); riskHighlights mark destructive/delete/failed',
+            'To roll back use suggest_rollback + entry_index',
           ]),
         ),
       );
@@ -94,7 +94,7 @@ export async function handleTool(
       return textResult(
         JSON.stringify(
           opsSuccess({ entry, suggestion }, [
-            'supported=true 仅 create 类可自动删 / project.godot 需 before_values;其余靠 Git(诚实)',
+            'supported=true only for create-type entries (auto-delete) / project.godot needs before_values; everything else relies on Git (honestly)',
           ]),
         ),
       );

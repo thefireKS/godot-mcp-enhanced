@@ -1,17 +1,17 @@
 # Capability Matrix
 
-> 自动生成，勿手改。由 `npm run build-matrix` 产出，漂移检测见 `npm run diff-matrix`。
+> Auto-generated, do not edit. Produced by `npm run build-matrix`; drift detection via `npm run diff-matrix`.
 
-## 概览
-- 工具总数：45
-- securityLevel：danger-api 11 / guarded 23 / safe 11
-- risk：read 124 / write 98 / destructive 10 / process 16
-- L2 覆盖：covered 0 / partial 0 / none 45
-- token 预算：tools/list ≈ 96950B / ~24238 tokens（description 17713B / schema 79237B，schema 占 82%）
-- annotations：readOnly 10 / destructive 5 / idempotent 13
-> 注：标 read 但实际启进程/有副作用(项目有意信任不确认): `validation.run_and_verify`, `validation.verify_delivery`
+## Overview
+- Total tools: 45
+- securityLevel: danger-api 11 / guarded 23 / safe 11
+- risk: read 124 / write 98 / destructive 10 / process 16
+- L2 coverage: covered 0 / partial 0 / none 45
+- Token budget: tools/list ≈ 96950B / ~24238 tokens (description 17713B / schema 79237B, schema is 82%)
+- annotations: readOnly 10 / destructive 5 / idempotent 13
+> Note: marked read but actually spawn processes / have side effects (deliberately trusted, no confirmation): `validation.run_and_verify`, `validation.verify_delivery`
 
-## danger-api 工具（L2 安全回归优先）
+## danger-api tools (L2 security regression first)
 - `audit` (core)
 - `godot_get_context` (core)
 - `help` (core)
@@ -24,7 +24,7 @@
 - `ui` (ui)
 - `validation` (core)
 
-## 覆盖缺口（L2=none）
+## Coverage gaps (L2=none)
 - `analysis` (code)
 - `android` (android)
 - `animation` (animation)
@@ -71,16 +71,16 @@
 - `validation` (core)
 - `workflow` (profiler)
 
-## 范围取舍（explicitly out of scope）
-以下品类经评估（2026-08-19 竞品横扫对表）明确**不做**，非遗漏：
-- **VisualShader 图谱编辑**（yanhuifair 8 工具/40+ 节点类型）：VisualShader 节点图是强交互编辑器域，AI 经文本属性路径（`VisualShaderNode*` 属性编辑）+ material/shader 工具已可覆盖大部分程序化材质需求；图谱级编排的维护成本（节点类型矩阵 × Godot 版本）远超收益。替代路径：`material` 工具（shader_read/write/load/save_file）+ `execute_gdscript` 动态构造。
+## Scope decisions (explicitly out of scope)
+The following categories were evaluated (competitor sweep, 2026-08-19) and are deliberately **not done**, not overlooked:
+- **VisualShader graph editing** (yanhuifair: 8 tools / 40+ node types): the VisualShader node graph is a heavily interactive editor domain; text property paths (editing `VisualShaderNode*` properties) + the material/shader tools already cover most procedural material needs; maintaining graph-level orchestration (node type matrix × Godot versions) costs far more than it gives. Alternative: the `material` tool (shader_read/write/load/save_file) + dynamic construction via `execute_gdscript`.
 
-## gdScriptImpl 说明
-- editor 侧：addons/godot_mcp_server/commands/*_commands.gd 按 group 匹配
-- headless 侧：恒为 exists=false（GDScript 由 gdscript-executor 运行时生成，无静态 1:1 文件）
-- editor 侧：按工具命令精确路由（EDITOR_COMMAND_ROUTING，源 command_handler.gd handle() 路由表）
+## gdScriptImpl notes
+- editor side: addons/godot_mcp_server/commands/*_commands.gd matched by group
+- headless side: always exists=false (GDScript is generated at runtime by gdscript-executor, no static 1:1 file)
+- editor side: exact routing by tool command (EDITOR_COMMAND_ROUTING, from the command_handler.gd handle() routing table)
 
-## token 预算 TOP 5
+## Token budget TOP 5
 - `game` (bridge): desc 1240B / schema 6743B / total 7983B
 - `ui` (ui): desc 1651B / schema 4909B / total 6560B
 - `scene` (core): desc 274B / schema 6043B / total 6317B

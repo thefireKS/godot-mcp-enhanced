@@ -1,23 +1,23 @@
 ---
 name: godot-mcp-safe-edit
-description: "安全编辑 edit_script search_and_replace validate_scripts 确认令牌 remove_node headless 改盘 editor 覆盖 沙箱 防误用 CRLF tab 缩进 —— 当你编辑 .gd/.tscn、删节点或执行危险操作时使用"
+description: "safe editing, edit_script, search_and_replace, validate_scripts, confirmation tokens, remove_node, headless disk writes, editor overwrite, sandbox, misuse protection, CRLF, tab indentation — use when editing .gd/.tscn, deleting nodes or running dangerous operations"
 ---
 
-## 安全编辑流
+## Safe editing flow
 
-编辑 `.gd`/`.tscn`、删节点、运行危险操作时的防护 checklist。工具细节见 `godot-mcp-core.md` 与 `godot-mcp-editor.md`。
+Protective checklist for editing `.gd`/`.tscn`, deleting nodes and running dangerous operations. Tool details in `godot-mcp-core.md` and `godot-mcp-editor.md`.
 
-**何时用**：编辑 `.gd`/`.tscn`、删节点、执行危险操作时。
+**When to use**: editing `.gd`/`.tscn`, deleting nodes, running dangerous operations.
 
-**checklist**：
-- [ ] 1. `edit_script` **优先 search_and_replace**（内容匹配、行号偏移鲁棒、CRLF 安全、免确认 token）；**禁用内置 Edit 工具改 .gd**（tab 缩进匹配率极低）
-- [ ] 2. 改 `.gd` 后必跑 `validate_scripts`（验证语法）
-- [ ] 3. headless 改盘 + editor 开同场景 → Ctrl+S 覆盖风险：建议 editor 内 Reload 场景或关闭该场景后再操作
-- [ ] 4. 危险操作（`remove_node` 等）需显式确认令牌
-- [ ] 5. GDScript 沙箱是**防误用层非防对抗**（间接构造可绕过；真正隔离须容器/VM + `GODOT_MCP_ALLOW_UNSAFE=false`）
-- [ ] 6. `write_script`/`edit_script` 写 .gd 前也走沙箱扫描（与 `execute_gdscript` 同威胁面，发现已知危险 API 模式（含 @tool 加载即执行等，清单不列举防被侦察）阻断 SANDBOX_VIOLATION；双 opt-in 旁路 `UNRESTRICTED + DISABLE_SAFETY`）
+**Checklist**:
+- [ ] 1. `edit_script` **with search_and_replace first** (content matching, survives line shifts, CRLF-safe, no confirmation token); **never edit .gd with the built-in Edit tool** (tab indentation rarely matches)
+- [ ] 2. Always run `validate_scripts` after changing a `.gd` (syntax check)
+- [ ] 3. Headless disk write + the editor has the same scene open → Ctrl+S overwrite risk: reload the scene in the editor or close it before continuing
+- [ ] 4. Dangerous operations (`remove_node` etc.) need an explicit confirmation token
+- [ ] 5. The GDScript sandbox is **a guard against misuse, not against adversaries** (indirect construction gets past it; real isolation needs a container/VM + `GODOT_MCP_ALLOW_UNSAFE=false`)
+- [ ] 6. `write_script`/`edit_script` also sandbox-scan before writing a .gd (same threat surface as `execute_gdscript`; known dangerous API patterns (including @tool run-on-load etc., list not published so it can't be probed) are blocked with SANDBOX_VIOLATION; double opt-in bypass `UNRESTRICTED + DISABLE_SAFETY`)
 
-**常见偏离**：
-- 用内置 Edit 工具改 `.gd`（tab 缩进失败）
-- 改完不 validate
-- headless 改盘后被 editor 旧版本 Ctrl+S 覆盖（MCP 不可控，须 Reload）
+**Common deviations**:
+- Editing a `.gd` with the built-in Edit tool (tab indentation fails)
+- Not validating after changes
+- After a headless disk write, the editor's old version overwrites it on Ctrl+S (MCP can't control it, reload first)

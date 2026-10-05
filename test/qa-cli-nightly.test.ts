@@ -110,7 +110,7 @@ describe('cli qa nightly', () => {
     // 回归清单 + 汇总 + 退出码
     const out = logs.join('\n');
     expect(out).toContain('REGRESSION  case-a');
-    expect(out).toContain('nightly 汇总: 1 套件 · 0 PASSED / 1 FAILED · 回归 1 · 修复 0');
+    expect(out).toContain('nightly summary: 1 suites · 0 PASSED / 1 FAILED · regressions 1 · fixed 0');
     expect(exitSpy).toHaveBeenCalledWith(1);
   });
 
@@ -126,8 +126,8 @@ describe('cli qa nightly', () => {
 
     const out = logs.join('\n');
     expect(out).toContain('IMPROVED');
-    expect(out).toContain('首次运行，无基线');
-    expect(out).toContain('nightly 汇总: 2 套件 · 2 PASSED / 0 FAILED · 回归 0 · 修复 1');
+    expect(out).toContain('first run, no baseline');
+    expect(out).toContain('nightly summary: 2 suites · 2 PASSED / 0 FAILED · regressions 0 · fixed 1');
     expect(exitSpy).toHaveBeenCalledWith(0);
     expect(appendAuditLine).toHaveBeenCalledTimes(2);
   });

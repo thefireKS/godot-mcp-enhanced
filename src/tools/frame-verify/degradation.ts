@@ -38,7 +38,7 @@ export function classifyDegradation(m: FrameMetrics): DegradationResult {
   const empty: DegradationResult['metrics'] = { meanConsecutive: 0, maxChange: 0, stallWindowRatio: 0, tailLag: 0 };
 
   if (m.frameCount < T.MIN_FRAMES) {
-    return { degraded: true, reason: `帧数不足（${m.frameCount} < ${T.MIN_FRAMES}）`, metrics: empty };
+    return { degraded: true, reason: `Not enough frames (${m.frameCount} < ${T.MIN_FRAMES})`, metrics: empty };
   }
 
   const meanConsecutive = mean(m.consecutiveSims);
@@ -65,16 +65,16 @@ export function classifyDegradation(m: FrameMetrics): DegradationResult {
   const metrics = { meanConsecutive, maxChange, stallWindowRatio, tailLag };
 
   if (meanConsecutive > T.IDENTICAL) {
-    return { degraded: true, reason: `帧全等（mean consecutive ${meanConsecutive.toFixed(4)} > ${T.IDENTICAL}，疑似相机/时序/输入未接线）`, metrics };
+    return { degraded: true, reason: `Frames identical (mean consecutive ${meanConsecutive.toFixed(4)} > ${T.IDENTICAL}; camera/timing/input probably not wired)`, metrics };
   }
   if (maxChange < T.NEVER_CHANGE) {
-    return { degraded: true, reason: `画面从未变化（maxChange ${maxChange.toFixed(4)} < ${T.NEVER_CHANGE}）`, metrics };
+    return { degraded: true, reason: `Picture never changed (maxChange ${maxChange.toFixed(4)} < ${T.NEVER_CHANGE})`, metrics };
   }
   if (stallWindowRatio > T.STALL_RATIO) {
-    return { degraded: true, reason: `超过半数窗口停滞（${(stallWindowRatio * 100).toFixed(0)}% 窗口 consecutive > ${T.STALL}）`, metrics };
+    return { degraded: true, reason: `More than half the windows stalled (${(stallWindowRatio * 100).toFixed(0)}% of windows consecutive > ${T.STALL})`, metrics };
   }
   if (tailLag > T.TAIL_LAG) {
-    return { degraded: true, reason: `后半段卡死（tailLag ${tailLag.toFixed(4)} > ${T.TAIL_LAG}，开头痛快后段冻结）`, metrics };
+    return { degraded: true, reason: `Second half froze (tailLag ${tailLag.toFixed(4)} > ${T.TAIL_LAG}: smooth start, frozen tail)`, metrics };
   }
   return { degraded: false, reason: 'ok', metrics };
 }

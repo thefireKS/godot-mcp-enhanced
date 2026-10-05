@@ -95,11 +95,11 @@ async function main(): Promise<void> {
   // ① GODOT_PATH 缺失 → incomplete + stderr 告警(IMPORTANT-9b,非静默跳过)
   if (!godotPath || !existsSync(godotPath)) {
     process.stderr.write(
-      `[M3c] GODOT_PATH 缺失或不存在 (${godotPath}) — gdscript 检查未执行,产出 incomplete report。\n` +
-      `  设置 GODOT_PATH 启用。未设时 gdscript 维度会硬否决(非静默跳过,防 CI 假绿)。\n`,
+      `[M3c] GODOT_PATH missing or nonexistent (${godotPath}) — gdscript check not run, producing an incomplete report.\n` +
+      `  Set GODOT_PATH to enable it. Without it the gdscript dimension is hard-vetoed (not silently skipped, so CI can't go falsely green).\n`,
     );
     writeReport({ errors: 0, warnings: 0, files: 0, details: [], detailsTotal: 0,
-                  incomplete: true, reason: `GODOT_PATH 缺失: ${godotPath}` });
+                  incomplete: true, reason: `GODOT_PATH missing: ${godotPath}` });
     return;
   }
 
@@ -113,7 +113,7 @@ async function main(): Promise<void> {
     result = await runGodotHeadless(['--headless', '--import', '--path', CHECK_PROJECT], godotPath, 120_000);
   } catch (e) {
     writeReport({ errors: 0, warnings: 0, files: expected, details: [], detailsTotal: 0,
-                  incomplete: true, reason: `spawn 失败: ${(e as Error).message}` });
+                  incomplete: true, reason: `spawn failed: ${(e as Error).message}` });
     return;
   }
 
@@ -125,7 +125,7 @@ async function main(): Promise<void> {
   const checkFiles = [...listGd(CHECK_ADDON), ...listGd(CHECK_SCRIPTS)];
   if (checkFiles.length !== expected) {
     writeReport({ ...parsed, files: checkFiles.length, incomplete: true,
-                  reason: `files 断言失败: 检查项目 ${checkFiles.length} ≠ 源 ${expected}` });
+                  reason: `files assertion failed: checked ${checkFiles.length} project files ≠ ${expected} source files` });
     return;
   }
   // class cache 断言(全部源 class_name 在 cache;当前仅 CommandHelpers)
@@ -138,7 +138,7 @@ async function main(): Promise<void> {
     const missing = srcClassNames.filter(n => !cache.includes(n));
     if (missing.length > 0) {
       writeReport({ ...parsed, files: expected, incomplete: true,
-                    reason: `class cache 缺: ${missing.join(', ')}(plugin 未加载?)` });
+                    reason: `class cache missing: ${missing.join(', ')} (plugin not loaded?)` });
       return;
     }
   }
@@ -152,5 +152,5 @@ const entry = fileURLToPath(import.meta.url);
 const arg1 = process.argv[1];
 const invoked = arg1 !== undefined && resolve(arg1) === entry;
 if (invoked) {
-  main().catch(e => { process.stderr.write(`check-gdscript 失败: ${(e as Error).stack ?? e}\n`); process.exit(1); });
+  main().catch(e => { process.stderr.write(`check-gdscript failed: ${(e as Error).stack ?? e}\n`); process.exit(1); });
 }

@@ -635,7 +635,7 @@ async function cleanupOldSessions(): Promise<void> {
     }
   }
   if (lockFailures.length > 0) {
-    getLogger().debug('gdscript', `cleanup stale dirs: ${lockFailures.length} 个 staging 目录清理失败(EPERM/EBUSY,Windows 句柄占用),待下次 cleanup 兜底`);
+    getLogger().debug('gdscript', `cleanup stale dirs: ${lockFailures.length} staging directories could not be removed (EPERM/EBUSY, Windows handles held); the next cleanup will retry`);
   }
 }
 

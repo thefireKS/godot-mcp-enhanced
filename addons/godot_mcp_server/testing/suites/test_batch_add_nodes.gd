@@ -107,20 +107,20 @@ func test_normal_batch_added_matches_real_tree_count() -> void:
 		{"node_type": "Node2D", "node_name": "_McpTestBatchA2", "parent_node_path": "_McpTestBatchArena"},
 		{"node_type": "Timer", "node_name": "_McpTestBatchA3", "parent_node_path": "_McpTestBatchArena"},
 	])
-	assert_false(resp.has("error"), "正常批次不应报错: %s" % str(resp.get("error", {})))
+	assert_false(resp.has("error"), "A normal batch should not fail: %s" % str(resp.get("error", {})))
 	var result: Dictionary = resp.get("result", {})
-	assert_eq(int(result.get("added", -1)), 3, "added 应为 3")
+	assert_eq(int(result.get("added", -1)), 3, "added should be 3")
 	## B5 核心契约:返回 added 严格等于独立数的真实入树计数(不信返回值)。
 	assert_eq(_count_tree_children(), int(result.get("added", -1)),
-		"真实入树计数(is_inside_tree)应 == added(B5 契约:返回值不得虚报)")
+		"The real in-tree count (is_inside_tree) should == added (B5 contract: the return value must not overstate)")
 	## 逐节点真实入树验证。
 	for name in ["_McpTestBatchA1", "_McpTestBatchA2", "_McpTestBatchA3"]:
 		var n := CommandHelpers.find_node(_arena, name)
-		assert_true(n != null and n.is_inside_tree(), "%s 应真实入树" % name)
+		assert_true(n != null and n.is_inside_tree(), "%s should really be in the tree" % name)
 	## 批量 undo 原子性:一次 undo 三个节点全部离树。
 	var did_undo := editor_undo(_plugin.get_undo_redo())
-	assert_true(did_undo, "editor_undo 应成功(批次 action 在栈上)")
-	assert_eq(_count_tree_children(), 0, "批量 undo 后 arena 应清空(原子性)")
+	assert_true(did_undo, "editor_undo should succeed (the batch action is on the stack)")
+	assert_eq(_count_tree_children(), 0, "The arena should be empty after the batch undo (atomicity)")
 
 
 # ----- test 2: 无效 parent —— precheck 整体拒绝 + 零节点入树 ------------------
@@ -131,14 +131,14 @@ func test_invalid_parent_rejects_whole_batch() -> void:
 		{"node_type": "Node", "node_name": "_McpTestBatchOkNode", "parent_node_path": "_McpTestBatchArena"},
 		{"node_type": "Node", "node_name": "_McpTestBatchOrphan", "parent_node_path": "_McpTestBatchArena/NoSuchParent"},
 	])
-	assert_true(resp.has("error"), "含无效 parent 的批次应整体报错(实现为 precheck 全拒,非部分成功)")
+	assert_true(resp.has("error"), "A batch with an invalid parent should fail as a whole (implemented as a full precheck rejection, not partial success)")
 	var err: Dictionary = resp.get("error", {})
-	assert_eq(int(err.get("code", 0)), -32002, "错误码应为 -32002(parent not found)")
-	assert_contains(String(err.get("message", "")), "NoSuchParent", "错误信息应指出缺失的 parent")
+	assert_eq(int(err.get("code", 0)), -32002, "Error code should be -32002 (parent not found)")
+	assert_contains(String(err.get("message", "")), "NoSuchParent", "The error message should name the missing parent")
 	## 零节点入树:有效定义的那个节点也不得入树(precheck 语义,无部分成功)。
-	assert_eq(_count_tree_children(), before, "整体拒绝后零新增节点入树")
+	assert_eq(_count_tree_children(), before, "No new nodes in the tree after the whole batch is rejected")
 	var leaked := CommandHelpers.find_node(EditorInterface.get_edited_scene_root(), "_McpTestBatchOkNode")
-	assert_true(leaked == null, "整体拒绝后不应残留任何已 instantiate 的节点(零孤儿)")
+	assert_true(leaked == null, "No instantiated nodes should be left over after the whole batch is rejected (zero orphans)")
 
 
 # ----- test 3: property coerce 失败 —— failed 列表正确 + 节点仍入树 ------------
@@ -151,20 +151,20 @@ func test_property_coerce_failure_lists_failed_node_still_added() -> void:
 		## 对照节点不带 properties(注意 "name" 在 BLOCKED_PROPERTIES,不能当合法属性用)。
 		{"node_type": "Node", "node_name": "_McpTestBatchGoodProp", "parent_node_path": "_McpTestBatchArena"},
 	])
-	assert_false(resp.has("error"), "含 coerce 失败的批次不应整体报错(部分失败路径): %s" % str(resp.get("error", {})))
+	assert_false(resp.has("error"), "A batch with a coerce failure should not fail as a whole (partial failure path): %s" % str(resp.get("error", {})))
 	var result: Dictionary = resp.get("result", {})
 	## coerce 失败只跳过该 property 的设置,节点仍 add_child → added 计两者。
-	assert_eq(int(result.get("added", -1)), 2, "coerce 失败的节点仍入树,added 应为 2")
+	assert_eq(int(result.get("added", -1)), 2, "Nodes with a coerce failure still enter the tree, added should be 2")
 	assert_eq(_count_tree_children(), int(result.get("added", -1)),
-		"真实入树计数应 == added(与 failed 列表语义交叉验证)")
+		"The real in-tree count should == added (cross-checked with the failed list semantics)")
 	## failed 列表:含节点名 + 失败 key + 错误文本。
 	var failed: Array = result.get("failed", [])
-	assert_eq(failed.size(), 1, "failed 列表应有 1 条(position coerce 失败)")
+	assert_eq(failed.size(), 1, "The failed list should have 1 entry (position coerce failure)")
 	if failed.size() == 1:
 		var f: Dictionary = failed[0]
-		assert_eq(String(f.get("node", "")), "_McpTestBatchBadProp", "failed 条目应记录节点名")
-		assert_eq(String(f.get("key", "")), "position", "failed 条目应记录失败属性 key")
-		assert_contains(String(f.get("error", "")), "Property not found", "failed 条目错误文本应为 Property not found")
+		assert_eq(String(f.get("node", "")), "_McpTestBatchBadProp", "The failed entry should record the node name")
+		assert_eq(String(f.get("key", "")), "position", "The failed entry should record the failing property key")
+		assert_contains(String(f.get("error", "")), "Property not found", "The failed entry's error text should be Property not found")
 
 
 # ----- test 4: 上限防御 —— >100 节点整体拒绝 -----------------------------------
@@ -175,9 +175,9 @@ func test_over_100_nodes_rejected() -> void:
 		nodes.append({"node_type": "Node", "node_name": "_McpTestBatchOver%d" % i, "parent_node_path": "_McpTestBatchArena"})
 	var before := _count_tree_children()
 	var resp := _batch(nodes)
-	assert_true(resp.has("error"), "101 节点应被上限拒绝")
-	assert_eq(int(resp.get("error", {}).get("code", 0)), -32004, "上限拒绝错误码应为 -32004")
-	assert_eq(_count_tree_children(), before, "上限拒绝后零节点入树")
+	assert_true(resp.has("error"), "101 nodes should be rejected by the limit")
+	assert_eq(int(resp.get("error", {}).get("code", 0)), -32004, "The limit rejection error code should be -32004")
+	assert_eq(_count_tree_children(), before, "No nodes in the tree after the limit rejection")
 
 
 # ----- test 5: 多层级 —— 两批次 parent/child 建树,层级真实入树 ------------------
@@ -190,25 +190,25 @@ func test_multi_level_hierarchy_lands_in_tree() -> void:
 	var resp1 := _batch([
 		{"node_type": "Node", "node_name": "_McpTestBatchParent", "parent_node_path": "_McpTestBatchArena"},
 	])
-	assert_false(resp1.has("error"), "批次1(Parent)不应报错: %s" % str(resp1.get("error", {})))
-	assert_eq(int(resp1.get("result", {}).get("added", -1)), 1, "批次1 added 应为 1")
+	assert_false(resp1.has("error"), "Batch 1 (Parent) should not fail: %s" % str(resp1.get("error", {})))
+	assert_eq(int(resp1.get("result", {}).get("added", -1)), 1, "Batch 1 added should be 1")
 	var resp2 := _batch([
 		{"node_type": "Node2D", "node_name": "_McpTestBatchChild", "parent_node_path": "_McpTestBatchArena/_McpTestBatchParent"},
 	])
-	assert_false(resp2.has("error"), "批次2(Child 挂 Parent)不应报错: %s" % str(resp2.get("error", {})))
-	assert_eq(int(resp2.get("result", {}).get("added", -1)), 1, "批次2 added 应为 1")
+	assert_false(resp2.has("error"), "Batch 2 (Child under Parent) should not fail: %s" % str(resp2.get("error", {})))
+	assert_eq(int(resp2.get("result", {}).get("added", -1)), 1, "Batch 2 added should be 1")
 	## 层级真实入树:Parent 在 arena 下,Child 在 Parent 下,且都在树上。
 	var parent_n := CommandHelpers.find_node(_arena, "_McpTestBatchParent")
-	assert_true(parent_n != null and parent_n.is_inside_tree(), "Parent 应挂 arena 且入树")
+	assert_true(parent_n != null and parent_n.is_inside_tree(), "Parent should hang under the arena and be in the tree")
 	var child_n := CommandHelpers.find_node(_arena, "_McpTestBatchParent/_McpTestBatchChild")
-	assert_true(child_n != null and child_n.is_inside_tree(), "Child 应挂 Parent 且入树")
+	assert_true(child_n != null and child_n.is_inside_tree(), "Child should hang under Parent and be in the tree")
 	if child_n != null and parent_n != null:
-		assert_eq(child_n.get_parent(), parent_n, "Child 的 parent 应是批次1 的 Parent")
+		assert_eq(child_n.get_parent(), parent_n, "Child's parent should be Batch 1's Parent")
 	## LIFO undo:第一次 undo 撤 Child,第二次撤 Parent(逐层)。
 	var did_undo1 := editor_undo(_plugin.get_undo_redo())
-	assert_true(did_undo1, "第一次 editor_undo 应成功")
-	assert_true(CommandHelpers.find_node(_arena, "_McpTestBatchChild") == null, "undo 后 Child 应离树")
-	assert_true(parent_n != null and is_instance_valid(parent_n), "撤 Child 后 Parent 仍在")
+	assert_true(did_undo1, "The first editor_undo should succeed")
+	assert_true(CommandHelpers.find_node(_arena, "_McpTestBatchChild") == null, "Child should leave the tree after undo")
+	assert_true(parent_n != null and is_instance_valid(parent_n), "Parent is still there after undoing Child")
 	var did_undo2 := editor_undo(_plugin.get_undo_redo())
-	assert_true(did_undo2, "第二次 editor_undo 应成功")
-	assert_eq(_count_tree_children(), 0, "两次 undo 后 arena 应清空")
+	assert_true(did_undo2, "The second editor_undo should succeed")
+	assert_eq(_count_tree_children(), 0, "The arena should be empty after two undos")

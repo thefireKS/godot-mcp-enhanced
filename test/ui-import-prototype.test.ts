@@ -187,8 +187,8 @@ describe('ui_import_prototype 正常链路(inline geometry)', () => {
     expect(r1!.isError).toBeFalsy();
     const w1 = JSON.parse(textOf(r1)).data.build_warnings.join('\n');
     expect(w1).toContain('parent_path="/root/HUD"');
-    expect(w1).toContain('原点对齐');
-    expect(w1).toContain('根级 diff 恒误报');
+    expect(w1).toContain('aligned to the origin');
+    expect(w1).toContain('root-level diffs are always false alarms');
 
     mockSinglePhase();
     const r2 = await handleTool('ui', {
@@ -197,7 +197,7 @@ describe('ui_import_prototype 正常链路(inline geometry)', () => {
     }, createCtx());
     expect(r2!.isError).toBeFalsy();
     const w2 = JSON.parse(textOf(r2)).data.build_warnings.join('\n');
-    expect(w2).not.toContain('根级 diff 恒误报');
+    expect(w2).not.toContain('root-level diffs are always false alarms');
   });
 
   // 审查遗留②:尾斜杠变体('root/' → 归一化为 '/root/')与 '/root' 语义等价,
@@ -211,7 +211,7 @@ describe('ui_import_prototype 正常链路(inline geometry)', () => {
       }, createCtx());
       expect(r!.isError).toBeFalsy();
       const w = JSON.parse(textOf(r)).data.build_warnings.join('\n');
-      expect(w).not.toContain('根级 diff 恒误报');
+      expect(w).not.toContain('root-level diffs are always false alarms');
     }
   });
 
@@ -281,7 +281,7 @@ describe('ui_import_prototype geometry_path', () => {
     }, createCtx());
     expect(result!.isError).toBe(true);
     expect(textOf(result)).toContain('INVALID_PARAMS');
-    expect(textOf(result)).toMatch(/traversal|越权|非法/i);
+    expect(textOf(result)).toMatch(/traversal|越权|非法|invalid/i);
     expect(execMock).not.toHaveBeenCalled();
   });
 

@@ -34,7 +34,7 @@ export const DEPRECATED_PROPERTIES: Record<string, Record<string, DeprecatedProp
     "friction": { removed: true, replacement: "PhysicsMaterial.friction via physics_material_override" },
   },
   "CylinderMesh": {
-    "radius": { removed: true, replacement: "top_radius 和 bottom_radius 分别设置", lintRule: "L003" },
+    "radius": { removed: true, replacement: "set top_radius and bottom_radius separately", lintRule: "L003" },
   },
   "FogMaterial": {
     "albedo_color": { removed: false, replacement: "albedo", lintRule: "L010" },

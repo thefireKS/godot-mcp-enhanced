@@ -24,7 +24,7 @@ static func place_one(
 	material: Variant, node_name: String, parent_path: String, request_id: int
 ) -> Dictionary:
 	if root == null:
-		return {"error": {"code": "INVALID_PARAMS", "message": "root 为 null（无活动场景）"}}
+		return {"error": {"code": "INVALID_PARAMS", "message": "root is null (no active scene)"}}
 	var parent := resolve_parent(root, parent_path)
 	if parent == null:
 		return {"error": {"code": "PARENT_NOT_FOUND", "message": "parent: %s" % parent_path}}
@@ -56,7 +56,7 @@ static func place_one(
 # 返回 {result:{node_paths:[]}} 或 {error:{code,message}}
 static func place_batch(root: Node, undo_mgr: Node, items: Array, request_id: int) -> Dictionary:
 	if root == null:
-		return {"error": {"code": "INVALID_PARAMS", "message": "root 为 null（无活动场景）"}}
+		return {"error": {"code": "INVALID_PARAMS", "message": "root is null (no active scene)"}}
 	if items.size() > BATCH_LIMIT:
 		return {"error": {"code": "BATCH_LIMIT_EXCEEDED", "message": "batch > %d: %d" % [BATCH_LIMIT, items.size()]}}
 	# 预校验原子：任一 item 失败立即返错（零节点落地，不入 undo 栈）
@@ -111,12 +111,12 @@ static func place_path(
 	align_vertices: bool, request_id: int
 ) -> Dictionary:
 	if mode == "continuous" and shape == "ramp":
-		return {"error": {"code": "UNSUPPORTED_SHAPE", "message": "continuous ramp 阻塞（方案 A：上游 make_ramp CRITICAL 未修）"}}
+		return {"error": {"code": "UNSUPPORTED_SHAPE", "message": "continuous ramp blocked (option A: upstream make_ramp CRITICAL not fixed)"}}
 	if root == null:
-		return {"error": {"code": "INVALID_PARAMS", "message": "root 为 null（无活动场景）"}}
+		return {"error": {"code": "INVALID_PARAMS", "message": "root is null (no active scene)"}}
 	var segments := PathGenerator.sample(points, mode, spacing, count, align, align_vertices)
 	if segments.is_empty():
-		return {"error": {"code": "INVALID_PARAMS", "message": "path 采样空（points<2 / 总长 0 / 参数非法）"}}
+		return {"error": {"code": "INVALID_PARAMS", "message": "path sampling empty (points<2 / total length 0 / invalid parameters)"}}
 	# 构造 items（每段注入 position/rotation/length）
 	var items: Array = []
 	var seg_count: int = segments.size()
@@ -198,21 +198,21 @@ static func _apply_transform(node: Node3D, d: Variant) -> void:
 # batch 原子保证：任一失败零节点落地
 static func _validate_item(root: Node, item: Variant) -> Dictionary:
 	if not (item is Dictionary):
-		return {"code": "INVALID_PARAMS", "message": "item 非 Dictionary"}
+		return {"code": "INVALID_PARAMS", "message": "item is not a Dictionary"}
 	var d: Dictionary = item
 	if not d.has("shape"):
-		return {"code": "INVALID_PARAMS", "message": "item 缺 shape 字段"}
+		return {"code": "INVALID_PARAMS", "message": "item is missing the shape field"}
 	var shape := String(d["shape"])
 	var params: Dictionary = d.get("params", {})
 	# shape 校验：create_mesh 返 null = 未知 shape（10 种以外）→ UNSUPPORTED_SHAPE
 	var mesh := AssetFactory.create_mesh(shape, params)
 	if mesh == null:
-		return {"code": "UNSUPPORTED_SHAPE", "message": "未知 shape: %s" % shape}
+		return {"code": "UNSUPPORTED_SHAPE", "message": "Unknown shape: %s" % shape}
 	# parent 校验（若提供）
 	var parent_path := String(d.get("parent", ""))
 	if parent_path != "":
 		if resolve_parent(root, parent_path) == null:
-			return {"code": "INVALID_PARAMS", "message": "parent 未找到: %s" % parent_path}
+			return {"code": "INVALID_PARAMS", "message": "parent not found: %s" % parent_path}
 	# material 不强校验（create_material 三态 + null 都吃，非法回退 default）
 	return {}
 

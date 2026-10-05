@@ -24,23 +24,23 @@ const COUNT_FIELDS = ['numTotalTests', 'numPassedTests', 'numFailedTests', 'numP
  */
 export function collectIntegration(jsonPath: string): DimensionResult {
   if (!existsSync(jsonPath)) {
-    return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json 不存在: ${jsonPath}` };
+    return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json does not exist: ${jsonPath}` };
   }
   const size = statSync(jsonPath).size;
   if (size > MAX_REPORT_BYTES) {
-    return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json 过大: ${size} bytes > ${MAX_REPORT_BYTES}` };
+    return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json too large: ${size} bytes > ${MAX_REPORT_BYTES}` };
   }
   let report: VitestJsonReport;
   try {
     report = JSON.parse(readFileSync(jsonPath, 'utf8'));
   } catch (e) {
-    return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json 解析失败: ${(e as Error).message}` };
+    return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `Failed to parse e2e json: ${(e as Error).message}` };
   }
   // A3:计数字段存在但非有限数字 → 视为污染,na(防非数字类型致通过率 NaN 传播)
   for (const k of COUNT_FIELDS) {
     const val = (report as Record<string, unknown>)[k];
     if (val !== undefined && val !== null && (typeof val !== 'number' || !Number.isFinite(val))) {
-      return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json 字段 ${k} 类型异常` };
+      return { score: NA_SCORE, weight: WEIGHTS.integration, status: 'na', detail: `e2e json field ${k} has the wrong type` };
     }
   }
   const passed = report.numPassedTests ?? 0;
@@ -51,7 +51,7 @@ export function collectIntegration(jsonPath: string): DimensionResult {
   if (ran === 0) {
     return {
       score: NA_SCORE, weight: WEIGHTS.integration, status: 'na',
-      detail: 'e2e 全部 skip(无 Godot?),无真实集成数据',
+      detail: 'All e2e tests skipped (no Godot?), no real integration data',
       raw: { passed, failed, pending, total },
     };
   }

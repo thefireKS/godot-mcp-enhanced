@@ -27,7 +27,7 @@ export function archiveFrame(run: ProofRun, index: number, pngBuffer: Buffer): s
   // B3:累计字节,超 100MB 配额拒绝(防失控帧捕获撑爆磁盘)
   run.bytes += pngBuffer.length;
   if (run.bytes > MAX_PROOF_BYTES) {
-    throw new Error(`proof bundle 配额超限: ${run.bytes} bytes > ${MAX_PROOF_BYTES}`);
+    throw new Error(`proof bundle quota exceeded: ${run.bytes} bytes > ${MAX_PROOF_BYTES}`);
   }
   const name = `frame_${String(index).padStart(2, '0')}.png`;
   fs.writeFileSync(path.join(run.dir, name), pngBuffer);
@@ -39,7 +39,7 @@ export function archiveFrame(run: ProofRun, index: number, pngBuffer: Buffer): s
 export function recordFrameBytes(run: ProofRun, filePath: string): void {
   run.bytes += fs.statSync(filePath).size;
   if (run.bytes > MAX_PROOF_BYTES) {
-    throw new Error(`proof bundle 配额超限: ${run.bytes} bytes > ${MAX_PROOF_BYTES}`);
+    throw new Error(`proof bundle quota exceeded: ${run.bytes} bytes > ${MAX_PROOF_BYTES}`);
   }
 }
 

@@ -426,9 +426,9 @@ async function ensureClassNameImport(
   try {
     const godot = await ctx.findGodot();
     await runImport(projectPath, godot, 30_000);
-    return `\n\n⚠️ 检测到 class_name '${after}'，已自动 --import 重建 .godot/global_script_class_cache。后续 execute_gdscript / F5 可直接引用。`;
+    return `\n\n⚠️ Detected class_name '${after}'; ran --import automatically to rebuild .godot/global_script_class_cache. Later execute_gdscript / F5 can reference it directly.`;
   } catch (err) {
-    return `\n\n⚠️ 检测到 class_name '${after}' 但自动 --import 失败: ${err instanceof Error ? err.message : String(err)}。需手动 \`godot --headless --import --path <project>\` 重建 cache，否则后续可能 "Identifier not declared"。`;
+    return `\n\n⚠️ Detected class_name '${after}' but the automatic --import failed: ${err instanceof Error ? err.message : String(err)}. Rebuild the cache manually with \`godot --headless --import --path <project>\`, otherwise later code may hit "Identifier not declared".`;
   }
 }
 
@@ -531,7 +531,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
             const suggestion = getTemplateSuggestion(issue.rule);
             if (suggestion) {
               const preview = suggestion.split('\n').slice(0, 3).join('\n');
-              suggestions.add(`  (${issue.rule}) → 建议:\n    ${preview}\n    ... (完整模板见 templates(action=list))`);
+              suggestions.add(`  (${issue.rule}) → suggestion:\n    ${preview}\n    ... (full template via templates(action=list))`);
             }
           }
           if (suggestions.size > 0) {

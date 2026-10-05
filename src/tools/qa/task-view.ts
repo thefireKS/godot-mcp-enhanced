@@ -48,5 +48,5 @@ export function toTaskPayload(r: RunRecord): Record<string, unknown> {
 /** wire 校验:TaskSchema.safeParse 失败即实现 bug(注册表字段与契约漂移),早爆。 */
 export function assertTaskWire(t: WireTask): void {
   const r = TaskSchema.safeParse(t);
-  if (!r.success) throw new Error(`task wire 校验失败(实现 bug): ${JSON.stringify(r.error.issues.map(i => `${i.path.join('.')}: ${i.message}`))}`);
+  if (!r.success) throw new Error(`task wire validation failed (implementation bug): ${JSON.stringify(r.error.issues.map(i => `${i.path.join('.')}: ${i.message}`))}`);
 }

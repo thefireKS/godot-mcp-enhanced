@@ -9,15 +9,15 @@ import type { ScoreJson } from './types.js';
 
 /** 读 score.json + 结构守卫(失败 throw,cli 用 try/catch 接 → console.error + exit)。gate/pr-comment/html 3 处共用。 */
 function loadScore(scorePath: string): ScoreJson {
-  if (!existsSync(scorePath)) throw new Error('score.json 不存在,先跑 npm run score');
+  if (!existsSync(scorePath)) throw new Error('score.json does not exist, run npm run score first');
   let score: ScoreJson;
   try {
     score = JSON.parse(readFileSync(scorePath, 'utf8'));
   } catch {
-    throw new Error('score.json 解析失败,重新跑 npm run score');
+    throw new Error('Failed to parse score.json, re-run npm run score');
   }
   if (!score || typeof score.total !== 'number' || !Array.isArray(score.hardFails)) {
-    throw new Error('score.json 结构异常(total/hardFails 缺失或类型错),重新跑 npm run score');
+    throw new Error('score.json is malformed (total/hardFails missing or wrong type), re-run npm run score');
   }
   return score;
 }
@@ -39,10 +39,10 @@ if (invoked) {
     }
     const { passed, reasons } = evaluateGate(score);
     if (!passed) {
-      console.error('质量门禁未过:\n' + reasons.join('\n'));
+      console.error('Quality gate failed:\n' + reasons.join('\n'));
       process.exit(1);
     }
-    process.stdout.write(`质量门禁通过: total=${score.total}\n`);
+    process.stdout.write(`Quality gate passed: total=${score.total}\n`);
   } else if (cmd === 'pr-comment') {
     const scorePath = resolve(process.cwd(), 'coverage/score.json');
     let score: ScoreJson;
@@ -54,7 +54,7 @@ if (invoked) {
     }
     const outPath = resolve(process.cwd(), 'coverage/pr-comment.md');
     writeFileSync(outPath, renderPrComment(score), 'utf8');
-    process.stdout.write(`PR comment 写入: ${outPath}\n`);
+    process.stdout.write(`PR comment written: ${outPath}\n`);
   } else if (cmd === 'html') {
     const scorePath = resolve(process.cwd(), 'coverage/score.json');
     let score: ScoreJson;
@@ -66,7 +66,7 @@ if (invoked) {
     }
     const outPath = resolve(process.cwd(), 'coverage/score-report.html');
     writeFileSync(outPath, renderScoreHtml(score), 'utf8');
-    process.stdout.write(`HTML 报告写入: ${outPath}\n`);
+    process.stdout.write(`HTML report written: ${outPath}\n`);
   } else {
     const lcovPath = resolve(process.cwd(), 'coverage/lcov.info');
     const outPath = resolve(process.cwd(), 'coverage/score.json');

@@ -305,12 +305,12 @@ export async function assertScreenshotDiff(args: Record<string, unknown>): Promi
     return textResult(JSON.stringify({ success: false, error: 'reference is required for screenshot_diff', error_code: 'INVALID_PARAMS' }));
   }
   if (!projectPathRaw) {
-    return textResult(JSON.stringify({ success: false, error: 'project_path is required for screenshot_diff (解析 user:// 截图路径)', error_code: 'INVALID_PARAMS' }));
+    return textResult(JSON.stringify({ success: false, error: 'project_path is required for screenshot_diff (to resolve user:// screenshot paths)', error_code: 'INVALID_PARAMS' }));
   }
   const projAbs = resolve(projectPathRaw);
   if (!isPathInAllowedRoots(projAbs)) {
     // P2-17: 不回显 resolve 后的绝对路径(PII 护栏立场与 dispatcher 一致)
-    return textResult(JSON.stringify({ success: false, error: 'project_path 不在 ALLOWED_PROJECT_PATHS 白名单内(检查环境变量或配置的项目根)', error_code: 'INVALID_PATH' }));
+    return textResult(JSON.stringify({ success: false, error: 'project_path is not in the ALLOWED_PROJECT_PATHS whitelist (check the env var or configured project roots)', error_code: 'INVALID_PATH' }));
   }
   // reference 解析:res:// → 项目内;相对 → 项目内;绝对直用;统一过白名单
   let refAbs: string;
@@ -319,7 +319,7 @@ export async function assertScreenshotDiff(args: Record<string, unknown>): Promi
   else refAbs = resolve(projAbs, reference);
   if (!isPathInAllowedRoots(refAbs)) {
     // P2-17: 不回显 resolve 后的绝对路径(PII 护栏立场与 dispatcher 一致)
-    return textResult(JSON.stringify({ success: false, error: `reference 不在 ALLOWED_PROJECT_PATHS 白名单内: ${basename(refAbs)}`, error_code: 'INVALID_PATH' }));
+    return textResult(JSON.stringify({ success: false, error: `reference is not in the ALLOWED_PROJECT_PATHS whitelist: ${basename(refAbs)}`, error_code: 'INVALID_PATH' }));
   }
 
   const resp = await sendToBridge('take_screenshot', {});
@@ -328,11 +328,11 @@ export async function assertScreenshotDiff(args: Record<string, unknown>): Promi
   }
   const shot = (resp.result ?? {}) as { success?: boolean; path?: string; size?: { x: number; y: number } };
   if (shot.success !== true || typeof shot.path !== 'string') {
-    return textResult(JSON.stringify({ success: false, error: `take_screenshot 未成功: ${JSON.stringify(resp.result).slice(0, 200)}`, error_code: 'BRIDGE_ERROR' }));
+    return textResult(JSON.stringify({ success: false, error: `take_screenshot did not succeed: ${JSON.stringify(resp.result).slice(0, 200)}`, error_code: 'BRIDGE_ERROR' }));
   }
   const localShot = resolveGameDataPath(projAbs, shot.path);
   if (!localShot) {
-    return textResult(JSON.stringify({ success: false, error: `user:// 截图无法解析到本机路径: ${shot.path}(user:// 布局异常或文件不存在)`, error_code: 'ASSERT_ERROR' }));
+    return textResult(JSON.stringify({ success: false, error: `user:// screenshot can't be resolved to a local path: ${shot.path} (unusual user:// layout, or the file does not exist)`, error_code: 'ASSERT_ERROR' }));
   }
 
   let refBuf: Buffer;
@@ -342,7 +342,7 @@ export async function assertScreenshotDiff(args: Record<string, unknown>): Promi
     actualBuf = readFileSync(localShot);
   } catch {
     // P2-17: ENOENT 的 err.message 含完整绝对路径——回显文件名即可定位,不泄路径
-    return textResult(JSON.stringify({ success: false, error: `读图失败(文件缺失或不可读): 参考图 ${basename(refAbs)} / 截图 ${basename(localShot)}`, error_code: 'ASSERT_ERROR' }));
+    return textResult(JSON.stringify({ success: false, error: `Failed to read images (missing or unreadable): reference ${basename(refAbs)} / screenshot ${basename(localShot)}`, error_code: 'ASSERT_ERROR' }));
   }
 
   let diff;
@@ -352,10 +352,10 @@ export async function assertScreenshotDiff(args: Record<string, unknown>): Promi
     const diffErr = (e as Error).message;
     // 尺寸不一致:FAILED(带双方尺寸),不是基础设施错误
     if (diffErr.includes('dimensions mismatch')) {
-      return fail('screenshot_diff', { dimensions: { expected: '参考图与截图同尺寸', actual: diffErr } }, { reference: refAbs });
+      return fail('screenshot_diff', { dimensions: { expected: 'reference and screenshot are the same size', actual: diffErr } }, { reference: refAbs });
     }
     // 其余解码失败(非 PNG/损坏图):基础设施错误 ASSERT_ERROR——不再误报"尺寸不一致"误导排错(审查 Minor⑤)
-    return textResult(JSON.stringify({ success: false, error: `读图/解码失败: ${diffErr}`, error_code: 'ASSERT_ERROR' }));
+    return textResult(JSON.stringify({ success: false, error: `Failed to read/decode images: ${diffErr}`, error_code: 'ASSERT_ERROR' }));
   }
 
   // 可选证据落盘(失败不改变判定)
@@ -368,7 +368,7 @@ export async function assertScreenshotDiff(args: Record<string, unknown>): Promi
     const evAbs = resolve(evidencePath);
     const reportsDir = qaReportsDir();
     if (!(evAbs === reportsDir || evAbs.startsWith(reportsDir + sep))) {
-      return textResult(JSON.stringify({ success: false, error: `evidence_path 必须位于 qa-reports 目录内: ${reportsDir}(拒绝任意路径写入): ${evAbs}`, error_code: 'INVALID_PATH' }));
+      return textResult(JSON.stringify({ success: false, error: `evidence_path must be inside the qa-reports directory: ${reportsDir} (arbitrary write paths are refused): ${evAbs}`, error_code: 'INVALID_PATH' }));
     }
     try {
       mkdirSync(dirname(evAbs), { recursive: true });

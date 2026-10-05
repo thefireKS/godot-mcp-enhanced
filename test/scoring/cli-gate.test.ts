@@ -19,7 +19,7 @@ describe('cli gate (exit code)', () => {
     mkdirSync(dir, { recursive: true });
     const r = runGate(dir);
     expect(r.status).toBe(1);
-    expect(r.stderr).toContain('不存在');
+    expect(r.stderr).toContain('does not exist');
   });
 
   it('score.json 损坏 → exit 1 + stderr 解析失败', () => {
@@ -29,7 +29,7 @@ describe('cli gate (exit code)', () => {
     writeFileSync(resolve(dir, 'coverage/score.json'), '{不是合法 json');
     const r = runGate(dir);
     expect(r.status).toBe(1);
-    expect(r.stderr).toContain('解析失败');
+    expect(r.stderr).toContain('Failed to parse');
   });
 
   it('score.json pass → exit 0 + stdout 通过', () => {
@@ -45,6 +45,6 @@ describe('cli gate (exit code)', () => {
     );
     const r = runGate(dir);
     expect(r.status).toBe(0);
-    expect(r.stdout).toContain('通过');
+    expect(r.stdout).toContain('passed');
   });
 });

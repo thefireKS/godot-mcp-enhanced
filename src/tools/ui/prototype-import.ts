@@ -131,7 +131,7 @@ export function parseGeometry(raw: unknown): PrototypeGeometry {
     const detail = r.error.issues
       .map(i => `${i.path.join('.') || '(root)'}: ${i.message}`)
       .join('; ');
-    throw new Error(`INVALID_PARAMS: geometry schema 校验失败: ${detail}`);
+    throw new Error(`INVALID_PARAMS: geometry schema validation failed: ${detail}`);
   }
   return r.data;
 }
@@ -173,14 +173,14 @@ function buildTree(geo: PrototypeGeometry, cleanNames: string[]): WorkNode[] {
       const ab = contains(a, b), ba = contains(b, a);
       if (ab && ba && rectNearEqual(a, b)) {
         throw new Error(
-          `INVALID_PARAMS: 节点 "${nodes[i]!.name}" 与 "${nodes[j]!.name}" rect 近似相等(互含,各边差 ≤1px),无法确定父子`);
+          `INVALID_PARAMS: nodes "${nodes[i]!.name}" and "${nodes[j]!.name}" have nearly equal rects (mutually containing, each edge within 1px), parent/child can't be determined`);
       }
       if (ab || ba) continue;
       const ox = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
       const oy = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
       if (ox > TOL && oy > TOL) {
         throw new Error(
-          `INVALID_PARAMS: 节点 "${nodes[i]!.name}" 与 "${nodes[j]!.name}" rect 交叉重叠(互不包含,重叠 ${ox}x${oy}px)`);
+          `INVALID_PARAMS: nodes "${nodes[i]!.name}" and "${nodes[j]!.name}" have crossing rects (neither contains the other, overlap ${ox}x${oy}px)`);
       }
     }
   }
@@ -217,7 +217,7 @@ function buildTree(geo: PrototypeGeometry, cleanNames: string[]): WorkNode[] {
 export function normalizeColor(c: string | number[], field: string, name: string): [number, number, number, number] {
   if (typeof c === 'string') {
     const m = /^#([0-9a-fA-F]{6})$/.exec(c);
-    if (!m) throw new Error(`INVALID_PARAMS: 节点 "${name}" 的 ${field} "${c}" 无法解析(仅支持 #rrggbb / [r,g,b] 0-255 / [r,g,b,a] 0-1)`);
+    if (!m) throw new Error(`INVALID_PARAMS: ${field} "${c}" of node "${name}" can't be parsed (only #rrggbb / [r,g,b] 0-255 / [r,g,b,a] 0-1)`);
     const v = parseInt(m[1]!, 16);
     return [(v >> 16 & 255) / 255, (v >> 8 & 255) / 255, (v & 255) / 255, 1];
   }
@@ -243,7 +243,7 @@ export const PROGRESS_BAR_MIN_HEIGHT = 27;
 function inferType(nd: GeometryNode, warnings: string[]): string {
   if (nd.type !== undefined) {
     if ((CONTROL_TYPES as readonly string[]).includes(nd.type)) return nd.type;
-    warnings.push(`节点 "${nd.name}": 非白名单 type "${nd.type}" 降级为 Panel`);
+    warnings.push(`node "${nd.name}": non-whitelisted type "${nd.type}" downgraded to Panel`);
     return 'Panel';
   }
   if (nd.flow !== undefined) return 'Panel';
@@ -287,7 +287,7 @@ function buildSpec(
 ): UiNodeSpec {
   const nd = node.spec;
   if (depth > MAX_DEPTH) {
-    throw new Error(`INVALID_PARAMS: 嵌套深度超过 ${MAX_DEPTH}(最终树含合成根 "${ROOT_NAME}" 计层),超出节点 "${node.cleanName}"`);
+    throw new Error(`INVALID_PARAMS: nesting depth exceeds ${MAX_DEPTH} (counting the synthetic root "${ROOT_NAME}" in the final tree), at node "${node.cleanName}"`);
   }
 
   const abs = nd.rect;
@@ -305,7 +305,7 @@ function buildSpec(
   if (nd.fontSize !== undefined) {
     props['theme_override_font_sizes/font_size'] = nd.fontSize;
     if (rel.h < nd.fontSize * 1.5) {
-      warnings.push(`节点 "${node.cleanName}": rect.h=${rel.h} < fontSize*1.5=${nd.fontSize * 1.5},可能被字体最小行高钳制`);
+      warnings.push(`node "${node.cleanName}": rect.h=${rel.h} < fontSize*1.5=${nd.fontSize * 1.5}, may be clamped by the font's minimum line height`);
     }
   }
   // PR-1 规则 9v2:样式三件套 → StyleBoxFlat(modulate 近似通道删除)。
@@ -337,16 +337,16 @@ function buildSpec(
       }
       if (overrides.length > 0) styleboxes = overrides;
     } else {
-      warnings.push(`节点 "${node.cleanName}"(${type}): bg/fill/border 无该控件的样式槽位,已忽略(换 Panel/Button/Label/ProgressBar 或外包 Panel)`);
+      warnings.push(`node "${node.cleanName}" (${type}): this control has no style slot for bg/fill/border, ignored (use Panel/Button/Label/ProgressBar or wrap it in a Panel)`);
     }
     if (hasFill && type !== 'ProgressBar') {
       // PR-2 顺手项 3/4(PR-1 终审转来):fill-only(无 bg/border)时不产任何 override
       // 且推断布局壳的透明壳被阻断 → 默认主题渲染。Panel 系是灰底(Label 默认透明),
       // 显式声明让 AI 可见;fill+bg 时有 override 不灰底,不发灰底措辞。
       if (type === 'Panel' && !hasBg && !hasBorderish) {
-        warnings.push(`节点 "${node.cleanName}": fill 仅 ProgressBar 支持,已忽略;且无 bg/border → 未产 stylebox override、未设透明壳(推断布局壳),将以默认主题灰底渲染——应有底色请显式给 bg`);
+        warnings.push(`node "${node.cleanName}": fill is only supported on ProgressBar, ignored; and with no bg/border → no stylebox override and no transparent shell (inferred layout shell), it will render with the default theme's grey background — give bg explicitly if it should have a colour`);
       } else {
-        warnings.push(`节点 "${node.cleanName}": fill 仅 ProgressBar 支持,已忽略`);
+        warnings.push(`node "${node.cleanName}": fill is only supported on ProgressBar, ignored`);
       }
     }
   } else if (nd.flow !== undefined || (nd.type === undefined && nd.text === undefined && nd.value === undefined)) {
@@ -362,7 +362,7 @@ function buildSpec(
   // **所有组合都被钳**(override 只降下限不除钳制),带 override 且 h<27 的场景同样
   // 需要预警,文案分档说明实测数据。
   if (type === 'ProgressBar' && rel.h < PROGRESS_BAR_MIN_HEIGHT) {
-    warnings.push(`节点 "${node.cleanName}": ProgressBar height below Godot 4.7 default theme minimum (~${PROGRESS_BAR_MIN_HEIGHT}px): will be clamped (with stylebox overrides the clamp differs — measured Godot 4.7.1: no override/bg-only/fill-only/bg+fill → 27/23/27/23px)`);
+    warnings.push(`node "${node.cleanName}": ProgressBar height below Godot 4.7 default theme minimum (~${PROGRESS_BAR_MIN_HEIGHT}px): will be clamped (with stylebox overrides the clamp differs — measured Godot 4.7.1: no override/bg-only/fill-only/bg+fill → 27/23/27/23px)`);
   }
   if (nd.color !== undefined) {
     props['theme_override_colors/font_color'] = normalizeColor(nd.color, 'color', nd.name);
@@ -401,7 +401,7 @@ function buildSpec(
           `${pathPrefix}/${node.cleanName}/${containerName}`, flowExpect);
         delete child.rect;
         child.flex = { min_width: c.spec.rect.w, min_height: c.spec.rect.h };
-        warnings.push(`flow 子节点 "${c.cleanName}": rect 尺寸映射为 flex.min_width/min_height(HUG 文本场景可能偏大)`);
+        warnings.push(`flow child "${c.cleanName}": rect size mapped to flex.min_width/min_height (may be too big for HUG text cases)`);
         return child;
       }),
     };
@@ -420,7 +420,7 @@ function buildSpec(
 
 export function translateGeometry(geo: PrototypeGeometry): TranslateResult {
   if (geo.nodes.length > MAX_NODES) {
-    throw new Error(`INVALID_PARAMS: 节点数 ${geo.nodes.length} 超过上限 ${MAX_NODES}`);
+    throw new Error(`INVALID_PARAMS: node count ${geo.nodes.length} exceeds the limit ${MAX_NODES}`);
   }
 
   // 规则 12:name 清洗([a-zA-Z0-9_] 外 → _)+ 清洗后重复检测(不静默重名)。
@@ -433,7 +433,7 @@ export function translateGeometry(geo: PrototypeGeometry): TranslateResult {
   });
   for (const [clean, originals] of seen) {
     if (originals.length > 1) {
-      throw new Error(`INVALID_PARAMS: name 清洗后重复 "${clean}"(原始: ${originals.map(o => `"${o}"`).join(', ')})`);
+      throw new Error(`INVALID_PARAMS: duplicate name "${clean}" after cleaning (originals: ${originals.map(o => `"${o}"`).join(', ')})`);
     }
   }
 
@@ -458,7 +458,7 @@ export function translateGeometry(geo: PrototypeGeometry): TranslateResult {
   if (flowChildCount > 0) {
     const coverage = { targets: flattenTargets(tree).length, total_nodes: geo.nodes.length };
     warnings.push(
-      `flow 直接子节点共 ${flowChildCount} 个: layout_verify 不覆盖(丢 rect),由 flow_verify 数字覆盖(期望=输入视口 rect vs 容器排布实测 global rect,逐节点 Δx/Δy/Δw/Δh);孙层为 layout_verify 的近似覆盖(期望相对输入父原点,容器排布后天然带偏移)(verify_coverage.targets=${coverage.targets}/total_nodes=${coverage.total_nodes})`);
+      `${flowChildCount} direct flow children: not covered by layout_verify (rect dropped), covered numerically by flow_verify (expected = input viewport rect vs measured global rect after container layout, per node Δx/Δy/Δw/Δh); grandchildren are covered approximately by layout_verify (expected relative to the input parent origin, naturally offset after container layout) (verify_coverage.targets=${coverage.targets}/total_nodes=${coverage.total_nodes})`);
   }
 
   return { tree, warnings, coverage: { targets: flattenTargets(tree).length, total_nodes: geo.nodes.length }, flow_expect: flowExpect };

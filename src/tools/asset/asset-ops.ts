@@ -126,7 +126,7 @@ export async function handleTool(
         type: 'text',
         text: JSON.stringify({
           presets: MATERIAL_PRESETS,
-          custom_rule: '{color(hex 或 #hex),alpha?,emissive?,metallic?,roughness?}',
+          custom_rule: '{color(hex or #hex),alpha?,emissive?,metallic?,roughness?}',
           external: 'res://*.tres',
         }),
       }],

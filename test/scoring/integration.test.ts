@@ -77,7 +77,7 @@ describe('collectIntegration', () => {
     writeFileSync(JSON_PATH, Buffer.alloc(10 * 1024 * 1024 + 1));
     const r = collectIntegration(JSON_PATH);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('过大');
+    expect(r.detail).toContain('too large');
   });
 
   it('计数字段非数字类型 → na(A3:防污染致通过率 NaN)', () => {
@@ -86,6 +86,6 @@ describe('collectIntegration', () => {
     }));
     const r = collectIntegration(JSON_PATH);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('类型异常');
+    expect(r.detail).toContain('wrong type');
   });
 });

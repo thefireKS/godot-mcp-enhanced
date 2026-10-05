@@ -91,7 +91,7 @@ static func create_mesh_uncached(shape: String, params: Dictionary) -> Mesh:
 		"fence":
 			return CustomMeshes.make_fence(params)
 		_:
-			push_error("AssetFactory: 未知 shape '%s'" % shape)
+			push_error("AssetFactory: unknown shape '%s'" % shape)
 			return null
 
 
@@ -187,7 +187,7 @@ static func _safe_html(hex: String, fallback: Color) -> Color:
 	var ok_len := s.length() == 6 or s.length() == 8 or s.length() == 3 or s.length() == 4
 	if ok_len and s.is_valid_hex_number():
 		return Color.html(hex)
-	push_warning("非法 hex 颜色 '%s'，回退 %s" % [hex, str(fallback)])
+	push_warning("Invalid hex colour '%s', falling back to %s" % [hex, str(fallback)])
 	return fallback
 
 

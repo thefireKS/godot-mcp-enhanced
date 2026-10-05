@@ -57,17 +57,17 @@ describe('writeReport / readReport', () => {
   it('目录空时 latest/prev 抛可读错误', () => {
     const empty = mkdtempSync(join(tmpdir(), 'qa-reports-empty-'));
     process.env.GODOT_MCP_QA_REPORTS_DIR = empty;
-    expect(() => readReport('latest')).toThrow(/先 qa run/);
-    expect(() => readReport('prev')).toThrow(/不足 2 份/);
+    expect(() => readReport('latest')).toThrow(/Run qa run first/);
+    expect(() => readReport('prev')).toThrow(/fewer than 2/);
     process.env.GODOT_MCP_QA_REPORTS_DIR = dir;
     rmSync(empty, { recursive: true, force: true });
   });
 
   it('安全（审查 Important-1）：白名单外绝对路径拒绝读取', () => {
     // 任意路径读是 v0.30 修复的口子——qa 报告只允许读 qa-reports 目录内
-    expect(() => readReport('C:/Windows/win.ini')).toThrow(/必须位于|不可解析/);
-    expect(() => readReport('C:\\Windows\\win.ini')).toThrow(/必须位于|不可解析/);
-    expect(() => readReport('/etc/passwd')).toThrow(/必须位于|不可解析/);
+    expect(() => readReport('C:/Windows/win.ini')).toThrow(/must be inside|cannot be resolved/);
+    expect(() => readReport('C:\\Windows\\win.ini')).toThrow(/must be inside|cannot be resolved/);
+    expect(() => readReport('/etc/passwd')).toThrow(/must be inside|cannot be resolved/);
     // 目录内合法路径仍可（构造 dir 内绝对路径）
     const r = readReport(join(dir, '20260815-100000-alpha.json'));
     expect(r.run_id).toBe('20260815-100000-alpha');
@@ -89,7 +89,7 @@ describe('writeReport / readReport', () => {
       return;
     }
     try {
-      expect(() => readReport(join(dir, '20260815-999999-evil.json')), 'symlink 指向外部必须拒').toThrow(/必须位于/);
+      expect(() => readReport(join(dir, '20260815-999999-evil.json')), 'symlink 指向外部必须拒').toThrow(/must be inside/);
     } finally {
       rmSync(outside, { recursive: true, force: true });
     }

@@ -92,8 +92,8 @@ describe('write_script class_name import (M6)', () => {
 
     expect(res.isError).toBeFalsy();
     const text = res.content[0].text;
-    expect(text).toContain('自动 --import 失败');
-    expect(text).toContain('手动');
+    expect(text).toContain('the automatic --import failed');
+    expect(text).toContain('manually');
   });
 });
 

@@ -27,7 +27,7 @@ describe('evaluateGate', () => {
   it('total < PASS_LINE(纯总分不足)→ passed=false, reason 含 pass 线', () => {
     const r = evaluateGate(makeScore({ total: 60 }));
     expect(r.passed).toBe(false);
-    expect(r.reasons).toEqual([`总分 60 < ${PASS_LINE}(pass 线)`]);
+    expect(r.reasons).toEqual([`Total score 60 < ${PASS_LINE} (pass line)`]);
   });
 
   it('total≥线但有 hardFails(纯硬否决)→ passed=false, reason 含维度', () => {
@@ -36,7 +36,7 @@ describe('evaluateGate', () => {
       hardFails: [{ dimension: 'security', reason: '低于硬否决线', threshold: 60, actual: 40 }],
     }));
     expect(r.passed).toBe(false);
-    expect(r.reasons).toEqual(['硬否决 security: 低于硬否决线(40 < 60)']);
+    expect(r.reasons).toEqual(['Hard veto security: 低于硬否决线 (40 < 60)']);
   });
 
   it('total<线 + hardFails(两者皆有)→ 两条 reason', () => {
@@ -46,8 +46,8 @@ describe('evaluateGate', () => {
     }));
     expect(r.passed).toBe(false);
     expect(r.reasons).toEqual([
-      `总分 50 < ${PASS_LINE}(pass 线)`,
-      '硬否决 integration: 低于硬否决线(70 < 80)',
+      `Total score 50 < ${PASS_LINE} (pass line)`,
+      'Hard veto integration: 低于硬否决线 (70 < 80)',
     ]);
   });
 
@@ -73,7 +73,7 @@ describe('evaluateGate', () => {
   it('total 为 NaN → fail-closed(A4:防 aggregate 异常时 NaN<PASS 为 false 放行)', () => {
     const r = evaluateGate(makeScore({ total: Number.NaN }));
     expect(r.passed).toBe(false);
-    expect(r.reasons.some(x => x.includes('无效'))).toBe(true);
+    expect(r.reasons.some(x => x.includes('Invalid'))).toBe(true);
   });
 
   it('total 为 Infinity → fail-closed', () => {

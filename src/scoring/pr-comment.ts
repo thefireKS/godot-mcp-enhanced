@@ -14,15 +14,15 @@ export function renderPrComment(score: ScoreJson): string {
   const overall = passed ? '✅ PASS' : '❌ FAIL';
   const total = Object.keys(score.dimensions).length;
   const verified = total - score.unverified.length;
-  const partialTag = score.partial ? `(其余 M3c-e 待接入)` : '';
+  const partialTag = score.partial ? `(the rest are pending in M3c-e)` : '';
   const lines: string[] = [];
-  lines.push(`## 📊 质量评分:${score.total} ${overall} · ${verified}/${total} 维已验证${partialTag}`);
+  lines.push(`## 📊 Quality score: ${score.total} ${overall} · ${verified}/${total} dimensions verified${partialTag}`);
   lines.push('');
   if (!passed) {
     for (const r of reasons) lines.push(`- ${r}`);
     lines.push('');
   }
-  lines.push('| 维度 | 分数 | 状态 |');
+  lines.push('| Dimension | Score | Status |');
   lines.push('|---|---|---|');
   for (const name of DIM_ORDER) {
     const d = score.dimensions[name];

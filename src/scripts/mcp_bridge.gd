@@ -1002,7 +1002,7 @@ func _handle_message(raw: String, pid: int) -> String:
 		"playtest.step_until":
 			result = _cmd_control_step_until(params, pid)
 		_:
-			error = {"code": -32601, "message": "Method not found: %s. 若为新增 method（如 get_node_layout），项目根 mcp_bridge.gd 可能版本过旧，请重新 game_bridge_install 或同步上游 src/scripts/mcp_bridge.gd。" % method}
+			error = {"code": -32601, "message": "Method not found: %s. If it is a new method (e.g. get_node_layout), the mcp_bridge.gd in the project root may be outdated; re-run game_bridge_install or sync upstream src/scripts/mcp_bridge.gd." % method}
 
 	# Promote command-level errors to top-level so TS client sees them.
 	# TS sendToBridge only checks resp.error (top-level), never result.error.
@@ -1154,7 +1154,7 @@ func _cmd_find_nodes(params: Dictionary) -> Dictionary:
 	if root_path != "":
 		start_root = get_node_or_null(root_path)
 		if start_root == null:
-			return {"error": {"code": -7, "message": "Root node not found: %s (find_nodes 的 root 须为有效节点路径,推荐绝对路径如 /root/Main)" % root_path}}
+			return {"error": {"code": -7, "message": "Root node not found: %s (the root of find_nodes must be a valid node path; absolute paths like /root/Main are recommended)" % root_path}}
 	var results: Array = _traverse_tree(
 		func(node: Node) -> bool:
 			if pattern != "" and not node.name.match(pattern):
@@ -2602,7 +2602,7 @@ func _cmd_control_step_until(params: Dictionary, pid: int) -> Dictionary:
 		if not _CONTROL_ALLOWED_OPS.has(op):
 			return {"error": {"code": -1, "message": "op must be one of %s, got %s" % [str(_CONTROL_ALLOWED_OPS), op]}}
 		if not _is_safe_value(cdict["value"]):
-			return {"error": {"code": -1, "message": "condition value failed _is_safe_value (几何/标量/PackedArray only)"}}
+			return {"error": {"code": -1, "message": "condition value failed _is_safe_value (geometry/scalars/PackedArray only)"}}
 		validated.append(cdict)
 	var max_frames: int = int(params.get("max_frames", _CONTROL_MAX_FRAMES))
 	if max_frames < 1 or max_frames > _CONTROL_MAX_FRAMES:

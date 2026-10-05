@@ -18,46 +18,46 @@ func cleanup() -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"animtree_create": {
-			"description": "创建 AnimationTree 节点并关联 AnimationPlayer。",
+			"description": "Create an AnimationTree node linked to an AnimationPlayer.",
 			"params": [
-				CommandHelpers.doc_param("name", "String", false, "节点名默认 AnimationTree"),
-				CommandHelpers.doc_param("parent", "String", false, "父节点路径"),
-				CommandHelpers.doc_param("animation_player_path", "String", true, "关联 AnimationPlayer 的 NodePath"),
-				CommandHelpers.doc_param("tree_root_type", "String", false, "根 AnimationNode 类型 AnimationNodeStateMachine/AnimationNodeBlendTree/AnimationNodeBlendSpace2D 默认 AnimationNodeStateMachine"),
+				CommandHelpers.doc_param("name", "String", false, "Node name, default AnimationTree"),
+				CommandHelpers.doc_param("parent", "String", false, "Parent node path"),
+				CommandHelpers.doc_param("animation_player_path", "String", true, "NodePath of the linked AnimationPlayer"),
+				CommandHelpers.doc_param("tree_root_type", "String", false, "Root AnimationNode type AnimationNodeStateMachine/AnimationNodeBlendTree/AnimationNodeBlendSpace2D, default AnimationNodeStateMachine"),
 			],
 		},
 		"animtree_add_state": {
-			"description": "向 StateMachine 添加状态并绑定动画。",
+			"description": "Add a state to a StateMachine and bind an animation.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree 节点路径须 StateMachine"),
-				CommandHelpers.doc_param("state_name", "String", true, "状态名"),
-				CommandHelpers.doc_param("animation", "String", true, "该状态绑定的动画名"),
-				CommandHelpers.doc_param("position", "Dictionary", false, "键 x/y → Vector2 状态机图上位置"),
+				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree node path, must be a StateMachine"),
+				CommandHelpers.doc_param("state_name", "String", true, "State name"),
+				CommandHelpers.doc_param("animation", "String", true, "Animation bound to this state"),
+				CommandHelpers.doc_param("position", "Dictionary", false, "keys x/y → Vector2 position on the state machine graph"),
 			],
 		},
 		"animtree_add_transition": {
-			"description": "在两个状态间添加过渡及可选条件。",
+			"description": "Add a transition between two states with optional conditions.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree 节点路径"),
-				CommandHelpers.doc_param("from_state", "String", true, "起始状态名"),
-				CommandHelpers.doc_param("to_state", "String", true, "目标状态名"),
-				CommandHelpers.doc_param("xfade_time", "float", false, "淡入淡出时间秒默认 0.0"),
-				CommandHelpers.doc_param("conditions", "Array", false, "条件数组每元素 Dictionary{name,value}"),
+				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree node path"),
+				CommandHelpers.doc_param("from_state", "String", true, "From state"),
+				CommandHelpers.doc_param("to_state", "String", true, "To state"),
+				CommandHelpers.doc_param("xfade_time", "float", false, "Cross-fade time in seconds, default 0.0"),
+				CommandHelpers.doc_param("conditions", "Array", false, "Conditions array, each element Dictionary{name,value}"),
 			],
 		},
 		"animtree_set_blend": {
-			"description": "设置 blend 参数值(float 或 Vector2)。",
+			"description": "Set a blend parameter value (float or Vector2).",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree 节点路径"),
-				CommandHelpers.doc_param("parameter_name", "String", true, "blend 参数名须以 parameters/ 开头"),
-				CommandHelpers.doc_param("value", "JSON", true, "参数值 float 或 Dict/Array 表达的 Vector2"),
+				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree node path"),
+				CommandHelpers.doc_param("parameter_name", "String", true, "Blend parameter name, must start with parameters/"),
+				CommandHelpers.doc_param("value", "JSON", true, "Parameter value: float, or a Vector2 as Dict/Array"),
 			],
 		},
 		"animtree_play": {
-			"description": "travel 到指定状态。",
+			"description": "Travel to a state.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree 节点路径"),
-				CommandHelpers.doc_param("state_name", "String", true, "要 travel 到的状态名"),
+				CommandHelpers.doc_param("node_path", "String", true, "AnimationTree node path"),
+				CommandHelpers.doc_param("state_name", "String", true, "State to travel to"),
 			],
 		},
 	}

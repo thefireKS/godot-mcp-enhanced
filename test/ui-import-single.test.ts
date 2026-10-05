@@ -45,7 +45,7 @@ describe('genUiImportSingleScript 组装结构契约', () => {
 
   it('reload 错误信息内嵌恢复语义(persist 先于 measure,spec §6)', () => {
     expect(script).toContain('Scene reload failed (post-persist)');
-    expect(script).toContain('已持久化,可重跑 ui_measure_layout');
+    expect(script).toContain('already persisted, you can re-run ui_measure_layout');
   });
 
   it('np 定位段按 parentPath 注入(_mcp_get_scene_node,与 measure _initialize 同款)', () => {

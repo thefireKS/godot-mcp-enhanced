@@ -21,7 +21,7 @@ describe('skill-builder 派生逻辑', () => {
     // 剥 rule frontmatter（不含 alwaysApply）
     expect(skill).not.toContain('alwaysApply');
     // 剃版本引用行
-    expect(skill).not.toContain('> 适用于');
+    expect(skill).not.toContain('> For godot-mcp-enhanced');
     expect(skill).not.toContain('{{MCP_VERSION}}');
     // 包 SKILL frontmatter（name + description 带双引号开头）
     expect(skill.startsWith('---\nname: godot-mcp-bridge-e2e\ndescription: "')).toBe(true);
@@ -29,7 +29,7 @@ describe('skill-builder 派生逻辑', () => {
     expect(skill).toContain('\n## ');
     expect(skill).not.toMatch(/\n#\s+\S/);  // 无独立 H1（\n 后单 # + 空格 + 非空白；## 的 # 后是 # 非空格，不匹配）
     // description 含触发短语
-    expect(skill).toContain('—— 当你');
+    expect(skill).toContain('— use when');
   });
 
   it('description 含内嵌双引号时正确派生（行尾锚定回溯保护，spec §8）', () => {
@@ -67,7 +67,7 @@ describe('skill-builder 派生逻辑', () => {
     expect(skills.has('godot-tween-taste')).toBe(true);
     for (const [name, content] of skills) {
       expect(content.startsWith(`---\nname: ${name}\ndescription: "`)).toBe(true);
-      expect(content).toContain('—— 当你');
+      expect(content).toContain('— use when');
     }
   });
 });
@@ -84,7 +84,7 @@ describe('手写 skill（Tier2-1）', () => {
   it('每个手写 skill frontmatter 合法（name + description + —— 当你 + H2 正文）', () => {
     for (const [name, content] of HANDWRITTEN_SKILLS) {
       expect(content.startsWith(`---\nname: ${name}\ndescription: "`)).toBe(true);
-      expect(content).toContain('—— 当你');
+      expect(content).toContain('— use when');
       expect(content).toContain('\n## ');
       expect(content).not.toMatch(/\n#\s+\S/);  // 无独立 H1
     }

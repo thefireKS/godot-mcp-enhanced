@@ -95,21 +95,21 @@ const CRITICAL_SKILLS: { skill: string; items: CriticalItem[] }[] = [
   {
     skill: 'godot-adapt-desktop-to-mobile',
     items: [
-      { cid: 'C1', desc: '硬编码密钥+无完整性校验' },
-      { cid: 'C2', desc: '缺 InputEventMouseButton 分支' },
-      { cid: 'C3', desc: 'zoom.x 单分量非等比缩放' },
+      { cid: 'C1', desc: 'hard-coded key + no integrity check' },
+      { cid: 'C2', desc: 'missing the InputEventMouseButton branch' },
+      { cid: 'C3', desc: 'zoom.x single component, non-uniform scaling' },
     ],
   },
   {
     skill: 'godot-3d-lighting',
     items: [
-      { cid: 'C4', desc: '动态光泄漏' },
-      { cid: 'C5', desc: 'visible 硬切换与 distance_fade 冲突' },
+      { cid: 'C4', desc: 'dynamic light leak' },
+      { cid: 'C5', desc: 'visible hard toggle conflicts with distance_fade' },
     ],
   },
   {
     skill: 'godot-3d-materials',
-    items: [{ cid: 'C6', desc: '未判 null 必崩' }],
+    items: [{ cid: 'C6', desc: 'crashes without a null check' }],
   },
 ];
 
@@ -126,7 +126,7 @@ function findCritical(mdPath: string): CriticalItem[] | null {
 
 function buildWarning(items: CriticalItem[]): string {
   const label = items.map(i => `${i.cid} ${i.desc}`).join(' / ');
-  return `\n\n⚠️ 参考代码含已知 CRITICAL(${label}),复制到生产前必须人工审。详见 godot-ai-kit docs/enhanced-boundaries.md #12。`;
+  return `\n\n⚠️ The reference code has a known CRITICAL issue (${label}); review it by hand before copying into production. See godot-ai-kit docs/enhanced-boundaries.md #12.`;
 }
 
 export async function searchSkills(

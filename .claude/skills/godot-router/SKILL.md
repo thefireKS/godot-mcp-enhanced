@@ -1,31 +1,31 @@
 ---
 name: godot-router
-description: "godot-mcp skill 路由器 不确定用哪个流程 入口匝道 决策树 E2E 安全编辑 验证闭环 动画审计 —— 当你不确定该用哪个 godot-mcp 流程、或需要把任务分发到具体子流程时使用。简单单工具操作(改单行/单次截图)不要用本 skill,直接调工具"
+description: "godot-mcp skill router: unsure which flow, entry ramp, decision tree, E2E, safe editing, verification loop, animation audit — use when you are unsure which godot-mcp flow fits, or need to dispatch a task to a specific sub-flow. Don't use this skill for simple single-tool operations (one-line edit / single screenshot); call the tool directly"
 ---
 
-## godot-mcp 流程路由
+## godot-mcp flow routing
 
-本 skill 是 godot-mcp skill 体系的路由器。当你不确定该用哪个流程时,按以下决策树分发。
+This skill is the router of the godot-mcp skill set. When you are unsure which flow to use, dispatch with the decision tree below.
 
-**何时用**:用户请求模糊(如"帮我改场景""验证一下"),或一个任务跨多个 skill 时。
+**When to use**: the request is vague (e.g. "change the scene for me", "check it"), or a task spans several skills.
 
-**主流程(想法 → 可交付)**:
-- [ ] 1. 改代码/场景 → 先 screenshot-verify 留证,再 godot-mcp-safe-edit 编辑,收尾 godot-mcp-verify-loop 验证
-- [ ] 2. 不确定怎么改 → 用 game 工具的 game_query action 读真实运行时值,不要纸面猜
-- [ ] 3. 批量建节点/文件 → 走 godot-mcp-safe-edit 的 batch 路径
+**Main flow (idea → deliverable)**:
+- [ ] 1. Changing code/scenes → screenshot-verify first for evidence, then edit with godot-mcp-safe-edit, finish with godot-mcp-verify-loop
+- [ ] 2. Unsure how to change it → read real runtime values with the game tool's game_query action instead of guessing on paper
+- [ ] 3. Creating many nodes/files → use the batch path of godot-mcp-safe-edit
 
-**入口匝道(按任务类型分流)**:
-- [ ] E2E 测试 / 模拟输入 / 回归测试 → `godot-mcp-bridge-e2e`
-- [ ] 动画/动效不对劲(卡顿/无弹性/方向反)→ `godot-tween-taste`
-- [ ] 视觉验证(操作前后截图对比)→ `screenshot-verify`
-- [ ] 安全编辑(.gd/.tscn 改动)→ `godot-mcp-safe-edit`
-- [ ] 交付前自检 → `godot-mcp-verify-loop`
+**Entry ramps (by task type)**:
+- [ ] E2E tests / simulated input / regression tests → `godot-mcp-bridge-e2e`
+- [ ] Animation/motion feels off (stutter / no bounce / wrong direction) → `godot-tween-taste`
+- [ ] Visual verification (before/after screenshots) → `screenshot-verify`
+- [ ] Safe editing (.gd/.tscn changes) → `godot-mcp-safe-edit`
+- [ ] Self-check before delivery → `godot-mcp-verify-loop`
 
-**何时不用 skill**:
-- 改单行 .gd → 直接 `edit_script`
-- 只读探索(看场景结构)→ 直接 `read_scene` / `game_query`
-- 单次截图 → 直接 `screenshot`
+**When not to use a skill**:
+- One-line .gd change → `edit_script` directly
+- Read-only exploration (looking at scene structure) → `read_scene` / `game_query` directly
+- A single screenshot → `screenshot` directly
 
-**常见偏离**:
-- 每个操作都走路由器(过度:简单操作直接调工具,路由器只在不确定时用)
-- 路由后不验证(漏:即使路由器分发,收尾仍需 verify-loop 或 screenshot-verify)
+**Common deviations**:
+- Routing every operation through the router (overkill: call tools directly for simple operations, use the router only when unsure)
+- Not verifying after routing (gap: even when the router dispatches, finish with verify-loop or screenshot-verify)

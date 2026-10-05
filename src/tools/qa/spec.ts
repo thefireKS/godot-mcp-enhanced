@@ -222,7 +222,7 @@ export function extractSpecJson(raw: string): unknown {
     if (body.startsWith('{')) return JSON.parse(body);
   }
   throw new Error(
-    'spec 源既不是裸 JSON 也不是 ```qa-spec 围栏。期望：以 "{" 开头的 JSON，或 markdown 内含 ```qa-spec 围栏的 JSON 块。',
+    'The spec source is neither bare JSON nor a ```qa-spec fence. Expected: JSON starting with "{", or a JSON block inside a ```qa-spec fence in markdown.',
   );
 }
 
@@ -246,16 +246,16 @@ export function parseQaSuite(input: unknown): ParsedSpec {
     raw = input;
   }
   if (raw === undefined || raw === null) {
-    return { ok: false, error: 'spec 为空。提供 inline spec 对象、.json 文件内容或 markdown ```qa-spec 围栏。' };
+    return { ok: false, error: 'spec is empty. Provide an inline spec object, .json file content or a markdown ```qa-spec fence.' };
   }
   const result = QaSuiteSchema.safeParse(raw);
   if (result.success) {
     return { ok: true, suite: result.data };
   }
   const issues = result.error.issues.slice(0, 5).map(i => `  - ${i.path.length ? i.path.join('.') : '(root)'}: ${i.message}`);
-  const more = result.error.issues.length > 5 ? `\n  (另有 ${result.error.issues.length - 5} 个问题)` : '';
+  const more = result.error.issues.length > 5 ? `\n  (${result.error.issues.length - 5} more issues)` : '';
   return {
     ok: false,
-    error: `QA spec 校验失败（${result.error.issues.length} 个问题）:\n${issues.join('\n')}${more}`,
+    error: `QA spec validation failed (${result.error.issues.length} issues):\n${issues.join('\n')}${more}`,
   };
 }

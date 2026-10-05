@@ -47,31 +47,31 @@ func cleanup() -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"engine_class_info": {
-			"description": "查单个类的完整结构(属性/方法/信号/枚举/继承)。默认 no_inherit=true 只看本类 own 成员。",
+			"description": "Full structure of one class (properties/methods/signals/enums/inheritance). Default no_inherit=true shows only its own members.",
 			"params": [
-				CommandHelpers.doc_param("class", "String", true, "类名(如 Node、Sprite2D、RigidBody3D,或第三方 addon 注册的类名)"),
-				CommandHelpers.doc_param("no_inherit", "bool", false, "true=只看本类 own 成员(默认);false=含继承链合并"),
+				CommandHelpers.doc_param("class", "String", true, "Class name (e.g. Node, Sprite2D, RigidBody3D, or a class registered by a third-party addon)"),
+				CommandHelpers.doc_param("no_inherit", "bool", false, "true = own members only (default); false = merge the inheritance chain"),
 			],
 		},
 		"engine_search": {
-			"description": "substring 匹配类名(大小写不敏感,返回 {name, parent} 列表,上限 100 条)。字母序排序后截断。",
+			"description": "Substring match on class names (case-insensitive, returns a {name, parent} list, max 100). Sorted alphabetically before truncation.",
 			"params": [
-				CommandHelpers.doc_param("query", "String", true, "substring 匹配类名"),
+				CommandHelpers.doc_param("query", "String", true, "Substring to match class names"),
 			],
 		},
 		"engine_get_inheritance": {
-			"description": "返回类的继承链(从本类到 Object)。含完整环检测(破互循环)。",
+			"description": "The class inheritance chain (from the class up to Object). With full cycle detection.",
 			"params": [
-				CommandHelpers.doc_param("class", "String", true, "类名"),
+				CommandHelpers.doc_param("class", "String", true, "Class name"),
 			],
 		},
 		# CMP-9-A (2026-08-08): call_method — 编辑器场景树节点实例方法调用
 		"engine_call_method": {
-			"description": "调用编辑器场景树节点的实例方法(对标竞品 node.call)。deny-list 默认挡危险方法(free/queue_free/set_script/call 等),env GODOT_MCP_EDITOR_CALL_DENYLIST_OVERRIDE 可追加(∪ 默认表,只能加不能减;显式空串=放开)。args 按方法声明类型自动强转。call 不可 undo(response undoable=false)。",
+			"description": "Call an instance method on a node in the editor scene tree (like node.call). The deny-list blocks dangerous methods by default (free/queue_free/set_script/call etc.); env GODOT_MCP_EDITOR_CALL_DENYLIST_OVERRIDE adds to it (union with the default list, can only add; an explicit empty string lifts it). args are coerced to the declared parameter types. Calls cannot be undone (response undoable=false).",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "目标节点路径(如 root/Player,相对编辑器场景树根)"),
-				CommandHelpers.doc_param("method", "String", true, "要调用的方法名(不存在时返回 did-you-mean 建议)"),
-				CommandHelpers.doc_param("args", "Array", false, "位置参数数组(按方法声明类型自动强转,最多 8 个)"),
+				CommandHelpers.doc_param("node_path", "String", true, "Target node path (e.g. root/Player, relative to the editor scene tree root)"),
+				CommandHelpers.doc_param("method", "String", true, "Method to call (unknown methods get did-you-mean suggestions)"),
+				CommandHelpers.doc_param("args", "Array", false, "Positional arguments (coerced to the declared parameter types, max 8)"),
 			],
 		},
 	}

@@ -140,7 +140,7 @@ describe('suggestRollback(诚实回滚)', () => {
   it('create 类 → supported(suggest 删除文件)', () => {
     const r = suggestRollback(makeEntry({ action: 'create_scene', changed_files: ['scenes/new.tscn'] }));
     expect(r.supported).toBe(true);
-    expect(r.suggestions[0]).toContain('删除');
+    expect(r.suggestions[0]).toContain('deleted');
   });
 
   it('project + before_values → supported(从 before 恢复)', () => {

@@ -78,7 +78,7 @@ describe('parseQaSuite 负向（非法必须拒绝且错误可读）', () => {
   it('空输入', () => {
     const r = parseQaSuite(undefined);
     expect(r.ok).toBe(false);
-    expect(r.error).toContain('spec 为空');
+    expect(r.error).toContain('spec is empty');
   });
 
   it('未知 step type', () => {
@@ -122,7 +122,7 @@ describe('parseQaSuite 负向（非法必须拒绝且错误可读）', () => {
   it('围栏内 JSON 语法错误 → 源格式错误（不进 zod）', () => {
     const r = parseQaSuite('```qa-spec\n{"name": }\n```');
     expect(r.ok).toBe(false);
-    expect(r.error).not.toContain('校验失败'); // 是 JSON.parse 的错误，不是 schema 错误
+    expect(r.error).not.toContain('validation failed'); // 是 JSON.parse 的错误，不是 schema 错误
   });
 });
 

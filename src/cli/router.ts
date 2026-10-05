@@ -110,27 +110,27 @@ export function isUnknownCommand(args: string[]): boolean {
 
 export function showHelp(): void {
   console.log(`
-godot-mcp-enhanced — Godot AI 开发环境
+godot-mcp-enhanced — AI development environment for Godot
 
-用法:
-  godot-mcp-enhanced                  启动 MCP 服务器（stdio 模式）
-  godot-mcp-enhanced setup            一键配置 AI 客户端
-  godot-mcp-enhanced configure <客户端>  定向配置单个客户端（--list 列出全部，--force 强制）
-  godot-mcp-enhanced skills [install]   打包的 Claude Code skills 列出/装入(install 支持 --target <目录> --force)
-  godot-mcp-enhanced doctor           环境诊断
-  godot-mcp-enhanced init <name>      创建 Godot 项目
-  godot-mcp-enhanced dashboard        启动监控面板
-  godot-mcp-enhanced qa run <spec>    执行 QA 测试套件（夜间跑批）
-  godot-mcp-enhanced install [tag]   从官方 releases 安装 Godot(默认 latest stable;零预装上手)
-  godot-mcp-enhanced gif <project>  录制 demo GIF(bridge 定频截图;--fps/--seconds/--keys/--out)
-  godot-mcp-enhanced web <project>  Web 试玩闭环(导出+127.0.0.1 服务器;--port/--serve-only)
+Usage:
+  godot-mcp-enhanced                  start the MCP server (stdio mode)
+  godot-mcp-enhanced setup            configure AI clients in one go
+  godot-mcp-enhanced configure <client>  configure a single client (--list lists all, --force forces)
+  godot-mcp-enhanced skills [install]   list/install the bundled Claude Code skills (install supports --target <dir> --force)
+  godot-mcp-enhanced doctor           environment diagnostics
+  godot-mcp-enhanced init <name>      create a Godot project
+  godot-mcp-enhanced dashboard        start the monitoring dashboard
+  godot-mcp-enhanced qa run <spec>    run a QA test suite (nightly batch)
+  godot-mcp-enhanced install [tag]   install Godot from official releases (default latest stable; zero-preinstall start)
+  godot-mcp-enhanced gif <project>  record a demo GIF (bridge fixed-rate screenshots; --fps/--seconds/--keys/--out)
+  godot-mcp-enhanced web <project>  web playtest loop (export + 127.0.0.1 server; --port/--serve-only)
 
-MCP 参数:
-  --profile=<name>  工具 profile (full/minimal/lite)
-  --minimal         最小工具集
-  --lite            轻量工具集
-  --help, -h        显示帮助
-  --version, -v     显示版本
+MCP arguments:
+  --profile=<name>  tool profile (full/minimal/lite)
+  --minimal         minimal tool set
+  --lite            lightweight tool set
+  --help, -h        show help
+  --version, -v     show version
 `);
 }
 

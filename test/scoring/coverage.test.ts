@@ -63,6 +63,6 @@ describe('collectCoverage', () => {
     writeFileSync(LCOV, Buffer.alloc(10 * 1024 * 1024 + 1));
     const r = collectCoverage(LCOV);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('过大');
+    expect(r.detail).toContain('too large');
   });
 });

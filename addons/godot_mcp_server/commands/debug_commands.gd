@@ -36,65 +36,65 @@ func cleanup() -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"debug_set_breakpoint": {
-			"description": "在指定脚本行设置断点(走 CodeEdit gutter,进入 editor breakpoint map)。CMP-14 后支持自动打开脚本(无需预先激活 tab)。",
+			"description": "Set a breakpoint on a script line (via the CodeEdit gutter, into the editor breakpoint map). Since CMP-14 the script opens automatically (no need to activate the tab first).",
 			"params": [
-				CommandHelpers.doc_param("path", "String", true, "res:// 路径的 .gd 脚本"),
-				CommandHelpers.doc_param("line", "int", true, "1-based 行号"),
+				CommandHelpers.doc_param("path", "String", true, "res:// path of the .gd script"),
+				CommandHelpers.doc_param("line", "int", true, "1-based line number"),
 			],
 		},
 		"debug_clear_breakpoint": {
-			"description": "清除指定脚本行的断点。CMP-14 后支持自动打开脚本。",
+			"description": "Clear the breakpoint on a script line. Since CMP-14 the script opens automatically.",
 			"params": [
-				CommandHelpers.doc_param("path", "String", true, "res:// 路径的 .gd 脚本"),
-				CommandHelpers.doc_param("line", "int", true, "1-based 行号"),
+				CommandHelpers.doc_param("path", "String", true, "res:// path of the .gd script"),
+				CommandHelpers.doc_param("line", "int", true, "1-based line number"),
 			],
 		},
 		"debug_list_breakpoints": {
-			"description": "列出当前活跃 tab 脚本的断点(Phase 1 只查当前 tab)。",
+			"description": "List breakpoints of the script in the active tab (Phase 1 checks only the current tab).",
 			"params": [
-				CommandHelpers.doc_param("path", "String", false, "可选:只列指定脚本(留空=当前活跃 tab)"),
+				CommandHelpers.doc_param("path", "String", false, "Optional: only this script (empty = the active tab)"),
 			],
 		},
 		# CMP-14 (2026-08-09) Phase 2/3
 		"debug_stack_trace": {
-			"description": "读当前断点的调用栈 + 当前帧局部变量。需游戏暂停在断点。",
+			"description": "Read the call stack at the current breakpoint + the current frame's locals. The game must be paused at a breakpoint.",
 			"params": [
-				CommandHelpers.doc_param("all_vars", "bool", false, "true=返回全部变量(默认截断 100 个)"),
-				CommandHelpers.doc_param("filter", "String", false, "变量名子串过滤"),
+				CommandHelpers.doc_param("all_vars", "bool", false, "true = return every variable (truncated to 100 by default)"),
+				CommandHelpers.doc_param("filter", "String", false, "Variable name substring filter"),
 			],
 		},
 		"debug_inspect_frame": {
-			"description": "切到指定栈帧 + 读该帧局部变量。需游戏暂停在断点。",
+			"description": "Switch to a stack frame + read that frame's locals. The game must be paused at a breakpoint.",
 			"params": [
-				CommandHelpers.doc_param("frame_index", "int", false, "栈帧索引(0=最内层,默认 0)"),
-				CommandHelpers.doc_param("all_vars", "bool", false, "true=返回全部变量(默认截断 100 个)"),
-				CommandHelpers.doc_param("filter", "String", false, "变量名子串过滤"),
+				CommandHelpers.doc_param("frame_index", "int", false, "Stack frame index (0 = innermost, default 0)"),
+				CommandHelpers.doc_param("all_vars", "bool", false, "true = return every variable (truncated to 100 by default)"),
+				CommandHelpers.doc_param("filter", "String", false, "Variable name substring filter"),
 			],
 		},
 		"debug_evaluate": {
-			"description": "断点上下文表达式求值(REPL)。需游戏暂停在断点。",
+			"description": "Evaluate an expression in the breakpoint context (REPL). The game must be paused at a breakpoint.",
 			"params": [
-				CommandHelpers.doc_param("expression", "String", true, "GDScript 表达式(在当前断点上下文求值)"),
+				CommandHelpers.doc_param("expression", "String", true, "GDScript expression (evaluated in the current breakpoint context)"),
 			],
 		},
 		"debug_step": {
-			"description": "单步执行(into/over)。需游戏暂停在断点。注:Godot wire 协议不支持 out。",
+			"description": "Step (into/over). The game must be paused at a breakpoint. Note: Godot's wire protocol has no step out.",
 			"params": [
-				CommandHelpers.doc_param("mode", "String", false, "into=进入函数 / over=跨过函数(默认 over)"),
+				CommandHelpers.doc_param("mode", "String", false, "into = step into / over = step over (default over)"),
 			],
 		},
 		"debug_continue": {
-			"description": "继续运行到下一断点。需游戏暂停在断点。",
+			"description": "Continue to the next breakpoint. The game must be paused at a breakpoint.",
 			"params": [],
 		},
 		"debug_pause": {
-			"description": "请求中断(暂停运行中游戏)。需游戏运行中。",
+			"description": "Request a break (pause the running game). The game must be running.",
 			"params": [],
 		},
 		"debug_reload_scripts": {
-			"description": "热重载指定脚本到运行中游戏。需游戏运行中(非暂停)。拒绝重载 MCP 自身 addon。",
+			"description": "Hot-reload scripts into the running game. The game must be running (not paused). Refuses to reload the MCP addon itself.",
 			"params": [
-				CommandHelpers.doc_param("paths", "Array", true, "res:// 脚本路径数组(如 [\"res://Player.gd\"])"),
+				CommandHelpers.doc_param("paths", "Array", true, "Array of res:// script paths (e.g. [\"res://Player.gd\"])"),
 			],
 		},
 	}

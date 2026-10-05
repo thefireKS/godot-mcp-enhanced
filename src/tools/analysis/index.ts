@@ -74,11 +74,11 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
       case 'impact_check':
         return impactCheck(args);
       default:
-        return opsErrorResult('UNKNOWN_ACTION', `Unknown action: ${action}（可用：signal_map/impact_check）`);
+        return opsErrorResult('UNKNOWN_ACTION', `Unknown action: ${action} (available: signal_map/impact_check)`);
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return opsErrorResult('ANALYSIS_ERROR', `analysis.${action} 失败: ${msg}`);
+    return opsErrorResult('ANALYSIS_ERROR', `analysis.${action} failed: ${msg}`);
   }
 }
 
@@ -111,9 +111,9 @@ function truncate<T>(list: T[], limit: number): { items: T[]; total: number; tru
 }
 
 const BLINDSPOTS = [
-  '运行时动态信号名（变量拼接/字典查找 emit_signal）静态不可见',
-  'autoload 单例之间的代码连接可见于 .gd 扫描，但 autoload 加载顺序问题不在本工具范围',
-  'instanced 子场景的 [connection] 声明归属子场景文件本身（按文件枚举已覆盖）',
+  'Signal names built at runtime (string concatenation / dictionary lookup in emit_signal) are invisible statically',
+  'Code connections between autoload singletons are visible in the .gd scan, but autoload load order problems are out of scope',
+  '[connection] declarations of instanced sub-scenes belong to the sub-scene file itself (covered by the per-file enumeration)',
 ];
 
 function normalizeResPath(root: string, p: string): string {
@@ -172,10 +172,10 @@ function impactCheck(args: Record<string, unknown>): ToolResult {
 
   const targets = [signal, scriptPath, scenePath].filter(Boolean);
   if (targets.length === 0) {
-    return opsErrorResult('INVALID_PARAMS', 'impact_check 需要 signal / script_path / scene_path 三选一');
+    return opsErrorResult('INVALID_PARAMS', 'impact_check needs one of signal / script_path / scene_path');
   }
   if (targets.length > 1) {
-    return opsErrorResult('INVALID_PARAMS', `impact_check 一次只评估一个目标（收到 ${targets.length} 个）`);
+    return opsErrorResult('INVALID_PARAMS', `impact_check evaluates one target at a time (got ${targets.length})`);
   }
 
   const scan = scanProject(projectPath);
@@ -219,8 +219,8 @@ function impactOfSignal(scan: ProjectScan, signal: string, limit: number): ToolR
     affected_scenes: affectedScenes,
     affected_scripts: affectedScripts,
     hint: conns.length + listeners.length === 0
-      ? `未发现 "${signal}" 的任何连接方/监听方——改名或删除前仍建议 grep signal 名复核（可能经动态名连接）`
-      : `"${signal}" 有 ${conns.length} 处编辑器连接 + ${listeners.length} 处代码监听，修改签名/重命名前先同步这些调用方`,
+      ? `No connectors/listeners found for "${signal}" — before renaming or deleting, still grep for the signal name (it may be connected by a dynamic name)`
+      : `"${signal}" has ${conns.length} editor connections + ${listeners.length} code listeners; update these callers before changing the signature/renaming`,
     blindspots: BLINDSPOTS,
   });
 }
@@ -267,18 +267,18 @@ function impactOfScript(scan: ProjectScan, scriptRes: string, limit: number): To
     text_refs: t.items,
     text_refs_truncated: t.truncated,
     hint: referencingScenes.length === 0 && t.total === 0
-      ? `未发现引用 ${scriptRes} 的场景/脚本——可安全删除（建议再 grep 文件名复核非 res:// 形态引用）`
-      : `${scriptRes} 被 ${referencingScenes.length} 个场景引用 + ${t.total} 处脚本文本引用，重命名/移动需同步`,
+      ? `No scenes/scripts reference ${scriptRes} — safe to delete (grep the file name too, for references not in res:// form)`
+      : `${scriptRes} is referenced by ${referencingScenes.length} scenes + ${t.total} text references in scripts; renaming/moving must update them`,
   });
 }
 
 function impactOfScene(scan: ProjectScan, sceneRes: string, limit: number): ToolResult {
   const scene = scan.scenes.find(s => s.scenePath === sceneRes);
   if (!scene) {
-    return opsErrorResult('SCENE_NOT_FOUND', `场景不在扫描结果中: ${sceneRes}（解析失败也算不在——见 stats.parseErrors）`);
+    return opsErrorResult('SCENE_NOT_FOUND', `Scene is not in the scan results: ${sceneRes} (a parse failure also counts — see stats.parseErrors)`);
   }
   if (!scene.parsed) {
-    return opsErrorResult('PARSE_ERROR', `场景解析失败: ${sceneRes}: ${scene.parseError}`);
+    return opsErrorResult('PARSE_ERROR', `Scene parse failed: ${sceneRes}: ${scene.parseError}`);
   }
   const connections = scene.parsed.connections;
   const scripts = sceneScriptBindings(scene.parsed);
@@ -299,8 +299,8 @@ function impactOfScene(scan: ProjectScan, sceneRes: string, limit: number): Tool
     script_bindings: truncate(scripts, limit).items,
     instanced_by: instancedBy,
     hint: instancedBy.length > 0
-      ? `${sceneRes} 被 ${instancedBy.length} 个场景实例化——改其内部节点名/结构会级联影响实例方`
-      : `${sceneRes} 无实例化方，结构调整影响面限本场景`,
+      ? `${sceneRes} is instanced by ${instancedBy.length} scenes — changing its internal node names/structure cascades to them`
+      : `${sceneRes} is not instanced anywhere; structural changes only affect this scene`,
     blindspots: BLINDSPOTS,
   });
 }

@@ -22,19 +22,19 @@ func setup(handler: Node, plugin: EditorPlugin) -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"editor_sync_start": {
-			"description": "启动场景树增量同步(推送场景树变更通知给 MCP 端)。无参数。",
+			"description": "Start incremental scene tree sync (pushes scene tree change notifications to the MCP side). No parameters.",
 			"params": [],
 		},
 		"editor_sync_stop": {
-			"description": "停止场景树增量同步。无参数。",
+			"description": "Stop incremental scene tree sync. No parameters.",
 			"params": [],
 		},
 		"editor_get_scene_tree": {
-			"description": "返回当前编辑器场景树的完整结构(节点名/类型/路径/子节点)。无参数。",
+			"description": "Return the full structure of the current editor scene tree (node names/types/paths/children). No parameters.",
 			"params": [],
 		},
 		"editor_get_scene_stats": {
-			"description": "返回场景统计(节点数/类型分布)。无参数。",
+			"description": "Return scene stats (node count/type distribution). No parameters.",
 			"params": [],
 		},
 	}

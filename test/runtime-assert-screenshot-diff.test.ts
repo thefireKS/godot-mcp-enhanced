@@ -187,7 +187,7 @@ describe('runtime-assert screenshot_diff 真实现(PR-1a)', () => {
     const r = await handleTool('runtime_assert', { action: 'screenshot_diff', reference: join(projDir, 'ref-not-png.txt'), project_path: projDir }, {} as never);
     const p = JSON.parse((r!.content[0] as { text: string }).text);
     expect(p.success).toBe(false); expect(p.error_code).toBe('ASSERT_ERROR');
-    expect(p.error).toContain('读图/解码失败');
+    expect(p.error).toContain('Failed to read/decode images');
     expect(p.mismatch).toBeUndefined(); // 不再误报尺寸不一致(dimensions FAILED)
   });
 });

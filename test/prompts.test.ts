@@ -51,15 +51,15 @@ describe('prompts', () => {
     const result = await getPrompt('scene_editing_strategy', { operation_type: 'add_node' });
     const text = (result.messages[0].content as any).text;
     expect(text).toContain('add_node');
-    expect(text).toContain('能力发现');
-    expect(text).toContain('决策树');
-    expect(text).toContain('闭环验证');
+    expect(text).toContain('capability discovery');
+    expect(text).toContain('decision tree');
+    expect(text).toContain('closed-loop verification');
   });
 
   it('scene_editing_strategy uses default when args empty', async () => {
     const result = await getPrompt('scene_editing_strategy', {});
     const text = (result.messages[0].content as any).text;
-    expect(text).toContain('通用');
+    expect(text).toContain('general');
   });
 });
 

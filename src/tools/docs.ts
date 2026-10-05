@@ -134,8 +134,8 @@ export async function handleTool(name: string, args: Record<string, unknown>, _c
                 description: p.description,
                 deprecated_notes: deprecated
                   ? (deprecated.removed
-                    ? `已移除 (Godot 4.6)${deprecated.replacement ? '，替代: ' + deprecated.replacement : ''}`
-                    : `已重命名 (Godot 4.6): 使用 ${deprecated.replacement}`)
+                    ? `removed (Godot 4.6)${deprecated.replacement ? ', replacement: ' + deprecated.replacement : ''}`
+                    : `renamed (Godot 4.6): use ${deprecated.replacement}`)
                   : null,
               };
             }),

@@ -6,7 +6,7 @@ describe('classifyDegradation', () => {
   it('flags degraded when frame count below MIN_FRAMES', () => {
     const r = classifyDegradation({ frameCount: 5, consecutiveSims: [0.9, 0.9, 0.9, 0.9], firstFrameSims: [0.9, 0.9, 0.9, 0.9] });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('帧数不足');
+    expect(r.reason).toContain('Not enough frames');
   });
 
   // 帧全等 → 退化（mean consecutive > 0.998）
@@ -16,7 +16,7 @@ describe('classifyDegradation', () => {
     const firstFrame = Array(n - 1).fill(1.0);
     const r = classifyDegradation({ frameCount: n, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('帧全等');
+    expect(r.reason).toContain('Frames identical');
   });
 
   // 画面从未变化 → 退化（maxChange < 0.002，即 min firstFrameSim > 0.998）
@@ -27,7 +27,7 @@ describe('classifyDegradation', () => {
     const firstFrame = Array(n - 1).fill(0.999);
     const r = classifyDegradation({ frameCount: n, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('从未变化');
+    expect(r.reason).toContain('never changed');
   });
 
   // 后半段卡死 → 退化（后 third 个 mean consecutive − 前 third 个 > 0.05）
@@ -38,7 +38,7 @@ describe('classifyDegradation', () => {
     const firstFrame = [0.5,0.4,0.3,0.25,0.2,0.18,0.16,0.15,0.15,0.15,0.15];
     const r = classifyDegradation({ frameCount: n, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('后半段卡死');
+    expect(r.reason).toContain('Second half froze');
   });
 
   // 判据4：超过半数窗口停滞（stallWindowRatio > STALL_RATIO）
@@ -50,7 +50,7 @@ describe('classifyDegradation', () => {
     const firstFrame = [0.70, 0.50, 0.45, 0.43, 0.42, 0.41, 0.40, 0.39, 0.38, 0.37, 0.36];
     const r = classifyDegradation({ frameCount: n, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('窗口停滞');
+    expect(r.reason).toContain('windows stalled');
   });
 
   // 正常运动 → 未退化

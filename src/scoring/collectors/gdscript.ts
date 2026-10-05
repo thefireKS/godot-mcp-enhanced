@@ -15,32 +15,32 @@ const MAX_REPORT_BYTES = 10 * 1024 * 1024; // 10MB
 export function collectGdscript(reportPath: string): DimensionResult {
   if (!existsSync(reportPath)) {
     return { score: NA_SCORE, weight: WEIGHTS.gdscript, status: 'na',
-             detail: `报告不存在: ${reportPath}` };
+             detail: `Report does not exist: ${reportPath}` };
   }
   const size = statSync(reportPath).size;
   if (size > MAX_REPORT_BYTES) {
     return { score: NA_SCORE, weight: WEIGHTS.gdscript, status: 'na',
-             detail: `报告过大: ${size} bytes > ${MAX_REPORT_BYTES}` };
+             detail: `Report too large: ${size} bytes > ${MAX_REPORT_BYTES}` };
   }
   let report: GdscriptReport;
   try {
     report = JSON.parse(readFileSync(reportPath, 'utf8'));
   } catch (e) {
     return { score: NA_SCORE, weight: WEIGHTS.gdscript, status: 'na',
-             detail: `报告解析失败: ${(e as Error).message}` };
+             detail: `Failed to parse report: ${(e as Error).message}` };
   }
 
   // incomplete 优先于 errors/warnings:检查不完整则 errors 不可信
   if (report.incomplete) {
     return { score: 0, weight: WEIGHTS.gdscript, status: 'fail',
-             detail: `检查不完整: ${report.reason ?? 'setup 失败'}`,
+             detail: `Check incomplete: ${report.reason ?? 'setup failed'}`,
              raw: { errors: 0, warnings: 0, files: report.files ?? 0,
                     details: [], detailsTotal: 0, incomplete: true } };
   }
 
   if (typeof report.errors !== 'number' || typeof report.warnings !== 'number') {
     return { score: NA_SCORE, weight: WEIGHTS.gdscript, status: 'na',
-             detail: '报告缺 errors/warnings 字段' };
+             detail: 'Report is missing the errors/warnings fields' };
   }
 
   const { errors, warnings } = report;

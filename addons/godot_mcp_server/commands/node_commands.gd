@@ -31,31 +31,31 @@ func _get_ei() -> EditorInterface:
 func get_command_docs() -> Dictionary:
 	return {
 		"add_node": {
-			"description": "向场景树添加一个新节点(类型须在白名单)。",
+			"description": "Add a new node to the scene tree (type must be whitelisted).",
 			"params": [
-				CommandHelpers.doc_param("node_type", "String", false, "节点类型须在 ALLOWED_NODE_TYPES 白名单默认 Node"),
-				CommandHelpers.doc_param("node_name", "String", false, "节点名须匹配 ^[A-Za-z0-9_]+$ 默认 NewNode"),
-				CommandHelpers.doc_param("parent_node_path", "String", false, "父节点路径空则挂场景根"),
-				CommandHelpers.doc_param("properties", "Dictionary", false, "节点属性键值表经 coerce_property_value"),
+				CommandHelpers.doc_param("node_type", "String", false, "Node type, must be in the ALLOWED_NODE_TYPES whitelist, default Node"),
+				CommandHelpers.doc_param("node_name", "String", false, "Node name, must match ^[A-Za-z0-9_]+$, default NewNode"),
+				CommandHelpers.doc_param("parent_node_path", "String", false, "Parent node path, empty = scene root"),
+				CommandHelpers.doc_param("properties", "Dictionary", false, "Node property key/values, through coerce_property_value"),
 			],
 		},
 		"remove_node": {
-			"description": "从场景树删除指定节点(不能删场景根)。",
+			"description": "Delete a node from the scene tree (the scene root can't be deleted).",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "要删除的节点路径不能删场景根"),
+				CommandHelpers.doc_param("node_path", "String", true, "Path of the node to delete; the scene root can't be deleted"),
 			],
 		},
 		"edit_node": {
-			"description": "批量修改节点属性(per-property undo)。",
+			"description": "Change node properties in bulk (per-property undo).",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "目标节点路径"),
-				CommandHelpers.doc_param("properties", "Dictionary", true, "属性键值表须非空 per-property undo"),
+				CommandHelpers.doc_param("node_path", "String", true, "Target node path"),
+				CommandHelpers.doc_param("properties", "Dictionary", true, "Property key/values, must be non-empty; per-property undo"),
 			],
 		},
 		"batch_add_nodes": {
-			"description": "批量添加节点(上限 100 个)。",
+			"description": "Add nodes in bulk (max 100).",
 			"params": [
-				CommandHelpers.doc_param("nodes", "Array", true, "节点定义数组上限 100 每元素含 node_type/node_name/parent_node_path/properties"),
+				CommandHelpers.doc_param("nodes", "Array", true, "Node definitions, max 100, each with node_type/node_name/parent_node_path/properties"),
 			],
 		},
 	}
@@ -78,7 +78,7 @@ func handle_add_node(params: Dictionary, request_id: int) -> Dictionary:
 		return {"error": {"code": -32004, "message": "Invalid node name: %s" % node_name}}
 
 	if not _is_allowed_node_type(node_type):
-		return {"error": {"code": -32004, "message": "Blocked node type: %s. Control 类（TextureRect/Button 等）请用 ui_create_control 工具" % node_type}}
+		return {"error": {"code": -32004, "message": "Blocked node type: %s. For Control types (TextureRect/Button etc.) use the ui_create_control tool" % node_type}}
 
 	var parent_node: Node = root
 	if not parent_path.is_empty():
@@ -261,7 +261,7 @@ func handle_batch_add_nodes(params: Dictionary, request_id: int) -> Dictionary:
 		if node_name.is_empty() or not _name_re.search(node_name):
 			return {"error": {"code": -32004, "message": "nodes[%d].node_name invalid: %s" % [i, node_name]}}
 		if not _is_allowed_node_type(node_type):
-			return {"error": {"code": -32004, "message": "nodes[%d].node_type blocked: %s. Control 类（TextureRect/Button 等）请用 ui_create_control 工具" % [i, node_type]}}
+			return {"error": {"code": -32004, "message": "nodes[%d].node_type blocked: %s. For Control types (TextureRect/Button etc.) use the ui_create_control tool" % [i, node_type]}}
 		var parent_node: Node = root if parent_path.is_empty() else CommandHelpers.find_node(root, parent_path)
 		if not parent_node:
 			return {"error": {"code": -32002, "message": "nodes[%d].parent not found: %s" % [i, parent_path]}}

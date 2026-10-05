@@ -128,12 +128,12 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
         let blankWarning = '';
 
         if (result.godotOutput?.includes('BLANK_DETECTED')) {
-          blankWarning = '\n⚠ Screenshot may be blank (headless RendererDummy 无 GPU 渲染，2D/3D 均空白).\n' +
-            '替代：① Bridge take_screenshot（游戏运行时 GPU viewport，2D/3D 均可）② editor/GUI 模式截图 ③ 手动 F5 运行后截图 ④ screenshot(action=analyze) 分析本地文件';
+          blankWarning = '\n⚠ Screenshot may be blank (headless RendererDummy has no GPU rendering, 2D/3D are blank).\n' +
+            'Alternatives: ① bridge take_screenshot (GPU viewport while the game runs, 2D and 3D) ② screenshot in editor/GUI mode ③ run with F5 and screenshot manually ④ screenshot(action=analyze) on a local file';
         } else if ((result.fileSize ?? 0) < 2048) {
           // 小文件（< 2KB）疑似空白，补充警告
-          blankWarning = `\n⚠ Screenshot file is unusually small (${result.fileSize} bytes), possibly blank (headless RendererDummy 无 GPU 渲染，2D/3D 均空白).\n` +
-            '替代：① Bridge take_screenshot（游戏运行时 GPU viewport，2D/3D 均可）② editor/GUI 模式截图 ③ 手动 F5 运行后截图 ④ screenshot(action=analyze) 分析本地文件';
+          blankWarning = `\n⚠ Screenshot file is unusually small (${result.fileSize} bytes), possibly blank (headless RendererDummy has no GPU rendering, 2D/3D are blank).\n` +
+            'Alternatives: ① bridge take_screenshot (GPU viewport while the game runs, 2D and 3D) ② screenshot in editor/GUI mode ③ run with F5 and screenshot manually ④ screenshot(action=analyze) on a local file';
         }
 
         return {
@@ -302,7 +302,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
       // detail=ascii:返回 ASCII art 文本(最低 token 成本)
       if (detail === 'ascii') {
         if (!isPng) {
-          return opsErrorResult('INVALID_PARAMS', 'detail=ascii 仅支持 PNG 图像(当前: ' + ext + ')。');
+          return opsErrorResult('INVALID_PARAMS', 'detail=ascii supports PNG images only (got: ' + ext + ').');
         }
         // review Nit 3: 正数校验,0/负数 clamp 到默认
         const cols = Math.max(1, (args.ascii_cols as number) ?? 80);
@@ -331,7 +331,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
       // detail=thumbnail:返回降采样 PNG base64(中等 token 成本)
       if (detail === 'thumbnail') {
         if (!isPng) {
-          return opsErrorResult('INVALID_PARAMS', 'detail=thumbnail 仅支持 PNG 图像(当前: ' + ext + ')。');
+          return opsErrorResult('INVALID_PARAMS', 'detail=thumbnail supports PNG images only (got: ' + ext + ').');
         }
         // review Nit 3: 正数校验
         const targetWidth = Math.max(1, (args.thumbnail_width as number) ?? 256);

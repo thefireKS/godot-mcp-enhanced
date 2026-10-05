@@ -19,7 +19,7 @@ const FOOTER = `bpy.ops.export_scene.gltf(filepath=sys.argv[sys.argv.index("--")
 
 /** 包装 AI 片段：header（空场景）+ AI code + footer（argv export）。 */
 export function buildBlenderScript(code: string): string {
-  return `${HEADER}\n# ===== AI 片段 =====\n${code}\n# ===== 自动导出 =====\n${FOOTER}`;
+  return `${HEADER}\n# ===== AI snippet =====\n${code}\n# ===== auto export =====\n${FOOTER}`;
 }
 
 export const TOOL_META: Record<string, { readonly: boolean; long_running: boolean; actionRisks?: Record<string, RiskLevel> }> = {

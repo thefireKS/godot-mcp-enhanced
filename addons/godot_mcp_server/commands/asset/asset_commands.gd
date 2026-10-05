@@ -44,45 +44,45 @@ func _get_root() -> Node:
 func get_command_docs() -> Dictionary:
 	return {
 		"asset_create": {
-			"description": "放置单个资源(基元/自定义形状)节点到场景。",
+			"description": "Place a single asset (primitive/custom shape) node in the scene.",
 			"params": [
-				CommandHelpers.doc_param("shape", "String", true, "资源形状名"),
-				CommandHelpers.doc_param("params", "Dictionary", false, "形状专属参数默认 {}"),
-				CommandHelpers.doc_param("material", "JSON", false, "材质默认 null"),
-				CommandHelpers.doc_param("name", "String", false, "节点名默认空"),
-				CommandHelpers.doc_param("parent", "String", false, "父节点路径空则挂根"),
+				CommandHelpers.doc_param("shape", "String", true, "Asset shape name"),
+				CommandHelpers.doc_param("params", "Dictionary", false, "Shape-specific parameters, default {}"),
+				CommandHelpers.doc_param("material", "JSON", false, "Material, default null"),
+				CommandHelpers.doc_param("name", "String", false, "Node name, default empty"),
+				CommandHelpers.doc_param("parent", "String", false, "Parent node path, empty = scene root"),
 			],
 		},
 		"asset_path": {
-			"description": "沿路径采样点批量放置资源。",
+			"description": "Place assets in bulk along sampled path points.",
 			"params": [
-				CommandHelpers.doc_param("path", "Array", false, "采样点数组与 path_node 至少其一有效 <2 点报错"),
-				CommandHelpers.doc_param("path_node", "String", false, "用于解析采样点的参考路径节点"),
-				CommandHelpers.doc_param("shape", "String", true, "资源形状名"),
-				CommandHelpers.doc_param("params", "Dictionary", false, "形状专属参数"),
-				CommandHelpers.doc_param("material", "JSON", false, "材质"),
-				CommandHelpers.doc_param("mode", "String", false, "排布模式默认 discrete"),
-				CommandHelpers.doc_param("spacing", "float", false, "间距默认 1.0"),
-				CommandHelpers.doc_param("count", "int", false, "数量上限默认 0"),
-				CommandHelpers.doc_param("align", "String", false, "朝向对齐模式默认 path"),
-				CommandHelpers.doc_param("align_vertices", "bool", false, "是否按顶点对齐默认 false"),
+				CommandHelpers.doc_param("path", "Array", false, "Sample points array; it or path_node must be valid, fewer than 2 points is an error"),
+				CommandHelpers.doc_param("path_node", "String", false, "Reference path node used to resolve sample points"),
+				CommandHelpers.doc_param("shape", "String", true, "Asset shape name"),
+				CommandHelpers.doc_param("params", "Dictionary", false, "Shape-specific parameters"),
+				CommandHelpers.doc_param("material", "JSON", false, "Material"),
+				CommandHelpers.doc_param("mode", "String", false, "Layout mode, default discrete"),
+				CommandHelpers.doc_param("spacing", "float", false, "Spacing, default 1.0"),
+				CommandHelpers.doc_param("count", "int", false, "Count limit, default 0"),
+				CommandHelpers.doc_param("align", "String", false, "Orientation mode, default path"),
+				CommandHelpers.doc_param("align_vertices", "bool", false, "Align to vertices, default false"),
 			],
 		},
 		"asset_batch": {
-			"description": "批量放置多件资源(结构同 asset_create)。",
+			"description": "Place several assets in bulk (same structure as asset_create).",
 			"params": [
-				CommandHelpers.doc_param("items", "Array", true, "多件定义数组每元素结构同 asset_create 的 shape/params/material/name/parent"),
+				CommandHelpers.doc_param("items", "Array", true, "Array of definitions, each with the shape/params/material/name/parent structure of asset_create"),
 			],
 		},
 		"asset_undo": {
-			"description": "弹全局 UndoRedo 栈顶 asset 类 action。",
+			"description": "Pop an asset-type action off the top of the global UndoRedo stack.",
 			"params": [],
 		},
 		"asset_save": {
-			"description": "把节点打包保存为 .tscn 资源。",
+			"description": "Pack a node and save it as a .tscn resource.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "要打包保存的节点路径"),
-				CommandHelpers.doc_param("resource_path", "String", true, "输出 .tscn 路径须 res:// 前缀且无 .. 遍历"),
+				CommandHelpers.doc_param("node_path", "String", true, "Path of the node to pack and save"),
+				CommandHelpers.doc_param("resource_path", "String", true, "Output .tscn path, needs the res:// prefix and no .. traversal"),
 			],
 		},
 	}
@@ -108,7 +108,7 @@ func handle_path(params: Dictionary, request_id: int) -> Dictionary:
 		return {"error": {"code": "NO_ACTIVE_SCENE", "message": "no active scene"}}
 	var points := PathGenerator.resolve_points(root, params.get("path", []), params.get("path_node", ""))
 	if points.is_empty():
-		return {"error": {"code": "PARENT_NOT_FOUND", "message": "path_node 无效或 path <2 点"}}
+		return {"error": {"code": "PARENT_NOT_FOUND", "message": "path_node invalid or path has fewer than 2 points"}}
 	return AssetPlacer.place_path(root, _undo_manager, params.get("shape", ""),
 		params.get("params", {}), params.get("material", null), points,
 		params.get("mode", "discrete"), params.get("spacing", 1.0), params.get("count", 0),
@@ -151,7 +151,7 @@ func handle_undo(params: Dictionary, request_id: int) -> Dictionary:
 		return {"error": {"code": "NOTHING_TO_UNDO", "message": "undo stack empty"}}
 	# P1: 仅撤 asset 类栈顶, 防误撤其他 peer / 手动编辑的非 asset 操作
 	if not (top.begins_with("MCP: asset_create_") or top.begins_with("MCP: asset_batch_")):
-		return {"error": {"code": "NOT_ASSET_TOP", "message": "栈顶非 asset 操作: %s — asset_undo 仅撤 asset 类, 请先处理栈顶或用编辑器 undo" % top}}
+		return {"error": {"code": "NOT_ASSET_TOP", "message": "Top of the stack is not an asset operation: %s — asset_undo only undoes asset actions; deal with the top of the stack first or use the editor's undo" % top}}
 	ur.undo()
 	return {"result": {"undone": true, "action": top}}
 
@@ -166,7 +166,7 @@ func handle_save(params: Dictionary, request_id: int) -> Dictionary:
 	var res_path: String = params.get("resource_path", "")
 	# 路径白名单：必须 res:// 前缀且无 .. 遍历段（防御深度，与 node_commands/ui_commands 对齐）
 	if not res_path.begins_with("res://") or CommandHelpers.has_path_traversal(res_path):
-		return {"error": {"code": "INVALID_PATH", "message": "resource_path 须 res:// 且无遍历"}}
+		return {"error": {"code": "INVALID_PATH", "message": "resource_path must be res:// without traversal"}}
 	var pkg := PackedScene.new()
 	var err := pkg.pack(node)
 	if err != OK:

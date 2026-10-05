@@ -46,7 +46,7 @@ describe('setup_project_rules AGENTS.md 双写', () => {
     await handleTool('project', { action: 'setup_project_rules', project_path: project, hooks: false }, makeCtx());
     const md = readFileSync(join(project, 'AGENTS.md'), 'utf-8');
     expect(md).toContain('# TestGame');
-    expect(md).toContain('## Godot MCP 引擎特性');
+    expect(md).toContain('## Godot MCP engine quirks');
   });
 
   it('幂等：再次运行不破坏用户段（保留用户自建 ## 段）', async () => {

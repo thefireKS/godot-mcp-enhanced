@@ -148,12 +148,12 @@ const ERROR_PATTERNS: ErrorPattern[] = [
   {
     test: (msg) => /get_tree/.test(msg) && /not (?:be )?found/.test(msg),
     type: 'script_error',
-    suggestion: () => 'Godot 4.6+ 兼容性提示: 在 extends SceneTree 脚本中，请使用 self.root 代替 get_tree().root，使用 quit() 代替 get_tree().quit()',
+    suggestion: () => 'Godot 4.6+ compatibility hint: in an extends SceneTree script use self.root instead of get_tree().root, and quit() instead of get_tree().quit()',
   },
   {
     test: (msg) => /\broot\b/.test(msg) && /redefined/.test(msg),
     type: 'script_error',
-    suggestion: () => "Godot 4.6+ 兼容性提示: 如果您在 extends SceneTree 脚本中，变量名 'root' 与 SceneTree.root 冲突，请改用其他名称如 scene_root 或 _root",
+    suggestion: () => "Godot 4.6+ compatibility hint: in an extends SceneTree script the variable name 'root' clashes with SceneTree.root; rename it, e.g. scene_root or _root",
   },
   {
     test: (msg) => /texture_2d_get/.test(msg) && /null/.test(msg),

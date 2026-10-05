@@ -7,7 +7,7 @@ export function round1(n: number): number {
 
 /** 按维度从 raw 提取"关键指标";na 维返回"未接入",raw 缺失返回 "—" */
 export function dimMetric(name: DimensionName, d: DimensionResult): string {
-  if (d.score === NA_SCORE || d.status === 'na') return '未接入';
+  if (d.score === NA_SCORE || d.status === 'na') return 'Not wired';
   const raw = d.raw as Record<string, number> | undefined;
   if (!raw) return '—';
   switch (name) {

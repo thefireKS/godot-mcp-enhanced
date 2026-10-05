@@ -108,6 +108,6 @@ describe('collectPerformance', () => {
     writeFileSync(REPORT, Buffer.alloc(10 * 1024 * 1024 + 1));
     const r = collectPerformance(REPORT);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('过大');
+    expect(r.detail).toContain('too large');
   });
 });

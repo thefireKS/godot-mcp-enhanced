@@ -549,7 +549,7 @@ function resolveGeometryInput(
   if (args.geometry !== undefined && args.geometry !== null) {
     const preWarnings: string[] = [];
     if (geometryPathRaw !== undefined) {
-      preWarnings.push('geometry 与 geometry_path 同时提供: geometry 优先, geometry_path 被忽略');
+      preWarnings.push('both geometry and geometry_path given: geometry wins, geometry_path is ignored');
     }
     return { ok: true, rawGeometry: args.geometry, preWarnings };
   }
@@ -558,15 +558,15 @@ function resolveGeometryInput(
     try {
       absGeometryPath = resolveWithinRoot(projectPath, normalizeUserProjectPath(geometryPathRaw));
     } catch (err) {
-      return { ok: false, result: opsErrorResult(ERROR_CODES.INVALID_PARAMS, `geometry_path 非法: ${getErrorMessage(err)}`) };
+      return { ok: false, result: opsErrorResult(ERROR_CODES.INVALID_PARAMS, `Invalid geometry_path: ${getErrorMessage(err)}`) };
     }
     try {
       return { ok: true, rawGeometry: JSON.parse(readFileSync(absGeometryPath, 'utf-8')), preWarnings: [] };
     } catch (err) {
-      return { ok: false, result: opsErrorResult(ERROR_CODES.INVALID_PARAMS, `geometry_path 文件读取或 JSON 解析失败: ${getErrorMessage(err)}`) };
+      return { ok: false, result: opsErrorResult(ERROR_CODES.INVALID_PARAMS, `Failed to read geometry_path or parse its JSON: ${getErrorMessage(err)}`) };
     }
   }
-  return { ok: false, result: opsErrorResult(ERROR_CODES.INVALID_PARAMS, 'geometry 与 geometry_path 必须提供其一') };
+  return { ok: false, result: opsErrorResult(ERROR_CODES.INVALID_PARAMS, 'One of geometry or geometry_path is required') };
 }
 
 /**
@@ -652,16 +652,16 @@ async function handleUiImportPrototype(
   const buildWarnings = [
     ...preWarnings,
     ...translated.warnings,
-    '使用提示: 避免构造 ≤2px 宽的相邻独立节点(容差模糊带)——verify 容差内兄弟关系与偏移不可区分',
+    'Usage hint: avoid adjacent separate nodes ≤2px wide (tolerance blur band) — within the verify tolerance, sibling relations and offsets can\'t be told apart',
     ...(!parentIsRoot ? [
-      `parent_path="${parentPath}" 非 root: layout_verify 根级条目期望 rect 按视口原点求解,挂载父非原点对齐(global_position≈0,0)时根级 diff 恒误报——请确认挂载父原点对齐,或忽略根级条目的 diff 结果`,
+      `parent_path="${parentPath}" is not root: layout_verify solves root-level expected rects against the viewport origin, so when the mount parent is not aligned to the origin (global_position≈0,0) root-level diffs are always false alarms — make sure the mount parent is origin-aligned, or ignore root-level diff results`,
     ] : []),
   ];
   for (const w of out.data?.warnings ?? []) {
     buildWarnings.push(typeof w === 'object' && w !== null && 'message' in w ? String((w as { message: unknown }).message) : String(w));
   }
   if (out.data?.persist?.saved !== true) {
-    buildWarnings.push('persist 落盘失败(saved=false):measure 读到的是磁盘旧场景,layout_verify 不可信,请排查后重试');
+    buildWarnings.push('persist failed to write (saved=false): measure read the old scene from disk, layout_verify is unreliable; investigate and retry');
   }
 
   // ③ 组装返回(单 spawn:measure 与 build 输出同批;输出异常保持原样,diff 缺失由 AI 视为未验证)。
@@ -683,7 +683,7 @@ async function handleUiImportPrototype(
     const flowVerify = diffFlow(measured, translated.flow_expect, tolerance);
     const verifyCoverage = {
       ...translated.coverage,
-      _note: 'targets 为受 layout_verify 几何覆盖的节点数(含合成根 _PrototypeRoot,无 flow 时 = 输入节点数+1);flow 直接子节点丢 rect 不在 layout_verify 覆盖内,由 flow_verify 数字覆盖(期望=输入视口 rect);孙层由 layout_verify 近似覆盖(期望相对输入父原点,容器排布后天然带偏移)',
+      _note: 'targets = nodes covered by layout_verify geometry (including the synthetic root _PrototypeRoot; without flows = input nodes + 1); direct flow children drop their rect and are not covered by layout_verify — flow_verify covers them numerically (expected = input viewport rect); grandchildren are covered approximately by layout_verify (expected relative to the input parent origin, naturally offset after container layout)',
     };
     return textResult(JSON.stringify(opsSuccess({
       tree: translated.tree,
@@ -717,13 +717,13 @@ async function handleUiPixelVerify(
 ): Promise<ToolResult> {
   const sceneRaw = args.scene_path as string | undefined;
   if (!sceneRaw || !String(sceneRaw).trim()) {
-    return opsErrorResult(ERROR_CODES.INVALID_PARAMS, 'ui_pixel_verify 需要 scene_path 指向已构建场景(ui_import_prototype persist 产物)');
+    return opsErrorResult(ERROR_CODES.INVALID_PARAMS, 'ui_pixel_verify needs scene_path pointing at an already built scene (the output of ui_import_prototype persist)');
   }
   let scenePath: string;
   try {
     scenePath = resolveWithinRoot(projectPath, normalizeUserProjectPath(String(sceneRaw)));
   } catch (err) {
-    return opsErrorResult(ERROR_CODES.INVALID_PARAMS, `scene_path 非法: ${getErrorMessage(err)}`);
+    return opsErrorResult(ERROR_CODES.INVALID_PARAMS, `Invalid scene_path: ${getErrorMessage(err)}`);
   }
   const resolved = resolveGeometryInput(args, projectPath);
   if (!resolved.ok) return resolved.result;

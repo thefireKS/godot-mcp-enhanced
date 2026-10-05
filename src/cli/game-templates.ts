@@ -23,7 +23,7 @@ export const GAME_TEMPLATES: Record<string, GameTemplateMeta> = {
   '2048': {
     slug: '2048',
     title: '2048',
-    summary: '数字滑块合并:方向键移动,相同数字碰撞翻倍,冲 2048',
+    summary: 'Number tiles merge: arrow keys move, equal numbers double on collision, reach 2048',
     files: [
       'main.tscn',
       'scripts/game.gd',
@@ -37,8 +37,8 @@ export const GAME_TEMPLATES: Record<string, GameTemplateMeta> = {
   },
   'snake': {
     slug: 'snake',
-    title: '贪吃蛇',
-    summary: '网格贪吃蛇:固定节奏移动,吃食变长,撞墙/自身判负',
+    title: 'Snake',
+    summary: 'Grid snake: moves at a fixed beat, grows when eating, hitting a wall/itself loses',
     files: [
       'main.tscn',
       'scripts/game.gd',
@@ -52,8 +52,8 @@ export const GAME_TEMPLATES: Record<string, GameTemplateMeta> = {
   },
   'breakout': {
     slug: 'breakout',
-    title: '打砖块',
-    summary: '自写 AABB 物理打砖块:挡板接球碎砖,确定性帧级可复现',
+    title: 'Breakout',
+    summary: 'Breakout with hand-written AABB physics: the paddle bounces the ball to break bricks, deterministic and frame-reproducible',
     files: [
       'main.tscn',
       'scripts/game.gd',

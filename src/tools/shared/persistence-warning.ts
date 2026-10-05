@@ -1,6 +1,6 @@
 import type { ToolResult } from '../../types.js';
 
-const RUNTIME_PERSIST_HINT = '是运行时操作，headless 进程退出后丢失。持久化须 add_node + save_scene 写入 .tscn（运行时工具仅用于验证/测试）';
+const RUNTIME_PERSIST_HINT = 'is a runtime operation and is lost when the headless process exits. To persist, write the .tscn with add_node + save_scene (runtime tools are for verification/testing only)';
 
 /** 运行时工具返回末尾追加的不持久化提示。action = 工具 action 名（如 audio_play）。 */
 export function runtimePersistWarning(action: string): string {

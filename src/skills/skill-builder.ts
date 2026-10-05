@@ -19,94 +19,94 @@ export const WORKFLOW_TO_SKILL: Record<string, string> = {
 
 const GODOT_ROUTER_SKILL = `---
 name: godot-router
-description: "godot-mcp skill 路由器 不确定用哪个流程 入口匝道 决策树 E2E 安全编辑 验证闭环 动画审计 —— 当你不确定该用哪个 godot-mcp 流程、或需要把任务分发到具体子流程时使用。简单单工具操作(改单行/单次截图)不要用本 skill,直接调工具"
+description: "godot-mcp skill router: unsure which flow, entry ramp, decision tree, E2E, safe editing, verification loop, animation audit — use when you are unsure which godot-mcp flow fits, or need to dispatch a task to a specific sub-flow. Don't use this skill for simple single-tool operations (one-line edit / single screenshot); call the tool directly"
 ---
 
-## godot-mcp 流程路由
+## godot-mcp flow routing
 
-本 skill 是 godot-mcp skill 体系的路由器。当你不确定该用哪个流程时,按以下决策树分发。
+This skill is the router of the godot-mcp skill set. When you are unsure which flow to use, dispatch with the decision tree below.
 
-**何时用**:用户请求模糊(如"帮我改场景""验证一下"),或一个任务跨多个 skill 时。
+**When to use**: the request is vague (e.g. "change the scene for me", "check it"), or a task spans several skills.
 
-**主流程(想法 → 可交付)**:
-- [ ] 1. 改代码/场景 → 先 screenshot-verify 留证,再 godot-mcp-safe-edit 编辑,收尾 godot-mcp-verify-loop 验证
-- [ ] 2. 不确定怎么改 → 用 game 工具的 game_query action 读真实运行时值,不要纸面猜
-- [ ] 3. 批量建节点/文件 → 走 godot-mcp-safe-edit 的 batch 路径
+**Main flow (idea → deliverable)**:
+- [ ] 1. Changing code/scenes → screenshot-verify first for evidence, then edit with godot-mcp-safe-edit, finish with godot-mcp-verify-loop
+- [ ] 2. Unsure how to change it → read real runtime values with the game tool's game_query action instead of guessing on paper
+- [ ] 3. Creating many nodes/files → use the batch path of godot-mcp-safe-edit
 
-**入口匝道(按任务类型分流)**:
-- [ ] E2E 测试 / 模拟输入 / 回归测试 → \`godot-mcp-bridge-e2e\`
-- [ ] 动画/动效不对劲(卡顿/无弹性/方向反)→ \`godot-tween-taste\`
-- [ ] 视觉验证(操作前后截图对比)→ \`screenshot-verify\`
-- [ ] 安全编辑(.gd/.tscn 改动)→ \`godot-mcp-safe-edit\`
-- [ ] 交付前自检 → \`godot-mcp-verify-loop\`
+**Entry ramps (by task type)**:
+- [ ] E2E tests / simulated input / regression tests → \`godot-mcp-bridge-e2e\`
+- [ ] Animation/motion feels off (stutter / no bounce / wrong direction) → \`godot-tween-taste\`
+- [ ] Visual verification (before/after screenshots) → \`screenshot-verify\`
+- [ ] Safe editing (.gd/.tscn changes) → \`godot-mcp-safe-edit\`
+- [ ] Self-check before delivery → \`godot-mcp-verify-loop\`
 
-**何时不用 skill**:
-- 改单行 .gd → 直接 \`edit_script\`
-- 只读探索(看场景结构)→ 直接 \`read_scene\` / \`game_query\`
-- 单次截图 → 直接 \`screenshot\`
+**When not to use a skill**:
+- One-line .gd change → \`edit_script\` directly
+- Read-only exploration (looking at scene structure) → \`read_scene\` / \`game_query\` directly
+- A single screenshot → \`screenshot\` directly
 
-**常见偏离**:
-- 每个操作都走路由器(过度:简单操作直接调工具,路由器只在不确定时用)
-- 路由后不验证(漏:即使路由器分发,收尾仍需 verify-loop 或 screenshot-verify)`;
+**Common deviations**:
+- Routing every operation through the router (overkill: call tools directly for simple operations, use the router only when unsure)
+- Not verifying after routing (gap: even when the router dispatches, finish with verify-loop or screenshot-verify)`;
 
 const SCREENSHOT_VERIFY_SKILL = `---
 name: screenshot-verify
-description: "视觉验证闭环 截图对比 操作前后留证 take_screenshot frame-verify runtime_assert screenshot_diff 渲染退化 GPU viewport headless 空白检测 —— 当你做了会影响视觉的操作、需要确认渲染结果、或怀疑渲染退化时使用"
+description: "visual verification loop, screenshot comparison, before/after evidence, take_screenshot, frame-verify, runtime_assert, screenshot_diff, render regression, GPU viewport, headless blank detection — use when an operation affected visuals, when you need to confirm the rendered result, or when you suspect a render regression"
 ---
 
-## 视觉验证闭环(操作前后留证)
+## Visual verification loop (before/after evidence)
 
-本 skill 是视觉验证原语,其他 skill 可 reach。核心原则:任何影响视觉的操作,操作前后都截图留证,对比确认。
+This skill is the visual verification primitive that other skills can reach for. Core rule: for any operation that affects visuals, screenshot before and after and compare.
 
-**何时用**:做了会影响视觉的操作(改场景树/材质/动画/UI)、需要确认渲染结果、怀疑渲染退化(headless 空白/GPU 丢失)。
+**When to use**: after operations that affect visuals (scene tree / materials / animation / UI), when you need to confirm the rendered result, or suspect a render regression (headless blank / GPU lost).
 
 **checklist**:
-- [ ] 1. \`screenshot(action=capture)\` — 操作前截图(基线留证,记 imagePath)
-- [ ] 2. 执行变更操作(edit_script / add_node / 材质修改等)
-- [ ] 3. \`screenshot(action=capture)\` — 操作后截图(同 viewport 同节点)
-- [ ] 4. \`screenshot(action=analyze, detail=thumbnail)\` — 分别 analyze 操作前/后两张图(thumbnail 省 token),人工或 AI 对比差异
-- [ ] 5. 若需程序化断言:\`runtime_assert(action=screenshot_diff, reference=<基线路径>, project_path=<项目路径>, threshold=0.12, max_diff_ratio=0.05)\`(threshold=像素差异容忍,per-pixel 归一化 RGB 距离严格大于此值才计差,值越小越严;max_diff_ratio=允许的差异像素占比上限,严格像素回归传 0;qa 套件可直接用 screenshot_diff 断言步骤)
-- [ ] 6. headless 模式警告:若 fileSize < 2048 或 BLANK_DETECTED,改用 bridge take_screenshot(GPU viewport)
+- [ ] 1. \`screenshot(action=capture)\` — screenshot before the operation (baseline evidence, note imagePath)
+- [ ] 2. Make the change (edit_script / add_node / material edits etc.)
+- [ ] 3. \`screenshot(action=capture)\` — screenshot after the operation (same viewport, same node)
+- [ ] 4. \`screenshot(action=analyze, detail=thumbnail)\` — analyze the before and after images separately (thumbnail saves tokens), compare by eye or with the AI
+- [ ] 5. For a programmatic assertion: \`runtime_assert(action=screenshot_diff, reference=<baseline path>, project_path=<project path>, threshold=0.12, max_diff_ratio=0.05)\` (threshold = per-pixel tolerance, a pixel counts only when its normalised RGB distance is strictly greater, smaller is stricter; max_diff_ratio = max share of differing pixels, 0 for strict pixel regression; qa suites can use the screenshot_diff assertion step directly)
+- [ ] 6. Headless warning: if fileSize < 2048 or BLANK_DETECTED, use bridge take_screenshot (GPU viewport) instead
 
-**常见偏离**:
-- 只截操作后不截操作前(漏基线,无法对比退化)
-- headless 空白当 bug 报(误:headless RendererDummy 无 GPU 渲染,2D/3D 均空白是已知限制,非 bug)
-- 用 screenshot(action=analyze, detail=full) 对比(token 浪费:thumbnail 足够看差异,full 只在需细节时用)`;
+**Common deviations**:
+- Screenshotting only after, not before (no baseline, can't compare for regressions)
+- Reporting a headless blank as a bug (wrong: headless RendererDummy has no GPU rendering; blank 2D/3D is a known limitation, not a bug)
+- Comparing with screenshot(action=analyze, detail=full) (wastes tokens: thumbnail is enough to see differences, full only when details matter)`;
 
 const GODOT_TWEEN_TASTE_SKILL = `---
 name: godot-tween-taste
-description: "Tween 动效品味审计 create_tween tween_property set_trans set_ease TRANS 类型 Ease 方向 时长 弹性 卡顿 方向反 只读不改 自包含修复计划 advisor —— 当你用 Tweener、Tween 动效不对劲(卡顿/无弹性/方向反)、或需要审计 Tween 品质时使用。改单行 Tween 值用 edit_script 即可"
+description: "Tween motion taste audit, create_tween, tween_property, set_trans, set_ease, TRANS types, Ease direction, duration, bounce, stutter, wrong direction, read-only, self-contained fix plan, advisor — use when working with Tweener, when Tween motion feels off (stutter / no bounce / wrong direction), or to audit Tween quality. For a one-line Tween value change, edit_script is enough"
 ---
 
-## Tween 动效品味审计(advisor-worker 模式)
+## Tween motion taste audit (advisor-worker mode)
 
-本 skill 是 advisor(只读不改源码),扫描 Tween 调用按品味审计,产出自包含修复计划给 worker 执行。借鉴 emilkowalski improve-animations 的 4 Phase 工作流。
+This skill is an advisor (reads, never edits source): it scans Tween calls, audits them for taste and produces self-contained fix plans for a worker. Borrows the 4-phase workflow of emilkowalski's improve-animations.
 
-**何时用**:Tween 动效"不对劲"(卡顿/无弹性/方向反/生硬)、批量审计 Tween 品质、用 Tweener 时想确认 TRANS/Ease 选择合理。
+**When to use**: Tween motion feels "off" (stutter / no bounce / wrong direction / stiff), a batch audit of Tween quality, or to confirm TRANS/Ease choices when using Tweener.
 
-**Phase 1 — Recon(只读,摸清 Tween 地图)**:
-- [ ] 1. \`read_scene\` + grep \`create_tween|tween_property|set_trans|set_ease\` 找所有 Tween 调用
-- [ ] 2. 记录每处:file:line + TRANS 类型 + Ease 方向 + 时长 + 目标属性
+**Phase 1 — Recon (read-only, map the Tweens)**:
+- [ ] 1. \`read_scene\` + grep \`create_tween|tween_property|set_trans|set_ease\` to find every Tween call
+- [ ] 2. Record each: file:line + TRANS type + Ease direction + duration + target property
 
-**Phase 2 — Audit(按 7 类审计,只返回 file:line + evidence)**:
-- [ ] 3. TRANS_LINEAR 用于 UI 动画(生硬,应换 TRANS_SINE/QUAD)
-- [ ] 4. Ease 缺失(默认 ease_in_out 可能不对,UI 进场应用 ease_out)
-- [ ] 5. 时长 < 0.1s(太快看不清)或 > 1.0s(太慢拖沓)
-- [ ] 6. parallel() 缺失(多 Tween 应并行但串行跑了)
-- [ ] 7. Tween 未 kill(场景切换后泄漏,应 connect tree_exited)
+**Phase 2 — Audit (7 categories, return only file:line + evidence)**:
+- [ ] 3. TRANS_LINEAR used for UI animation (stiff, switch to TRANS_SINE/QUAD)
+- [ ] 4. Missing Ease (the default ease_in_out may be wrong; UI entrances want ease_out)
+- [ ] 5. Duration < 0.1s (too fast to see) or > 1.0s (too slow, drags)
+- [ ] 6. Missing parallel() (several Tweens should run in parallel but run in sequence)
+- [ ] 7. Tween never killed (leaks after scene change; connect tree_exited)
 
-**Phase 3 — Vet & prioritize(剔除误判)**:
-- [ ] 8. 重读每条 finding,剔除 by-design(如 LoadingScreen 故意用 LINEAR)
-- [ ] 9. 按 leverage 排序(影响用户体验大的优先)
+**Phase 3 — Vet & prioritize (drop false positives)**:
+- [ ] 8. Re-read every finding, drop by-design ones (e.g. a LoadingScreen using LINEAR on purpose)
+- [ ] 9. Sort by leverage (bigger impact on the player experience first)
 
-**Phase 4 — Write plans(自包含修复计划)**:
-- [ ] 10. 每条 finding 写一个 plan,内联精确值(如"TRANS_LINEAR → TRANS_SINE,Ease In → Ease Out,0.05s → 0.3s")
-- [ ] 11. plan 交接给 worker(任何 agent),按 plan 用 edit_script 逐条修
+**Phase 4 — Write plans (self-contained fix plans)**:
+- [ ] 10. One plan per finding with exact values inline (e.g. "TRANS_LINEAR → TRANS_SINE, Ease In → Ease Out, 0.05s → 0.3s")
+- [ ] 11. Hand the plans to a worker (any agent), who fixes them one by one with edit_script
 
-**常见偏离**:
-- advisor 直接改源码(越界:advisor 只读,改是 worker 的事)
-- plan 写模糊指令(漂移:必须内联精确值,不允许"用更柔和的 easing")
-- 把 by-design 当 bug 报(噪声:先 Vet 剔除故意的妥协)`;
+**Common deviations**:
+- The advisor edits source directly (out of bounds: the advisor is read-only, editing is the worker's job)
+- Plans with vague instructions (drift: exact values inline are required, no "use a softer easing")
+- Reporting by-design choices as bugs (noise: vet out deliberate trade-offs first)`;
 
 /**
  * 手写 skill（非派生）。key = skill name，value = 完整 SKILL.md 内容（含 frontmatter）。
@@ -131,18 +131,18 @@ export const HANDWRITTEN_SKILLS: Map<string, string> = new Map([
 export function deriveSkillFromWorkflow(tpl: string, skillName: string): string {
   // 1. 剥 rule frontmatter
   const fmMatch = tpl.match(/^---\n([\s\S]*?)\n---\n/);
-  if (!fmMatch) throw new Error(`skill-builder: ${skillName} 的 workflow 模板缺 rule frontmatter (---...---)`);
+  if (!fmMatch) throw new Error(`skill-builder: the workflow template of ${skillName} is missing the rule frontmatter (---...---)`);
   const frontmatter = fmMatch[1]!;
   const afterFm = tpl.slice(fmMatch[0].length);
 
   // 2. 提取 description 引号内纯文本
   const descMatch = frontmatter.match(/^description:\s*"([\s\S]*?)"\s*$/m);
-  if (!descMatch) throw new Error(`skill-builder: ${skillName} 的 workflow frontmatter 缺 description (带引号)`);
+  if (!descMatch) throw new Error(`skill-builder: the workflow frontmatter of ${skillName} is missing a (quoted) description`);
   const description = descMatch[1]!;
 
   // 3. 剃到首个 ## 前（版本引用行 + 空行）
   const h2Idx = afterFm.search(/^##\s/m);
-  if (h2Idx === -1) throw new Error(`skill-builder: ${skillName} 的 workflow 模板缺 ## 标题`);
+  if (h2Idx === -1) throw new Error(`skill-builder: the workflow template of ${skillName} is missing a ## heading`);
   const body = afterFm.slice(h2Idx);
 
   // 4. 组装（description 重新包引号，不加 H1）
@@ -155,7 +155,7 @@ export function buildAllSkills(): Map<string, string> {
   // 派生 skill（现有 3 个，从 rule-templates.ts workflow 模板派生）
   for (const [workflowKey, skillName] of Object.entries(WORKFLOW_TO_SKILL)) {
     const tpl = DETAILED_RULE_TEMPLATES[workflowKey];
-    if (!tpl) throw new Error(`skill-builder: DETAILED_RULE_TEMPLATES 缺 workflow 模板 ${workflowKey}`);
+    if (!tpl) throw new Error(`skill-builder: DETAILED_RULE_TEMPLATES has no workflow template ${workflowKey}`);
     result.set(skillName, deriveSkillFromWorkflow(tpl, skillName));
   }
   // 手写 skill（Tier2-1 新增 3 个：路由器/原语/advisor）

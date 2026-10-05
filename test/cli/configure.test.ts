@@ -171,7 +171,7 @@ describe('configure 命令', () => {
     it('N-4:project scope 在非 Godot 项目目录警告(不阻断)', async () => {
       // tmpDir 无 project.godot → warn;global scope(Codex)不 warn
       await runConfigure(['claude-code']);
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('不是 Godot 项目'));
+      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('is not a Godot project'));
       const claude = ALL_ADAPTERS.find(a => a.name === 'Claude Code')!;
       expect(claude.configure).toHaveBeenCalled(); // 警告不阻断
     });

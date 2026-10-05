@@ -335,7 +335,7 @@ describe('runPixelVerify 编排(mock capture)', () => {
       const r = await runPixelVerify({ godotPath: 'godot', projectPath: dir, scenePath: join(dir, 'main.tscn'), geo });
       expect(r.ok).toBe(false);
       if (r.ok) return;
-      expect(r.error).toContain('空白');
+      expect(r.error).toContain('blank');
       expect(r.hint).toContain('headless');
     } finally {
       blankHintMock.mockReturnValue('');
@@ -424,7 +424,7 @@ describe('runPixelVerify 编排(mock capture)', () => {
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.summary.nodes).toHaveLength(0);
-    expect(r.summary.note).toContain('无 bg 节点');
+    expect(r.summary.note).toContain('no bg nodes');
   });
 });
 
@@ -445,7 +445,7 @@ describe('ui_pixel_verify handler 接线', () => {
     const r = await handleTool('ui', { action: 'ui_pixel_verify', project_path: process.cwd(), scene_path: 'main.tscn' }, createCtx());
     const text = (r?.content?.[0] as { text: string }).text;
     expect(text).toContain('INVALID_PARAMS');
-    expect(text).toContain('必须提供其一');
+    expect(text).toContain('One of geometry or geometry_path is required');
   });
 
   it('geometry_path 越界逃逸(../) → INVALID_PARAMS(路径白名单负向)', async () => {

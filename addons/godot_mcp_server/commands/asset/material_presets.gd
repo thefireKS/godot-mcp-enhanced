@@ -23,7 +23,7 @@ const _PRESETS: Dictionary = {
 static func create(preset_name: String) -> StandardMaterial3D:
 	var key := preset_name.to_lower()
 	if not _PRESETS.has(key):
-		push_warning("MaterialPresets: 未知预设 '%s'，回退 default" % preset_name)
+		push_warning("MaterialPresets: unknown preset '%s', falling back to default" % preset_name)
 		key = "default"
 	return _build(_PRESETS[key])
 
@@ -48,5 +48,5 @@ static func _safe_html(hex: String, fallback: Color) -> Color:
 	var ok_len := s.length() == 6 or s.length() == 8 or s.length() == 3 or s.length() == 4
 	if ok_len and s.is_valid_hex_number():
 		return Color.html(hex)
-	push_warning("非法 hex 颜色 '%s'，回退 %s" % [hex, str(fallback)])
+	push_warning("Invalid hex colour '%s', falling back to %s" % [hex, str(fallback)])
 	return fallback

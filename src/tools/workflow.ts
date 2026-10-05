@@ -452,7 +452,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
             for (let i = 0; i < count; i++) {
               const tmpPath = `user://mcp_frame_${i}.png`;
               const ssResp = await sendToBridge('take_screenshot', { path: tmpPath }, 10000);
-              if (ssResp.error) { captureError = `frame ${i} 截图失败: ${ssResp.error.message ?? JSON.stringify(ssResp.error)}`; break; }
+              if (ssResp.error) { captureError = `frame ${i} screenshot failed: ${ssResp.error.message ?? JSON.stringify(ssResp.error)}`; break; }
               // 通过 executeGdscript 把 user:// 的 PNG 字节读到 proof 目录（GDScript 函数体用 tab 缩进）
               const frameName = `frame_${String(i).padStart(2, '0')}.png`;
               const copyScript = `extends SceneTree
@@ -464,7 +464,7 @@ func _initialize():
 `;
               // N2: 检查归档结果——失败则停止(防 proof 缺帧致 frame_degradation 误判)
               const copyResult = await executeGdscript({ godotPath: godot, projectPath, code: copyScript, timeout: Math.min(timeout, 15), loadAutoloads });
-              if (!copyResult.compile_success || !copyResult.run_success) { captureError = `frame ${i} 归档失败: ${copyResult.compile_error || copyResult.run_error}`; break; }
+              if (!copyResult.compile_success || !copyResult.run_success) { captureError = `frame ${i} archive failed: ${copyResult.compile_error || copyResult.run_error}`; break; }
               // N1: 配额累计(此路径用 GDScript 直写绕过 archiveFrame,需显式检查,防 60 帧撑爆磁盘)
               try { recordFrameBytes(run, join(run.dir, frameName)); }
               catch (e) { captureWarning = (e as Error).message; break; }
@@ -518,7 +518,7 @@ func _initialize():
                     referencePath = rawReferencePath;
                   } else {
                     try { referencePath = resolveWithinRoot(projectPath, rawReferencePath); }
-                    catch { assertionResults.push({ description: desc, passed: false, error: `reference_path 越出项目根目录: ${rawReferencePath}` }); continue; }
+                    catch { assertionResults.push({ description: desc, passed: false, error: `reference_path escapes the project root: ${rawReferencePath}` }); continue; }
                   }
                   // N3: sim_threshold 运行时类型校验(裸 as 对字符串值无效,致 sim < 字符串得 NaN 放行)
                   const rawSimThreshold = (a as Record<string, unknown>).sim_threshold;
@@ -587,7 +587,7 @@ func _initialize():
                 framesDir = rawFramesDir;
               } else {
                 try { framesDir = resolveWithinRoot(projectPath, rawFramesDir); }
-                catch { assertionResults.push({ description: fd.description, passed: false, error: `frames_dir 越出项目根目录: ${rawFramesDir}` }); continue; }
+                catch { assertionResults.push({ description: fd.description, passed: false, error: `frames_dir escapes the project root: ${rawFramesDir}` }); continue; }
               }
               try {
                 const metricsResult = await executeGdscript({

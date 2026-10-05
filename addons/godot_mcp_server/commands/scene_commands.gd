@@ -27,33 +27,33 @@ func _has_path_traversal(p: String) -> bool:
 func get_command_docs() -> Dictionary:
 	return {
 		"open_scene": {
-			"description": "打开编辑器中的场景。",
+			"description": "Open a scene in the editor.",
 			"params": [
-				CommandHelpers.doc_param("scene_path", "String", true, "场景资源路径须 res:// 前缀且无 .. 遍历"),
+				CommandHelpers.doc_param("scene_path", "String", true, "Scene resource path, needs the res:// prefix and no .. traversal"),
 			],
 		},
 		"save_scene": {
-			"description": "保存当前场景,空路径则用场景已绑定的 scene_file_path。",
+			"description": "Save the current scene; an empty path uses the scene's bound scene_file_path.",
 			"params": [
-				CommandHelpers.doc_param("path", "String", false, "保存路径空则用场景已绑定 scene_file_path"),
+				CommandHelpers.doc_param("path", "String", false, "Save path; empty uses the scene's bound scene_file_path"),
 			],
 		},
 		"instance_scene": {
-			"description": "把 PackedScene 实例化并挂到当前场景树。",
+			"description": "Instance a PackedScene and attach it to the current scene tree.",
 			"params": [
-				CommandHelpers.doc_param("scene_path", "String", true, "当前场景路径"),
-				CommandHelpers.doc_param("instance_path", "String", true, "要实例化的 PackedScene 资源路径须 res://"),
-				CommandHelpers.doc_param("parent_node_path", "String", false, "父节点路径空则挂根"),
-				CommandHelpers.doc_param("node_name", "String", false, "实例节点名空则保留原根名"),
-				CommandHelpers.doc_param("properties", "Dictionary", false, "实例属性键值经 coerce_property_value"),
+				CommandHelpers.doc_param("scene_path", "String", true, "Current scene path"),
+				CommandHelpers.doc_param("instance_path", "String", true, "PackedScene resource path to instance, must be res://"),
+				CommandHelpers.doc_param("parent_node_path", "String", false, "Parent node path, empty = scene root"),
+				CommandHelpers.doc_param("node_name", "String", false, "Instance node name; empty keeps the original root name"),
+				CommandHelpers.doc_param("properties", "Dictionary", false, "Instance property key/values, through coerce_property_value"),
 			],
 		},
 		"set_instance_property": {
-			"description": "修改已实例化节点的单个属性。",
+			"description": "Change a single property of an instanced node.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "目标 instance 节点路径不能是场景根"),
-				CommandHelpers.doc_param("property", "String", true, "属性名"),
-				CommandHelpers.doc_param("value", "JSON", true, "属性值经 coerce_property_value"),
+				CommandHelpers.doc_param("node_path", "String", true, "Target instance node path; can't be the scene root"),
+				CommandHelpers.doc_param("property", "String", true, "Property name"),
+				CommandHelpers.doc_param("value", "JSON", true, "Property value, through coerce_property_value"),
 			],
 		},
 	}

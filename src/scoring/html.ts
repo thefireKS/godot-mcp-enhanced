@@ -46,7 +46,7 @@ export function renderScoreHtml(score: ScoreJson): string {
   const overallClass = score.pass ? 'status-pass' : 'status-fail';
   const total = Object.keys(score.dimensions).length;
   const verified = total - score.unverified.length;
-  const partialTag = score.partial ? ` (partial: ${verified}/${total} 维已验证)` : '';
+  const partialTag = score.partial ? ` (partial: ${verified}/${total} dimensions verified)` : '';
 
   const rows = DIM_ORDER.map(name => {
     const d = score.dimensions[name];
@@ -66,36 +66,36 @@ export function renderScoreHtml(score: ScoreJson): string {
   }).join('\n');
 
   const hardFailsHtml = score.hardFails.length === 0
-    ? '    <p>(无)</p>'
+    ? '    <p>(none)</p>'
     : '    <ul>\n' + score.hardFails.map(hf =>
         `      <li>${escapeHtml(hf.dimension)}: ${escapeHtml(hf.reason)} (${hf.actual} &lt; ${hf.threshold})</li>`
       ).join('\n') + '\n    </ul>';
 
   const unverifiedHtml = score.unverified.length === 0
-    ? '    <p>(无)</p>'
-    : `    <p>${escapeHtml(score.unverified.join(', '))} — M3c-e 接入</p>`;
+    ? '    <p>(none)</p>'
+    : `    <p>${escapeHtml(score.unverified.join(', '))} — wired in M3c-e</p>`;
 
   return `<!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>质量评分报告</title>
+  <title>Quality score report</title>
   <style>${CSS}</style>
 </head>
 <body>
-  <h1>质量评分报告</h1>
+  <h1>Quality score report</h1>
   <div class="total">${score.total} / 100 <span class="badge ${overallClass}">${overall}</span></div>
   <p>${escapeHtml(score.generatedAt)}${partialTag}</p>
-  <h2>维度明细</h2>
+  <h2>Dimensions</h2>
   <table>
-    <thead><tr><th>维度</th><th>分数</th><th>权重</th><th>状态</th><th>关键指标</th></tr></thead>
+    <thead><tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Status</th><th>Key metrics</th></tr></thead>
     <tbody>
 ${rows}
     </tbody>
   </table>
-  <h2>硬否决</h2>
+  <h2>Hard vetoes</h2>
 ${hardFailsHtml}
-  <h2>未验证维度</h2>
+  <h2>Unverified dimensions</h2>
 ${unverifiedHtml}
 </body>
 </html>`;

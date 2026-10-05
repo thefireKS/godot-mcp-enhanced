@@ -248,7 +248,7 @@ export class GodotServer {
 
     this.server.setRequestHandler('tasks/get', { params: TaskIdParams }, async ({ taskId }) => {
       const r = getRun(taskId);
-      if (!r) throw new Error(`task not found: ${taskId}(server 可能已重启;qa report 可读落盘报告)`);
+      if (!r) throw new Error(`task not found: ${taskId} (the server may have restarted; qa report can read the saved report)`);
       const t = toWireTask(r);
       assertTaskWire(t);
       return t;
@@ -653,7 +653,7 @@ export class GodotServer {
       // 等待上限 min(60s, ttl) 见 cancelAndAwaitWorkingRun;超时放弃等,killProcess 兜底。
       await safeStep('cancel running qa run', async () => {
         const { cancelled, settled } = await cancelAndAwaitWorkingRun();
-        if (cancelled && !settled) getLogger().warn('godot-mcp', `qa run ${cancelled} 未在收尾窗口内 settle(进程级兜底兜住)`);
+        if (cancelled && !settled) getLogger().warn('godot-mcp', `qa run ${cancelled} did not settle within the shutdown window (caught by the process-level fallback)`);
       });
       // 报告②P0：先停周期扫描，防与下方 kill 逻辑竞争。
       if (this.orphanScanTimer) {

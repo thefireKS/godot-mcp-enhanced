@@ -196,7 +196,7 @@ export async function handleTool(
     switch (action) {
       case 'recording_start': {
         if (!loadAutoloads) {
-          return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, '录制功能需要 Game Bridge 连接，headless 模式不支持。', {
+          return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, 'Recording needs a Game Bridge connection; headless mode is not supported.', {
             suggestion: 'Recording requires an active game bridge. Run game_bridge_install first, then start the game with run_project or F5.',
           });
         }
@@ -206,7 +206,7 @@ export async function handleTool(
         const resp = await sendToBridge('recording.start', {}, 5000);
         if (resp.error) {
           if (resp.error.message?.includes('Method not found')) {
-            return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, '请更新项目中的 MCP Bridge 脚本以支持录制功能。运行 install-plugin 获取最新版本。');
+            return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, 'Update the MCP Bridge script in the project to support recording. Run install-plugin to get the latest version.');
           }
           return opsErrorResult(ERROR_CODES.SCRIPT_EXEC_FAILED, resp.error.message);
         }
@@ -215,7 +215,7 @@ export async function handleTool(
       }
       case 'recording_stop': {
         if (!loadAutoloads) {
-          return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, '录制功能需要 Game Bridge 连接，headless 模式不支持。', {
+          return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, 'Recording needs a Game Bridge connection; headless mode is not supported.', {
             suggestion: 'Recording requires an active game bridge. Run game_bridge_install first, then start the game with run_project or F5.',
           });
         }
@@ -225,7 +225,7 @@ export async function handleTool(
         const resp = await sendToBridge('recording.stop', {}, 5000);
         if (resp.error) {
           if (resp.error.message?.includes('Method not found')) {
-            return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, '请更新项目中的 MCP Bridge 脚本以支持录制功能。运行 install-plugin 获取最新版本。');
+            return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, 'Update the MCP Bridge script in the project to support recording. Run install-plugin to get the latest version.');
           }
           return opsErrorResult(ERROR_CODES.SCRIPT_EXEC_FAILED, resp.error.message);
         }
@@ -422,12 +422,12 @@ export async function handleTool(
     // 连上但卡住 → TIMEOUT;真正 GDScript 执行错误才 SCRIPT_EXEC_FAILED。
     if (err instanceof BridgeNotConnectedError) {
       return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, msg, {
-        suggestion: '录制/回放需要 Game Bridge 连接。Ensure: 1) game_bridge_install 已调用, 2) 游戏正在运行(F5 或 run_project), 3) 检查 .godot/ 下的 mcp_bridge_*.secret(端口被占自动避让,非固定 9081)。',
+        suggestion: 'Recording/replay needs a Game Bridge connection. Ensure: 1) game_bridge_install has been called, 2) the game is running (F5 or run_project), 3) check mcp_bridge_*.secret under .godot/ (the port moves aside when taken, it is not fixed at 9081).',
       });
     }
     if (err instanceof BridgeTimeoutError) {
       return opsErrorResult(ERROR_CODES.BRIDGE_TIMEOUT, msg, {
-        suggestion: '游戏在运行但无响应(可能被 runtime error 卡住)——这不是连接问题。检查游戏是否报错,或加大 timeout 重试。',
+        suggestion: 'The game is running but not responding (possibly stuck on a runtime error) — this is not a connection problem. Check the game for errors, or retry with a larger timeout.',
       });
     }
     return opsErrorResult('SCRIPT_EXEC_FAILED', msg);

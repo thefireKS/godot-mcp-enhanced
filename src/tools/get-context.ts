@@ -72,7 +72,7 @@ export async function handleTool(
     return textResult(JSON.stringify(opsSuccess({
       status: 'partial',
       failedFields: ['__handler__'],
-      hint: 'godot_get_context 内部异常，已降级返回',
+      hint: 'godot_get_context hit an internal error, returning a degraded result',
     })));
   }
 }
@@ -116,7 +116,7 @@ async function handleGetContext(args: Record<string, unknown>, ctx: ToolContext)
     workflows,
     rules,
     performance,
-    hint: 'scene.nodeCount=节点总数；recentCalls=最近操作；callStats.topTools=最常用工具；workflows=推荐入口(prompt)；performance 仅 bridge；status=partial 时看 failedFields',
+    hint: 'scene.nodeCount = total nodes; recentCalls = recent operations; callStats.topTools = most used tools; workflows = recommended entry points (prompts); performance is bridge-only; when status=partial see failedFields',
   })));
 }
 

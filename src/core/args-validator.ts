@@ -43,12 +43,12 @@ function validateValue(value: unknown, schema: SubSchema, path: string, errors: 
   // type
   if (schema.type !== undefined && !checkType(value, schema.type)) {
     const exp = Array.isArray(schema.type) ? schema.type.join('|') : schema.type;
-    errors.push(`${path}: 期望 type ${exp},实际 ${actualType(value)}`);
+    errors.push(`${path}: expected type ${exp}, got ${actualType(value)}`);
     return; // 类型错,后续 enum/items/properties 跳过(避免噪音)
   }
   // enum
   if (Array.isArray(schema.enum) && !schema.enum.includes(value)) {
-    errors.push(`${path}: 值 ${JSON.stringify(value)} 不在 enum [${schema.enum.map((e) => String(e)).join(',')}]`);
+    errors.push(`${path}: value ${JSON.stringify(value)} is not in enum [${schema.enum.map((e) => String(e)).join(',')}]`);
   }
   // items 递归(array 元素)
   if (Array.isArray(value) && schema.items) {
@@ -64,7 +64,7 @@ function validateObject(obj: Record<string, unknown>, schema: SubSchema, path: s
   // required
   if (schema.required) {
     for (const req of schema.required) {
-      if (!(req in obj)) errors.push(`${path}.${req}: required 字段缺失`);
+      if (!(req in obj)) errors.push(`${path}.${req}: required field missing`);
     }
   }
   // properties(只校验出现的字段;未知字段允许)

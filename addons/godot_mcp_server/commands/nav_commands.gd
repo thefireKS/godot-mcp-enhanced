@@ -18,46 +18,46 @@ func cleanup() -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"nav_create_region": {
-			"description": "创建 NavigationRegion3D 节点,可选立即 bake 导航网格。",
+			"description": "Create a NavigationRegion3D node, optionally baking the navigation mesh right away.",
 			"params": [
-				CommandHelpers.doc_param("name", "String", false, "节点名默认 NavRegion"),
-				CommandHelpers.doc_param("parent", "String", false, "父节点路径空则挂根"),
-				CommandHelpers.doc_param("position", "Dictionary", false, "键 x/y/z float → Vector3 局部坐标"),
-				CommandHelpers.doc_param("bake", "bool", false, "创建后是否立即 bake 默认 false"),
+				CommandHelpers.doc_param("name", "String", false, "Node name, default NavRegion"),
+				CommandHelpers.doc_param("parent", "String", false, "Parent node path, empty = scene root"),
+				CommandHelpers.doc_param("position", "Dictionary", false, "keys x/y/z float → Vector3 local coordinates"),
+				CommandHelpers.doc_param("bake", "bool", false, "Bake right after creation, default false"),
 			],
 		},
 		"nav_bake_mesh": {
-			"description": "对指定 NavigationRegion3D bake 导航网格。",
+			"description": "Bake the navigation mesh of a NavigationRegion3D.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "目标 NavigationRegion3D 路径"),
+				CommandHelpers.doc_param("node_path", "String", true, "Target NavigationRegion3D path"),
 			],
 		},
 		"nav_create_agent": {
-			"description": "创建 NavigationAgent3D 节点并设置避障参数。",
+			"description": "Create a NavigationAgent3D node and set avoidance parameters.",
 			"params": [
-				CommandHelpers.doc_param("name", "String", false, "默认 NavAgent"),
-				CommandHelpers.doc_param("parent", "String", false, "父节点路径"),
-				CommandHelpers.doc_param("target_position", "Dictionary", false, "键 x/y/z → Vector3 目标位置"),
-				CommandHelpers.doc_param("path_desired_distance", "float", false, "路径到达阈值默认 0.5"),
-				CommandHelpers.doc_param("target_desired_distance", "float", false, "目标到达阈值默认 1.0"),
-				CommandHelpers.doc_param("avoidance_enabled", "bool", false, "是否启用避障默认 false"),
+				CommandHelpers.doc_param("name", "String", false, "Default NavAgent"),
+				CommandHelpers.doc_param("parent", "String", false, "Parent node path"),
+				CommandHelpers.doc_param("target_position", "Dictionary", false, "keys x/y/z → Vector3 target position"),
+				CommandHelpers.doc_param("path_desired_distance", "float", false, "Path desired distance, default 0.5"),
+				CommandHelpers.doc_param("target_desired_distance", "float", false, "Target desired distance, default 1.0"),
+				CommandHelpers.doc_param("avoidance_enabled", "bool", false, "Enable avoidance, default false"),
 			],
 		},
 		"nav_set_params": {
-			"description": "批量设置 NavigationAgent3D 的参数。",
+			"description": "Set NavigationAgent3D parameters in bulk.",
 			"params": [
-				CommandHelpers.doc_param("node_path", "String", true, "目标 NavigationAgent3D 路径"),
-				CommandHelpers.doc_param("params", "Dictionary", true, "键值表支持 path_desired_distance/target_desired_distance/radius/height/max_speed/avoidance_enabled 等"),
+				CommandHelpers.doc_param("node_path", "String", true, "Target NavigationAgent3D path"),
+				CommandHelpers.doc_param("params", "Dictionary", true, "Key/value table, supports path_desired_distance/target_desired_distance/radius/height/max_speed/avoidance_enabled etc."),
 			],
 		},
 		"nav_create_link": {
-			"description": "创建 NavigationLink3D 节点连接两处导航区域。",
+			"description": "Create a NavigationLink3D node connecting two navigation areas.",
 			"params": [
-				CommandHelpers.doc_param("name", "String", false, "默认 NavLink"),
-				CommandHelpers.doc_param("parent", "String", false, "父节点路径"),
-				CommandHelpers.doc_param("start_position", "Dictionary", false, "键 x/y/z → Vector3 起点"),
-				CommandHelpers.doc_param("end_position", "Dictionary", false, "键 x/y/z → Vector3 终点"),
-				CommandHelpers.doc_param("bidirectional", "bool", false, "是否双向默认 true"),
+				CommandHelpers.doc_param("name", "String", false, "Default NavLink"),
+				CommandHelpers.doc_param("parent", "String", false, "Parent node path"),
+				CommandHelpers.doc_param("start_position", "Dictionary", false, "keys x/y/z → Vector3 start"),
+				CommandHelpers.doc_param("end_position", "Dictionary", false, "keys x/y/z → Vector3 end"),
+				CommandHelpers.doc_param("bidirectional", "bool", false, "Bidirectional, default true"),
 			],
 		},
 	}
@@ -190,7 +190,7 @@ func handle_nav_create_region_async(params: Dictionary, request_id: int) -> Dict
 		if is_instance_valid(nav) and nav.bake_finished.is_connected(_cb):
 			nav.bake_finished.disconnect(_cb)  # one-shot 显式断开，避节点复用累积
 		if not _bake_state["done"]:
-			push_warning("[MCP] nav bake deadline exhausted (req:%d) — bake_result 退化乐观" % request_id)
+			push_warning("[MCP] nav bake deadline exhausted (req:%d) — bake_result degraded to optimistic" % request_id)
 		bake_result = is_instance_valid(nav) and nav.navigation_mesh != null and nav.navigation_mesh.get_vertices().size() > 0
 
 	return {"result": {"node_path": str(nav.get_path()), "type": "NavigationRegion3D", "baked": bake_result}}
@@ -243,7 +243,7 @@ func handle_nav_bake_mesh_async(params: Dictionary) -> Dictionary:
 	if is_instance_valid(nav) and nav.bake_finished.is_connected(_cb):
 		nav.bake_finished.disconnect(_cb)
 	if not _bake_state["done"]:
-		push_warning("[MCP] nav bake_mesh deadline exhausted — bake_result 退化乐观")
+		push_warning("[MCP] nav bake_mesh deadline exhausted — bake_result degraded to optimistic")
 	# N1 补全：对齐 :144（create_region_async 末行）。循环内/freed 分支已守，但 deadline 耗尽退出后
 	# nav 可能被并发 peer 删除（MAX_PEERS=5），末行属性访问须先 is_instance_valid 否则 SCRIPT ERROR。
 	var success: bool = is_instance_valid(nav) and nav.navigation_mesh != null and nav.navigation_mesh.get_vertices().size() > 0

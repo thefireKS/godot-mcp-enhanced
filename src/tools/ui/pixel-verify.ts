@@ -111,13 +111,13 @@ export function collectBgTargets(geo: PrototypeGeometry): { targets: BgTarget[];
     if (nd.bg === undefined) continue;
     const rgba = normalizeColor(nd.bg, 'bg', nd.name);
     if (rgba[3] < 0.999) {
-      skipped.push({ name: nd.name, reason: `bg alpha=${rgba[3]}(半透明):与底层合成后采样色≠bg_color,像素直判不可用` });
+      skipped.push({ name: nd.name, reason: `bg alpha=${rgba[3]} (translucent): the sampled colour after compositing ≠ bg_color, a direct pixel check is not possible` });
       continue;
     }
     // type/value 两分支对齐翻译器 inferType 推断,fill 分支为保守扩展
     // (fill-only+bg 节点翻译后是可采样 Panel bg,保守跳过只少判不误绿)
     if (nd.type === 'ProgressBar' || nd.value !== undefined || nd.fill !== undefined) {
-      skipped.push({ name: nd.name, reason: 'ProgressBar 的 bg 渲染面被 fill 与百分比文字覆盖,无可采样纯色区域——bg 槽请依赖 style_verify 数值验证' });
+      skipped.push({ name: nd.name, reason: 'A ProgressBar\'s bg surface is covered by the fill and the percentage text, no solid area to sample — rely on style_verify\'s numeric check for the bg slot' });
       continue;
     }
     const r = typeof nd.borderRadius === 'number' ? nd.borderRadius
@@ -187,11 +187,11 @@ export function toResPath(projectPath: string, absPath: string): string {
   return 'res://' + relative(projectPath, absPath).replace(/\\/g, '/');
 }
 
-const PIXEL_VERIFY_NOTE = '终验定位(spec §5):几何 layout_verify + style_verify 全绿后才跑一次'
-  + '(每次 capture 窗口模式弹窗 + 秒级耗时,迭代每轮跑会拖垮收敛循环);'
-  + '采样基准 = 输入 geometry 的视口 rect,挂载父须原点对齐(同 layout_verify 约束);'
-  + 'flow 子节点的实际渲染位置由容器排布决定,与输入 rect 的偏差正是 flow_verify 的收敛对象'
-  + '(终验前提全绿时偏差已在容差内;采样红时先查 flow_verify——位置未收敛与色错都表现为红)';
+const PIXEL_VERIFY_NOTE = 'Final-check placement (spec §5): run once only after geometry layout_verify + style_verify are all green '
+  + '(each capture opens a window and takes seconds; running it every iteration would wreck the convergence loop);'
+  + 'sampling reference = the input geometry\'s viewport rect, the mount parent must be origin-aligned (same constraint as layout_verify);'
+  + 'the actual render position of flow children is decided by container layout; its deviation from the input rect is exactly what flow_verify converges '
+  + '(when the final-check precondition is all green, the deviation is within tolerance; if sampling is red, check flow_verify first — unconverged position and wrong colour both show as red)';
 
 /**
  * ui_pixel_verify 编排:collectBgTargets → captureScreenshot(窗口模式,viewport=geo.viewport)
@@ -206,7 +206,7 @@ export async function runPixelVerify(params: {
 }): Promise<{ ok: true; summary: PixelVerifySummary } | { ok: false; error: string; hint?: string }> {
   const { godotPath, projectPath, scenePath, geo } = params;
   const { targets, skipped } = collectBgTargets(geo);
-  const note = PIXEL_VERIFY_NOTE + (targets.length === 0 ? ';本次 geometry 无 bg 节点,无采样目标' : '');
+  const note = PIXEL_VERIFY_NOTE + (targets.length === 0 ? '; this geometry has no bg nodes, nothing to sample' : '');
   if (targets.length === 0) {
     return { ok: true, summary: emptySummary(geo, skipped, note) };
   }
@@ -221,14 +221,14 @@ export async function runPixelVerify(params: {
       timeout: 60,
     });
     if (!shot.success) {
-      return { ok: false, error: `像素截图失败: ${shot.error ?? 'unknown'}`, hint: getBlankHint(shot.godotOutput ?? '') || undefined };
+      return { ok: false, error: `Pixel screenshot failed: ${shot.error ?? 'unknown'}`, hint: getBlankHint(shot.godotOutput ?? '') || undefined };
     }
 
     let png: PNG;
     try {
       png = PNG.sync.read(readFileSync(tmpPng));
     } catch (err) {
-      return { ok: false, error: `PNG 解码失败: ${err instanceof Error ? err.message : String(err)}` };
+      return { ok: false, error: `PNG decode failed: ${err instanceof Error ? err.message : String(err)}` };
     }
 
     // BLANK 双条件拦截(F1,2026-08-18 集成取证):stdout BLANK_DETECTED 与 PNG 内容
@@ -237,7 +237,7 @@ export async function runPixelVerify(params: {
     // Linux headless 真空白两证据同时成立,拦截。getBlankHint 仅为错误信息附加 hint。
     const blankHint = getBlankHint(shot.godotOutput ?? '');
     if (blankHint && isUniformImage(png)) {
-      return { ok: false, error: '像素截图为空白(headless 2D CanvasItem 不可渲染)', hint: blankHint };
+      return { ok: false, error: 'Pixel screenshot is blank (headless can\'t render 2D CanvasItems)', hint: blankHint };
     }
 
     // 采样坐标缩放:PNG 尺寸与 geometry viewport 不一致(如 content scale/窗口边框差异)时

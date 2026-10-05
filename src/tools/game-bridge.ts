@@ -474,7 +474,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
           }
           return textResult(JSON.stringify({
             success: true,
-            message: `Override installed: ${entry.autoloadKey} (autoload 段末尾,游戏 autoload 之后加载,_ready 可直接访问游戏单例)`,
+            message: `Override installed: ${entry.autoloadKey} (end of the autoload section, loads after the game's autoloads, _ready can use game singletons directly)`,
             autoload_key: entry.autoloadKey,
             dest_script: `res://${entry.destScriptName}`,
             project_root: entry.projectRoot,
@@ -513,7 +513,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
         const allowed = methodSets[action]!;
         const method = args.method as string;
         if (!allowed.has(method)) {
-          return textResult(`Error: Unknown bridge method "${method}". Supported: ${[...allowed].join(', ')}. 业务方法（如 take_damage/emit_signal）请用 game_write method=call_method params={method:"业务方法名", args:[...]}（bridge 运行时白名单校验，可通过 GODOT_MCP_BRIDGE_EXTRA_METHODS env 扩展）`);
+          return textResult(`Error: Unknown bridge method "${method}". Supported: ${[...allowed].join(', ')}. For game methods (e.g. take_damage/emit_signal) use game_write method=call_method params={method:"method_name", args:[...]} (checked against the bridge runtime whitelist, extendable via the GODOT_MCP_BRIDGE_EXTRA_METHODS env)`);
         }
         const rawParams = args.params;
         const params = (rawParams && typeof rawParams === 'object' && !Array.isArray(rawParams))
@@ -662,12 +662,12 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
     const msg = getErrorMessage(err);
     if (err instanceof BridgeNotConnectedError) {
       return opsErrorResult(ERROR_CODES.BRIDGE_NOT_CONNECTED, msg, {
-        suggestion: '游戏未运行或 Bridge 未正确响应。先 run_project 启动游戏,确认 game_bridge_install 已执行',
+        suggestion: 'The game is not running or the bridge is not responding. Start the game with run_project first and make sure game_bridge_install has been run',
       });
     }
     if (err instanceof BridgeTimeoutError) {
       return opsErrorResult(ERROR_CODES.BRIDGE_TIMEOUT, msg, {
-        suggestion: '游戏在运行但无响应(可能被 runtime error 卡住)——这不是连接问题。检查游戏是否报错,或加大 timeout 重试',
+        suggestion: 'The game is running but not responding (possibly stuck on a runtime error) — this is not a connection problem. Check the game for errors, or retry with a larger timeout',
       });
     }
     return opsErrorResult(ERROR_CODES.BRIDGE_ERROR, msg);

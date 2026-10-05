@@ -141,11 +141,11 @@ export class EditorConnectionManager {
 
   private async _doRebuild(): Promise<{ connected: boolean; detail: string }> {
     if (this.projectPath === null) {
-      return { connected: false, detail: 'editor 连接信息丢失(未初始化),重启 MCP 服务端恢复' };
+      return { connected: false, detail: 'editor connection info lost (not initialised); restart the MCP server to recover' };
     }
     const secret = (await waitForEditorSecret(this.projectPath, EDITOR_SECRET_TIMEOUT_MS)) ?? undefined;
     if (!secret) {
-      return { connected: false, detail: '未找到 editor secret(插件未运行?),用 launch_editor / F5 启动编辑器后重试 reconnect' };
+      return { connected: false, detail: 'editor secret not found (plugin not running?); start the editor with launch_editor / F5, then retry reconnect' };
     }
     return this.establish(this.port, secret);
   }

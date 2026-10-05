@@ -16,12 +16,12 @@ export function collectCoverage(lcovPath: string): DimensionResult {
       score: NA_SCORE,
       weight: WEIGHTS.coverage,
       status: 'na',
-      detail: `lcov 不存在: ${lcovPath}`,
+      detail: `lcov does not exist: ${lcovPath}`,
     };
   }
   const size = statSync(lcovPath).size;
   if (size > MAX_REPORT_BYTES) {
-    return { score: NA_SCORE, weight: WEIGHTS.coverage, status: 'na', detail: `lcov 过大: ${size} bytes > ${MAX_REPORT_BYTES}` };
+    return { score: NA_SCORE, weight: WEIGHTS.coverage, status: 'na', detail: `lcov too large: ${size} bytes > ${MAX_REPORT_BYTES}` };
   }
   const text = readFileSync(lcovPath, 'utf8');
   let found = 0;
@@ -38,7 +38,7 @@ export function collectCoverage(lcovPath: string): DimensionResult {
       score: NA_SCORE,
       weight: WEIGHTS.coverage,
       status: 'na',
-      detail: 'lcov 无 DA 行',
+      detail: 'lcov has no DA lines',
     };
   }
   const pct = (hit / found) * 100;

@@ -110,8 +110,8 @@ export async function startMcpServer(args: string[]): Promise<void> {
   const overrides = [...overridesFromArgs, ...overridesFromEnv];
   if (overrides.length > 0) {
     getLogger().warn('godot-mcp',
-      `--overrides / GODOT_MCP_OVERRIDES 已声明 ${overrides.length} 个脚本,但 CLI flag 不自动 install。` +
-      `请用 game_bridge install_override action 注入到目标项目。CLI flag 仅用于 close() 时清理。`);
+      `--overrides / GODOT_MCP_OVERRIDES declares ${overrides.length} scripts, but the CLI flag does not install them automatically. ` +
+      `Use the game_bridge install_override action to inject them into the target project. The CLI flag is only used for cleanup on close().`);
   }
 
   const server = new GodotServer(join(__dirname, 'scripts', 'godot_operations.gd'), {

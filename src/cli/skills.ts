@@ -67,7 +67,7 @@ export async function runSkills(args: string[]): Promise<void> {
 
   if (!existsSync(skillsDir)) {
     console.error(`✗ Packaged skills not found: ${skillsDir}`);
-    console.error('  (从 npm 包运行应含 skills/ 目录;源码仓跑 npm run build:skills 生成)');
+    console.error('  (running from the npm package should include the skills/ directory; in the source repo run npm run build:skills)');
     process.exit(1);
     return;
   }
@@ -82,7 +82,7 @@ export async function runSkills(args: string[]): Promise<void> {
       if (s.description) console.log(`    ${s.description}`);
     }
     console.log('\nInstall:  npx godot-mcp-enhanced skills install [--force]');
-    console.log('Skills 指导 AI 调用 godot-mcp MCP 工具——请先 `configure <client>` 配好 MCP server。');
+    console.log('Skills teach the AI to call the godot-mcp MCP tools — run `configure <client>` first to set up the MCP server.');
     return;
   }
 
@@ -102,7 +102,7 @@ export async function runSkills(args: string[]): Promise<void> {
     for (const name of installed) console.log(`  ✓ ${name}: installed`);
     for (const name of skipped) console.log(`  ⊘ ${name}: already exists (use --force to overwrite)`);
     console.log(`\n${installed.length > 0 ? `✓ ${installed.length} skill(s) installed.` : 'No new skills installed.'}`);
-    console.log('  重启 Claude Code 会话后生效;skills 配合 godot-mcp MCP server 使用(configure <client>)。');
+    console.log('  Takes effect after restarting the Claude Code session; skills work together with the godot-mcp MCP server (configure <client>).');
     return;
   }
 

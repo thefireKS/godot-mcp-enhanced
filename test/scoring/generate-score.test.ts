@@ -79,7 +79,7 @@ describe('generateScore', () => {
     const s = generateScore({ lcovPath: LCOV, outPath: OUT });
     const reportPath = OUT.replace('score.json', 'score-report.md');
     const md = readFileSync(reportPath, 'utf8');
-    expect(md).toContain('质量评分报告');
+    expect(md).toContain('Quality score report');
     expect(md).toContain(String(s.total));
   });
 

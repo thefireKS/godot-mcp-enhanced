@@ -36,7 +36,7 @@ const registry = new Map<string, RunRecord>();
 export class QaBusyError extends Error {
   readonly currentRunId: string;
   constructor(currentRunId: string) {
-    super(`已有进行中的 QA run(${currentRunId});bridge 单连接约束下同时仅允许 1 个 run,先 qa status 轮询其完成或 qa cancel 取消`);
+    super(`A QA run is already in progress (${currentRunId}); the single bridge connection allows only 1 run at a time — poll it with qa status until it finishes, or cancel it with qa cancel`);
     this.name = 'QaBusyError';
     this.currentRunId = currentRunId;
   }
@@ -84,8 +84,8 @@ export function activeWorkingRun(): RunRecord | undefined {
 
 export function requestCancel(runId: string): { ok: boolean; message?: string } {
   const r = registry.get(runId);
-  if (!r) return { ok: false, message: `run_id 不在运行注册表(server 可能已重启),尝试 qa report "${runId}" 读落盘报告` };
-  if (r.status !== 'working') return { ok: false, message: `run 已终态(${r.status}),不可取消` };
+  if (!r) return { ok: false, message: `run_id is not in the run registry (the server may have restarted); try qa report "${runId}" to read the saved report` };
+  if (r.status !== 'working') return { ok: false, message: `run already finished (${r.status}), cannot cancel` };
   r.cancelRequested = true;
   r.lastUpdatedAt = new Date().toISOString();
   return { ok: true };

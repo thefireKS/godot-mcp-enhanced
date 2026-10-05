@@ -29,7 +29,7 @@ function lcg(seed: number): () => number {
 export async function runGif(args: string[]): Promise<void> {
   const projectPath = args[0];
   if (!projectPath || !existsSync(join(projectPath, 'project.godot'))) {
-    console.error('用法: gif <project-path> [--out <path>] [--fps 1-10] [--seconds N] [--keys up,left,…] [--seed N]');
+    console.error('Usage: gif <project-path> [--out <path>] [--fps 1-10] [--seconds N] [--keys up,left,…] [--seed N]');
     process.exit(2);
   }
   // B-1(审查)/F-2(2026-08-20):参数解析统一走 args.ts 共享双形式 helper + range 钳制
@@ -45,14 +45,14 @@ export async function runGif(args: string[]): Promise<void> {
     ? resolve(process.cwd(), outArg)
     : join(projectAbs, 'dist', 'demo.gif');
   if (!outPath.startsWith(projectAbs + sep) && outPath !== projectAbs) {
-    if (!(await confirmYesNo(`产物在项目外:${outPath}\n确认写入?`))) {
-      console.error('已取消(项目内路径免确认,或用默认 dist/demo.gif)');
+    if (!(await confirmYesNo(`Output is outside the project: ${outPath}\nWrite it?`))) {
+      console.error('Cancelled (paths inside the project need no confirmation, or use the default dist/demo.gif)');
       process.exit(1);
     }
   }
 
   const ctx = makeCtx();
-  console.log(`🎬 录制 demo GIF:${fps}fps × ${seconds}s = ${fps * seconds} 帧,seed=${seed}`);
+  console.log(`🎬 Recording demo GIF: ${fps}fps × ${seconds}s = ${fps * seconds} frames, seed=${seed}`);
 
   // ── setup(bridge-session 共享链;原与 qa runner 同款,2026-08-21 收敛到单一入口)──
   await startBridgeSession(projectAbs, ctx);
@@ -79,7 +79,7 @@ export async function runGif(args: string[]): Promise<void> {
         ],
         settle_frames: 0,
       }, 20_000);
-      if (seq.error) console.warn(`  ⚠ 按键注入失败(${seq.error.message})`);
+      if (seq.error) console.warn(`  ⚠ Key injection failed (${seq.error.message})`);
       // 注:截图/注入耗时未计入窗口预算,实际帧率略低于 --fps(demo 场景可接受)
       const elapsed = Date.now() - windowStart;
       if (elapsed < windowMs) await new Promise(r => setTimeout(r, windowMs - elapsed));
@@ -87,28 +87,28 @@ export async function runGif(args: string[]): Promise<void> {
       const shot = await sendToBridge('take_screenshot', { path: shotUri }, 15_000);
       const sr = (shot.result ?? {}) as { success?: boolean; path?: string; size?: { x: number; y: number } };
       if (shot.error || sr.success !== true || typeof sr.path !== 'string') {
-        console.warn(`  ⚠ 第 ${i + 1} 帧截图失败,跳过`);
+        console.warn(`  ⚠ Screenshot of frame ${i + 1} failed, skipped`);
         continue;
       }
       const local = resolveGameDataPath(projectAbs, sr.path);
       if (!local) {
-        console.warn(`  ⚠ 无法解析 user:// 路径:${sr.path}(残留游戏侧)`);
+        console.warn(`  ⚠ Cannot resolve user:// path: ${sr.path} (left on the game side)`);
         continue;
       }
       capturedPngPaths.push(local);
       const png = PNG.sync.read(readFileSync(local));
       frames.push({ width: png.width, height: png.height, data: new Uint8Array(png.data) });
-      if ((i + 1) % (fps * 2) === 0) console.log(`  已采集 ${frames.length}/${total} 帧`);
+      if ((i + 1) % (fps * 2) === 0) console.log(`  Captured ${frames.length}/${total} frames`);
     }
     if (frames.length < 2) {
       // 不用 process.exit:try 内 exit 旁路 finally 的 stop_project → 游戏进程残留(审查 I-1)
-      throw new Error(`有效帧不足(${frames.length})`);
+      throw new Error(`Not enough valid frames (${frames.length})`);
     }
-    console.log(`  编码 ${frames.length} 帧 → ${outPath}`);
+    console.log(`  Encoding ${frames.length} frames → ${outPath}`);
     const gif = encodeGif(frames, delayCs);
     mkdirSync(dirname(outPath), { recursive: true });
     writeFileSync(outPath, gif);
-    console.log(`✓ demo GIF 完成: ${outPath}(${(gif.length / 1024).toFixed(0)} KB,${frames[0]!.width}×${frames[0]!.height},${frames.length} 帧@${fps}fps)`);
+    console.log(`✓ Demo GIF done: ${outPath} (${(gif.length / 1024).toFixed(0)} KB, ${frames[0]!.width}×${frames[0]!.height}, ${frames.length} frames @${fps}fps)`);
   } finally {
     // teardown:停游戏(与 qa 同款,防进程残留)+ 清理 user:// 侧截图残留(审查 N-2)
     for (const f of capturedPngPaths) {

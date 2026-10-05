@@ -247,7 +247,7 @@ describe('Godot 4.6+ compatibility hints', () => {
     ];
     const result = analyzeOutput(output);
     expect(result.hasErrors).toBe(true);
-    const hint = result.suggestions.find(s => s.includes('root') && s.includes('SceneTree') && s.includes('冲突'));
+    const hint = result.suggestions.find(s => s.includes('root') && s.includes('SceneTree') && s.includes('clashes'));
     expect(hint).toBeDefined();
   });
 

@@ -11,13 +11,13 @@ describe('buildMarkdown token budget', () => {
     registerAllModules();
     const caps = extractCapabilities(PROJECT_ROOT);
     const md = buildMarkdown(caps);
-    expect(md).toContain('token 预算：tools/list');
-    expect(md).toContain('## token 预算 TOP 5');
+    expect(md).toContain('Token budget: tools/list');
+    expect(md).toContain('## Token budget TOP 5');
     // TOP5 必含体积最大的工具
     const top = [...caps].sort((a, b) => b.size.totalBytes - a.size.totalBytes)[0]!;
     expect(md).toContain(`\`${top.name}\``);
     // schema 占比百分比存在
-    expect(md).toMatch(/schema 占 \d+%/);
+    expect(md).toMatch(/schema is \d+%/);
   });
 });
 
@@ -54,6 +54,6 @@ describe('P1-2 annotations in capability matrix', () => {
     registerAllModules();
     const caps = extractCapabilities(PROJECT_ROOT);
     const md = buildMarkdown(caps);
-    expect(md).toMatch(/annotations：readOnly \d+ \/ destructive \d+ \/ idempotent \d+/);
+    expect(md).toMatch(/annotations: readOnly \d+ \/ destructive \d+ \/ idempotent \d+/);
   });
 });

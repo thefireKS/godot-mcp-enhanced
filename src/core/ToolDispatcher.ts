@@ -332,7 +332,7 @@ export class ToolDispatcher {
         if (!ok) {
           return opsErrorResult(
             COMMON_ERROR_CODES.INVALID_PARAMS,
-            `参数校验失败: ${errors.join('; ')}`,
+            `Argument validation failed: ${errors.join('; ')}`,
           );
         }
       }
@@ -368,7 +368,7 @@ export class ToolDispatcher {
           if (pending.wasTruncated) return opsErrorResult('ARGS_TRUNCATED',
             `Confirmation token args were truncated (exceeded 10KB limit). ` +
             `Please call the original tool again — the server will re-generate a fresh token with the full args.`);
-          console.warn(`[SECURITY] GODOT_MCP_ALLOW_UNSAFE_CONFIRM=true — confirm_and_execute 跳过 elicitation (token:${String(token).slice(0, 8)} tool:${pending.toolName})。仅可信本地/CI,生产保持默认未设。`);
+          console.warn(`[SECURITY] GODOT_MCP_ALLOW_UNSAFE_CONFIRM=true — confirm_and_execute skips elicitation (token:${String(token).slice(0, 8)} tool:${pending.toolName}). Trusted local/CI only; leave it unset in production.`);
           // 跳到执行段（下面 confirmedPending 赋值后共用）
           const __confirmedResult = await this._confirmExecute(pending, startTime, progressEmitter, currentMode, currentExecutor, clientTasksCapable);
           await this._auditConfirmedExecution(pending, startTime, __confirmedResult, traceId);
@@ -388,11 +388,11 @@ export class ToolDispatcher {
           //   2025-era：LegacyInputRequiredShim 自动转 elicitation/create push（server→client→user UI）
           //   2026-era：直接放 InputRequiredResult 到 wire，client 弹 UI 后重发请求
           const argsJson = JSON.stringify(pending.args);
-          const argsPreview = argsJson.length > 500 ? argsJson.slice(0, 500) + '...(截断)' : argsJson;
+          const argsPreview = argsJson.length > 500 ? argsJson.slice(0, 500) + '...(truncated)' : argsJson;
           return inputRequired({
             inputRequests: {
               confirm: inputRequired.elicit({
-                message: `确认执行 "${pending.toolName}" (action: ${String(pending.args.action ?? 'n/a')})?\n参数摘要: ${argsPreview}\n此操作经 confirm_and_execute,需用户 out-of-band 确认(防 AI 自确认)。拒绝请点 cancel/decline。`,
+                message: `Run "${pending.toolName}" (action: ${String(pending.args.action ?? 'n/a')})?\nArguments: ${argsPreview}\nThis goes through confirm_and_execute and needs out-of-band user confirmation (so the AI can't confirm itself). Press cancel/decline to refuse.`,
                 requestedSchema: { type: 'object' as const, properties: { confirm: { type: 'boolean' } }, required: ['confirm'] },
               }),
             },
@@ -404,7 +404,7 @@ export class ToolDispatcher {
         if (!confirmed || confirmed.confirm !== true) {
           consumeToken(token);  // 消费掉防止重放
           return opsErrorResult('ELICITATION_DENIED',
-            `执行需用户经 elicitation out-of-band 确认。Elicitation 被 decline/cancel/不支持或返回非确认,中止(堵 AI 自确认)。可信环境可设 GODOT_MCP_ALLOW_UNSAFE_CONFIRM=true 降级。`);
+            `Running this needs out-of-band user confirmation via elicitation. Elicitation was declined/cancelled/unsupported or did not confirm, aborting (blocks AI self-confirmation). Trusted environments can set GODOT_MCP_ALLOW_UNSAFE_CONFIRM=true to downgrade.`);
         }
 
         const pending = consumeToken(token);

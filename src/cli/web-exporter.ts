@@ -61,7 +61,7 @@ export async function installExportTemplates(opts: {
   const started = Date.now();
   const { version } = opts;
   if (isWebTemplatesInstalled(version)) {
-    opts.onProgress?.(`export templates ${version} 已安装,跳过`);
+    opts.onProgress?.(`export templates ${version} already installed, skipping`);
     return;
   }
   const tag = version.replace('.stable', '-stable');
@@ -71,7 +71,7 @@ export async function installExportTemplates(opts: {
   const tpzPath = join(tmpDir, assetName);
   const sumsPath = join(tmpDir, 'SHA512-SUMS.txt');
 
-  opts.onProgress?.(`下载 ${assetName}(~1GB,首次安装较久)`);
+  opts.onProgress?.(`Downloading ${assetName} (~1GB, the first install takes a while)`);
   if (!(await opts.confirm())) throw new InternalError('export templates install cancelled by user');
   try {
     mkdirSync(tmpDir, { recursive: true });
@@ -86,7 +86,7 @@ export async function installExportTemplates(opts: {
     if (!existsSync(templatesSrc)) {
       const { readdirSync } = await import('fs');
       throw new InternalError(
-        `tpz 解压后 templates/ 目录缺失;extracted/ 实际内容: ${readdirSync(extractTmp).join(', ')}(调试现场保留: ${tmpDir})`,
+        `templates/ directory missing after extracting the tpz; extracted/ actually contains: ${readdirSync(extractTmp).join(', ')} (debug leftovers kept in: ${tmpDir})`,
       );
     }
     // Godot 期望模板文件直接位于 export_templates/<ver>.stable/ 下(无 templates/ 中间层,
@@ -103,7 +103,7 @@ export async function installExportTemplates(opts: {
       ok: true, project_path: '', changed_files: [dest], duration_ms: Date.now() - started,
       details: { version, assetName, binaryUrl },
     });
-    opts.onProgress?.(`✓ templates ${version} 安装完成`);
+    opts.onProgress?.(`✓ templates ${version} installed`);
   } catch (err) {
     // 保留 .tmp 现场供诊断(下次成功安装时覆盖);失败审计照记
     await appendMachineAuditLine({
@@ -165,22 +165,22 @@ export function ensureWebPreset(projectPath: string): boolean {
 
 /** headless 导出(spec B-2 处置:官方支持路径,绕开 editor stub)。成功返回 build/web 目录。 */
 export async function exportWeb(projectPath: string, godotPath: string, onProgress?: (msg: string) => void): Promise<string> {
-  onProgress?.('headless 导出 Web 版(--export-release,可能需要 1-3 分钟)');
+  onProgress?.('Headless web export (--export-release, may take 1-3 minutes)');
   mkdirSync(join(projectPath, 'build', 'web'), { recursive: true });  // Godot 不自动建导出目录
   try {
     const { stderr } = await execFileAsync(godotPath, ['--headless', '--export-release', 'Web', '--path', projectPath], {
       timeout: 300_000, maxBuffer: 16 * 1024 * 1024,
     });
     if (stderr && /error/i.test(stderr)) {
-      onProgress?.(`导出器输出: ${stderr.slice(-300)}`);
+      onProgress?.(`Exporter output: ${stderr.slice(-300)}`);
     }
   } catch (err) {
     const e = err as { stderr?: string; message: string };
-    throw new InternalError(`godot --export-release 失败: ${(e.stderr ?? e.message).slice(-500)}`);
+    throw new InternalError(`godot --export-release failed: ${(e.stderr ?? e.message).slice(-500)}`);
   }
   const webDir = join(projectPath, 'build', 'web');
   if (!existsSync(join(webDir, 'index.html'))) {
-    throw new InternalError(`导出完成但 ${webDir}/index.html 缺失(检查 export preset 与模板版本匹配)`);
+    throw new InternalError(`Export finished but ${webDir}/index.html is missing (check that the export preset matches the template version)`);
   }
   return webDir;
 }

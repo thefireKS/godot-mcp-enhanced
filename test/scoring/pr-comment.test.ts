@@ -26,14 +26,14 @@ describe('renderPrComment', () => {
     const md = renderPrComment(makeScore());
     expect(md).toContain('85.8');
     expect(md).toContain('✅ PASS');
-    expect(md).toContain('3/6 维已验证');
+    expect(md).toContain('3/6 dimensions verified');
     expect(md).toContain('integration');
   });
 
   it('fail 总分不足:头部 FAIL + reason 含 pass 线', () => {
     const md = renderPrComment(makeScore({ total: 60, pass: false }));
     expect(md).toContain('❌ FAIL');
-    expect(md).toContain(`总分 60 < ${PASS_LINE}(pass 线)`);
+    expect(md).toContain(`Total score 60 < ${PASS_LINE} (pass line)`);
   });
 
   it('fail hardFails:硬否决列出', () => {
@@ -41,7 +41,7 @@ describe('renderPrComment', () => {
       total: 90, pass: false,
       hardFails: [{ dimension: 'security', reason: '低于硬否决线', threshold: 60, actual: 40 }],
     }));
-    expect(md).toContain('硬否决 security');
+    expect(md).toContain('Hard veto security');
     expect(md).toContain('40 < 60');
   });
 

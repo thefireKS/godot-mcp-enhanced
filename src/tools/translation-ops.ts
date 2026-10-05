@@ -333,7 +333,7 @@ function resolveTranslationPath(projectPath: string, rawPath: unknown): string {
 function validateLanguageCode(lang: unknown): string {
   const s = String(lang ?? '').trim();
   if (!/^[a-zA-Z_]{2,3}([_-][a-zA-Z0-9]{2,4}(@[a-zA-Z0-9]+)?)?$/.test(s)) {
-    throw new Error(`invalid language code: ${s}(示例: en, zh_CN, pt_BR)`);
+    throw new Error(`invalid language code: ${s} (e.g. en, zh_CN, pt_BR)`);
   }
   return s;
 }
@@ -384,7 +384,7 @@ export async function handleTool(
       case 'translation_write': {
         const absPath = resolveTranslationPath(projectPath, args.path);
         if (!absPath.toLowerCase().endsWith('.csv')) {
-          return opsError('INVALID_FORMAT', 'write supports .csv only(PO 写入用编辑器或 gettext 工具)');
+          return opsError('INVALID_FORMAT', 'write supports .csv only (write PO files with the editor or gettext tools)');
         }
         const languagesRaw = args.languages;
         if (!Array.isArray(languagesRaw) || languagesRaw.length === 0) {

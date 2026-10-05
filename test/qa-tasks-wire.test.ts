@@ -217,7 +217,7 @@ describe('tasks wire layer(PR-2 Task 3)', () => {
       finishRun('run-cancel-2', 'completed');
       const terminal = await tc.request('tasks/cancel', { taskId: 'run-cancel-2' });
       expect(terminal.error).toBeDefined();
-      expect(terminal.error!.message).toContain('不可取消');
+      expect(terminal.error!.message).toContain('cannot cancel');
 
       const unknown = await tc.request('tasks/cancel', { taskId: 'no-such-task' });
       expect(unknown.error).toBeDefined();

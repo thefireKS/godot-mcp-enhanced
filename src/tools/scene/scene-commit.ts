@@ -95,7 +95,7 @@ function validateOpFields(idx: number, opType: string, op: Record<string, unknow
       return `${at}: "shape" must be "rect" or "polygon"`;
     }
     if (shape === 'rect' && op.points !== undefined) {
-      return `${at}: "points" must be omitted when shape is "rect" (rect 生成全格四点)`;
+      return `${at}: "points" must be omitted when shape is "rect" (rect generates the whole cell's four corners)`;
     }
     if (shape === 'polygon') {
       const pts = op.points;

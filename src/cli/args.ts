@@ -28,7 +28,7 @@ export function num(args: string[], name: string, fallback: number, range?: [num
   if (v === undefined) return fallback;
   const n = Number(v);
   if (!Number.isFinite(n)) {
-    console.error(`--${name} 需要数字,收到 "${v}"`);
+    console.error(`--${name} needs a number, got "${v}"`);
     process.exit(2);
   }
   return range ? Math.max(range[0], Math.min(range[1], n)) : n;

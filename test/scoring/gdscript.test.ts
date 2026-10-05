@@ -57,7 +57,7 @@ describe('collectGdscript', () => {
     const r = collectGdscript(REPORT);
     expect(r.score).toBe(0);
     expect(r.status).toBe('fail');
-    expect(r.detail).toContain('检查不完整');
+    expect(r.detail).toContain('Check incomplete');
     expect((r.raw as { incomplete: boolean }).incomplete).toBe(true);
   });
 
@@ -97,6 +97,6 @@ describe('collectGdscript', () => {
     writeFileSync(REPORT, Buffer.alloc(10 * 1024 * 1024 + 1));
     const r = collectGdscript(REPORT);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('过大');
+    expect(r.detail).toContain('too large');
   });
 });

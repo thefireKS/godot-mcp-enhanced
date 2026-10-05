@@ -128,7 +128,7 @@ export function readReport(pathRef: string): QaReport {
   if (!ref) {
     // P2-17(2026-08-21 七维度审核): 不回显 qaReportsDir() 绝对路径(含用户名),
     // 此消息经 qa/index 顶层 catch 直达 client
-    throw new Error(`无 QA 报告（${pathRef === 'prev' ? '不足 2 份' : '为空'}）。先 qa run。`);
+    throw new Error(`No QA reports (${pathRef === 'prev' ? 'fewer than 2' : 'none'}). Run qa run first.`);
   }
 
   let full: string;
@@ -141,16 +141,16 @@ export function readReport(pathRef: string): QaReport {
     try {
       realDir = realpathSync(dir);
     } catch {
-      throw new Error(`报告目录不存在(先 qa run)`);
+      throw new Error(`Report directory does not exist (run qa run first)`);
     }
     let real: string;
     try {
       real = realpathSync(resolve(ref));
     } catch {
-      throw new Error(`report_path 不存在或不可解析: ${ref}`);
+      throw new Error(`report_path does not exist or cannot be resolved: ${ref}`);
     }
     if (!(real === realDir || real.startsWith(realDir + sep))) {
-      throw new Error(`report_path 必须位于 QA 报告目录内（拒绝任意路径读取）: ${ref}`);
+      throw new Error(`report_path must be inside the QA report directory (arbitrary paths are refused): ${ref}`);
     }
     full = real;
   } else {
@@ -158,7 +158,7 @@ export function readReport(pathRef: string): QaReport {
     full = realpathSync(join(dir, ref.endsWith('.json') ? ref : `${ref}.json`));
   }
   if (!existsSync(full)) {
-    throw new Error(`QA 报告不存在: ${ref}`);
+    throw new Error(`QA report does not exist: ${ref}`);
   }
   return JSON.parse(readFileSync(full, 'utf-8')) as QaReport;
 }

@@ -42,7 +42,7 @@ describe('frame_degradation 端到端契约（脚本生成 + 判据）', () => {
     const firstFrame = Array(8).fill(0.999);
     const r = classifyDegradation({ frameCount: 9, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('从未变化');
+    expect(r.reason).toContain('never changed');
   });
 
   it('STALL_RATIO: 中段大面积停滞(超半数窗口) → 退化', () => {
@@ -52,7 +52,7 @@ describe('frame_degradation 端到端契约（脚本生成 + 判据）', () => {
     const firstFrame = Array(15).fill(0.3);
     const r = classifyDegradation({ frameCount: 16, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('停滞');
+    expect(r.reason).toContain('stalled');
   });
 
   it('TAIL_LAG: 后段冻结(后1/3 consecutive 远高于前1/3) → 退化', () => {
@@ -62,7 +62,7 @@ describe('frame_degradation 端到端契约（脚本生成 + 判据）', () => {
     const firstFrame = Array(15).fill(0.3);
     const r = classifyDegradation({ frameCount: 16, consecutiveSims: consecutive, firstFrameSims: firstFrame });
     expect(r.degraded).toBe(true);
-    expect(r.reason).toContain('后半段');
+    expect(r.reason).toContain('Second half');
   });
 });
 

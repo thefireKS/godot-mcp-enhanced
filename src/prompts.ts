@@ -100,55 +100,55 @@ const PROMPTS: Record<string, { def: PromptDef; build: (args: Record<string, str
     },
     build: (args) => [{
       role: 'user' as const,
-      content: { type: 'text' as const, text: `# 场景编辑策略 SOP — ${args.operation_type || '通用'}
+      content: { type: 'text' as const, text: `# Scene editing SOP — ${args.operation_type || 'general'}
 
-> 本指导将散落的「截图验证纪律」固化为 AI 自动遵循的 SOP。三层结构:能力发现 → 决策树 → 闭环验证。
+> This guide turns the scattered "verify with screenshots" discipline into an SOP the AI follows automatically. Three layers: capability discovery → decision tree → closed-loop verification.
 
-## 第 0 层:能力发现(摸清当前环境)
+## Layer 0: capability discovery (learn the current environment)
 
-先用 godot_get_context 工具探测连接模式(connectionMode):
-- **editor**(编辑器运行中):优先走实时场景树同步、支持 undo、add_node/edit_node 即时生效
-- **headless**(独立 Godot 进程):文件读写为主,批量创建/一次性验证
-- **bridge**(游戏运行中):E2E 测试、运行时调试、输入模拟
+First use the godot_get_context tool to detect the connection mode (connectionMode):
+- **editor** (editor running): prefer live scene tree sync, undo support, add_node/edit_node take effect immediately
+- **headless** (standalone Godot process): mostly file read/write, batch creation / one-shot verification
+- **bridge** (game running): E2E tests, runtime debugging, input simulation
 
-不同模式下同一操作的最佳工具可能不同,不要假设默认。
+The best tool for the same operation can differ between modes; don't assume a default.
 
-## 第 1 层:操作决策树(按 operation_type 分流)
+## Layer 1: operation decision tree (by operation_type)
 
-当前操作:**${args.operation_type || '通用(未指定,按场景判断)'}**
+Current operation: **${args.operation_type || 'general (unspecified, judge by the scene)'}**
 
-- **add_node**:先 read_scene 确认父节点存在 → 用 scene 的 add_node action(指定 parent_node_path)→ editor 模式即时生效 / headless 模式需 save_scene 落盘
-- **edit_node**:先 inspect_node 拿当前属性 → edit_node 传 properties 对象 → editor 模式可 undo
-- **remove_node**:先 inspect_node 确认目标 + 子节点影响范围 → remove_node → 验证场景树完整性
-- **create_scene**:create_scene 指定 root_node_type → add_node 加子节点 → save_scene 落盘
-- **read_scene**:read_scene 拿结构 → summary_only=true 先看骨架,需要细节再 full read
+- **add_node**: read_scene first to confirm the parent exists → scene's add_node action (with parent_node_path) → immediate in editor mode / headless needs save_scene to write it
+- **edit_node**: inspect_node first for the current properties → edit_node with a properties object → undoable in editor mode
+- **remove_node**: inspect_node first to confirm the target + impact on children → remove_node → verify scene tree integrity
+- **create_scene**: create_scene with root_node_type → add_node for children → save_scene to write it
+- **read_scene**: read_scene for the structure → summary_only=true for the skeleton first, a full read when details are needed
 
-降级原则:editor 不可用时降级 headless;headless 失败(如需 EditorUndoRedoManager)再考虑 editor。
+Fallback: if the editor is unavailable fall back to headless; if headless fails (e.g. needs EditorUndoRedoManager) consider the editor.
 
-## 第 2 层:闭环验证(每步截图 + 断言)
+## Layer 2: closed-loop verification (screenshot + assertion at every step)
 
-每个变更操作后,不要直接进下一步:
+After each change, don't go straight to the next step:
 
-1. **截图**:screenshot 工具截当前视口(editor 模式截编辑器 / bridge 模式截游戏画面)
-2. **断言**:用 runtime_assert 或 verify_delivery 验证变更落盘/生效
-   - verify_delivery(scope="scene") 检查场景树完整性 + 脚本健康
-   - runtime_assert 做自定义断言(如 \`node_count > 0\`、\`property == expected\`)
-3. **失败处理**:断言失败 → analyze_error 分析 → 修复 → 重新验证,不跳过
+1. **Screenshot**: the screenshot tool captures the current viewport (the editor in editor mode / the game in bridge mode)
+2. **Assert**: use runtime_assert or verify_delivery to check the change was written / took effect
+   - verify_delivery(scope="scene") checks scene tree integrity + script health
+   - runtime_assert for custom assertions (e.g. \`node_count > 0\`, \`property == expected\`)
+3. **On failure**: assertion fails → analyze_error → fix → verify again, never skip
 
-## 关键陷阱(对照 engine-quirks)
+## Key traps (see engine-quirks)
 
-- GPU 粒子 headless 不渲染,2D/3D 截图可能空白(非 bug)
-- set_instance_property 对 root 节点返 NODE_NOT_INSTANCE(用 edit_node 替代)
-- TileMapLayer 是 4.3+ 新类型,旧项目可能是 TileMap,操作前确认节点类型
-- save_scene 后 .tscn 文件可能因 EditorPlugin 缓存不立即反映,headless 模式读文件更可靠
+- GPU particles don't render headless; 2D/3D screenshots may be blank (not a bug)
+- set_instance_property on the root node returns NODE_NOT_INSTANCE (use edit_node instead)
+- TileMapLayer is a 4.3+ type; older projects may use TileMap, check the node type first
+- after save_scene the .tscn may not reflect changes right away because of EditorPlugin caching; reading the file in headless mode is more reliable
 
-## 验证清单
+## Verification checklist
 
-变更完成后,最终验证:
-- [ ] read_scene 确认目标节点存在且属性正确
-- [ ] validate_scripts 0 error(若改了脚本)
-- [ ] verify_delivery(scope="scene") 通过
-- [ ] screenshot 视觉确认(非空白且符合预期)` },
+When the change is done, verify finally:
+- [ ] read_scene confirms the target node exists with correct properties
+- [ ] validate_scripts reports 0 errors (if scripts changed)
+- [ ] verify_delivery(scope="scene") passes
+- [ ] screenshot visual check (not blank, as expected)` },
     }],
   },
 };

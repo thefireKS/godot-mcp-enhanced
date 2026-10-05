@@ -202,22 +202,22 @@ export async function installGodot(opts: {
   const sumsPath = join(installDir, 'SHA512-SUMS.txt');
   const traceId = `install-${versionTag}-${started}`;
 
-  opts.onProgress?.(`资产: ${assetName}`);
-  opts.onProgress?.(`目标: ${installDir}`);
+  opts.onProgress?.(`Asset: ${assetName}`);
+  opts.onProgress?.(`Target: ${installDir}`);
   if (!(await opts.confirm())) {
     throw new InternalError('install cancelled by user');
   }
 
   try {
-    opts.onProgress?.('下载 SHA512-SUMS.txt …');
+    opts.onProgress?.('Downloading SHA512-SUMS.txt …');
     await downloadWithProgress(sumsUrl, sumsPath);
     const expected = parseSha512Sums(readFileSync(sumsPath, 'utf-8'), assetName);
 
-    opts.onProgress?.(`下载 ${assetName} …`);
+    opts.onProgress?.(`Downloading ${assetName} …`);
     await downloadWithProgress(binaryUrl, zipPath);
     await verifyDownloadedAsset(zipPath, expected);
 
-    opts.onProgress?.('解压 …');
+    opts.onProgress?.('Extracting …');
     await extractZip(zipPath, installDir);
     await rm(zipPath, { force: true });  // 校验通过的 zip 用后即删
     await rm(sumsPath, { force: true });  // SUMS 同样用后即删
@@ -255,15 +255,15 @@ export async function installGodot(opts: {
 /** install 子命令:可选版本 tag 参数(默认 latest stable),交互确认后安装。 */
 export async function runInstall(args: string[]): Promise<void> {
   const versionTag = args[0];
-  console.log('📥 Godot 自动安装(官方 GitHub releases,SHA512 同源校验)\n');
+  console.log('📥 Godot auto-install (official GitHub releases, SHA512 checked against the same source)\n');
   const { confirmYesNo } = await import('./confirm.js');
   const { godotPath, versionTag: tag } = await installGodot({
     versionTag,
-    confirm: () => confirmYesNo('确认下载并安装?'),
+    confirm: () => confirmYesNo('Download and install?'),
     onProgress: (msg) => console.log(`  ${msg}`),
   });
-  console.log(`\n✓ Godot ${tag} 安装完成: ${godotPath}`);
-  console.log('  已登记 ~/.godot-mcp/godot-paths.json(findGodot 搜索链 + 路径白名单)。');
-  console.log('  注意:登记后白名单收紧为登记路径;若需继续使用其他 Godot(如 GODOT_PATH 指向的),');
-  console.log('  设 GODOT_MCP_ALLOWED_GODOT_PATHS(分号分隔)显式列出全部可信路径。');
+  console.log(`\n✓ Godot ${tag} installed: ${godotPath}`);
+  console.log('  Registered in ~/.godot-mcp/godot-paths.json (findGodot search chain + path whitelist).');
+  console.log('  Note: after registering, the whitelist narrows to registered paths; to keep using another Godot (e.g. the one GODOT_PATH points at),');
+  console.log('  set GODOT_MCP_ALLOWED_GODOT_PATHS (semicolon-separated) listing every trusted path explicitly.');
 }

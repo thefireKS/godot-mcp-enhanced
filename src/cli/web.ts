@@ -20,11 +20,11 @@ export async function runWeb(args: string[]): Promise<void> {
   if (serveOnly) {
     const dir = resolve(serveOnly);
     if (!existsSync(join(dir, 'index.html'))) {
-      console.error(`--serve-only 目录缺少 index.html:${dir}`);
+      console.error(`--serve-only directory has no index.html: ${dir}`);
       process.exit(2);
     }
-    if (!(await confirmYesNo(`在 127.0.0.1 启动静态服务器 serve ${dir}?`))) {
-      console.error('已取消');
+    if (!(await confirmYesNo(`Start a static server on 127.0.0.1 serving ${dir}?`))) {
+      console.error('Cancelled');
       process.exit(1);
     }
     await serveForever(dir, port);
@@ -33,29 +33,29 @@ export async function runWeb(args: string[]): Promise<void> {
 
   const projectPath = resolve(args[0] ?? '.');
   if (!existsSync(join(projectPath, 'project.godot'))) {
-    console.error('用法: web <project-path> [--port N] 或 web --serve-only <exported-dir> [--port N]');
+    console.error('Usage: web <project-path> [--port N] or web --serve-only <exported-dir> [--port N]');
     process.exit(2);
   }
 
-  console.log('🌐 Web 试玩闭环(导出 → 本地服务器 → 浏览器可玩)');
+  console.log('🌐 Web playtest loop (export → local server → playable in the browser)');
   const godotPath = await findGodot();
   const version = await detectGodotVersion(godotPath);  // 如 "4.7.2.stable"
   console.log(`  Godot: ${godotPath}(${version})`);
 
   await installExportTemplates({
     version,
-    confirm: () => confirmYesNo(`首次使用 Web 导出需下载 export templates ${version}(~1GB,官方 releases,SHA512 校验,装到机器级目录)。继续?`),
+    confirm: () => confirmYesNo(`The first web export needs export templates ${version} (~1GB, official releases, SHA512-checked, installed machine-wide). Continue?`),
     onProgress: (msg) => console.log(`  ${msg}`),
   });
 
   if (ensureWebPreset(projectPath)) {
-    console.log('  已生成 export_presets.cfg(Web preset)');
+    console.log('  Generated export_presets.cfg (Web preset)');
   }
   const webDir = await exportWeb(projectPath, godotPath, (msg) => console.log(`  ${msg}`));
-  console.log(`✓ Web 导出完成: ${webDir}`);
+  console.log(`✓ Web export done: ${webDir}`);
 
-  if (!(await confirmYesNo(`启动本地服务器试玩(127.0.0.1${port ? ':' + port : ' 随机端口'})?`))) {
-    console.log(`已跳过。之后可随时:npx godot-mcp-enhanced web --serve-only "${webDir}"`);
+  if (!(await confirmYesNo(`Start a local server to play (127.0.0.1${port ? ':' + port : ' random port'})?`))) {
+    console.log(`Skipped. You can do it later: npx godot-mcp-enhanced web --serve-only "${webDir}"`);
     return;
   }
   await serveForever(webDir, port);
@@ -63,8 +63,8 @@ export async function runWeb(args: string[]): Promise<void> {
 
 async function serveForever(dir: string, port: number): Promise<never> {
   const running = await startWebServer(dir, port);
-  console.log(`\n✓ 试玩地址: ${running.url}`);
-  console.log('  (Ctrl+C 停止服务器并退出)');
+  console.log(`\n✓ Play at: ${running.url}`);
+  console.log('  (Ctrl+C stops the server and exits)');
   // 用一个不占 CPU 的常驻 promise 保活;SIGINT 里优雅关服
   await new Promise<never>((_resolve, reject) => {
     process.on('SIGINT', () => {

@@ -29,7 +29,7 @@ describe('metric', () => {
   });
 
   it('dimMetric flaky → —(无 case)', () => {
-    expect(dimMetric('flaky', dim(-1, 'na'))).toBe('未接入');
+    expect(dimMetric('flaky', dim(-1, 'na'))).toBe('Not wired');
   });
 
   it('dimMetric performance → wallclockMs/1000 s', () => {
@@ -41,7 +41,7 @@ describe('metric', () => {
   });
 
   it('dimMetric na 维(score=-1 或 status=na)→ 未接入', () => {
-    expect(dimMetric('coverage', dim(-1, 'na'))).toBe('未接入');
+    expect(dimMetric('coverage', dim(-1, 'na'))).toBe('Not wired');
   });
 
   it('dimMetric raw 缺失 → —', () => {

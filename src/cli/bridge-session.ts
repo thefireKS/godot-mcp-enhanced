@@ -36,7 +36,7 @@ export async function startBridgeSession(
   const install = await gameBridge.handleTool('game', { action: 'game_bridge_install', project_path: projectAbs }, ctx);
   const installText = install?.content[0]?.type === 'text' ? install.content[0].text : '';
   if (!installText.includes('already registered') && !installText.includes('success')) {
-    console.error(`game_bridge_install 失败: ${installText.slice(0, 200)}`);
+    console.error(`game_bridge_install failed: ${installText.slice(0, 200)}`);
     process.exit(1);
   }
   setBridgeProjectDir(projectAbs);
@@ -45,7 +45,7 @@ export async function startBridgeSession(
   }, ctx);
   const runText = run?.content[0]?.type === 'text' ? run.content[0].text : '';
   if (!runText.includes('Bridge ready')) {
-    console.error(`run_project 失败: ${runText.slice(0, 200)}`);
+    console.error(`run_project failed: ${runText.slice(0, 200)}`);
     process.exit(1);
   }
 }

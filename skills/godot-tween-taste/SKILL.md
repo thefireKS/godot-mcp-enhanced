@@ -1,34 +1,34 @@
 ---
 name: godot-tween-taste
-description: "Tween 动效品味审计 create_tween tween_property set_trans set_ease TRANS 类型 Ease 方向 时长 弹性 卡顿 方向反 只读不改 自包含修复计划 advisor —— 当你用 Tweener、Tween 动效不对劲(卡顿/无弹性/方向反)、或需要审计 Tween 品质时使用。改单行 Tween 值用 edit_script 即可"
+description: "Tween motion taste audit, create_tween, tween_property, set_trans, set_ease, TRANS types, Ease direction, duration, bounce, stutter, wrong direction, read-only, self-contained fix plan, advisor — use when working with Tweener, when Tween motion feels off (stutter / no bounce / wrong direction), or to audit Tween quality. For a one-line Tween value change, edit_script is enough"
 ---
 
-## Tween 动效品味审计(advisor-worker 模式)
+## Tween motion taste audit (advisor-worker mode)
 
-本 skill 是 advisor(只读不改源码),扫描 Tween 调用按品味审计,产出自包含修复计划给 worker 执行。借鉴 emilkowalski improve-animations 的 4 Phase 工作流。
+This skill is an advisor (reads, never edits source): it scans Tween calls, audits them for taste and produces self-contained fix plans for a worker. Borrows the 4-phase workflow of emilkowalski's improve-animations.
 
-**何时用**:Tween 动效"不对劲"(卡顿/无弹性/方向反/生硬)、批量审计 Tween 品质、用 Tweener 时想确认 TRANS/Ease 选择合理。
+**When to use**: Tween motion feels "off" (stutter / no bounce / wrong direction / stiff), a batch audit of Tween quality, or to confirm TRANS/Ease choices when using Tweener.
 
-**Phase 1 — Recon(只读,摸清 Tween 地图)**:
-- [ ] 1. `read_scene` + grep `create_tween|tween_property|set_trans|set_ease` 找所有 Tween 调用
-- [ ] 2. 记录每处:file:line + TRANS 类型 + Ease 方向 + 时长 + 目标属性
+**Phase 1 — Recon (read-only, map the Tweens)**:
+- [ ] 1. `read_scene` + grep `create_tween|tween_property|set_trans|set_ease` to find every Tween call
+- [ ] 2. Record each: file:line + TRANS type + Ease direction + duration + target property
 
-**Phase 2 — Audit(按 7 类审计,只返回 file:line + evidence)**:
-- [ ] 3. TRANS_LINEAR 用于 UI 动画(生硬,应换 TRANS_SINE/QUAD)
-- [ ] 4. Ease 缺失(默认 ease_in_out 可能不对,UI 进场应用 ease_out)
-- [ ] 5. 时长 < 0.1s(太快看不清)或 > 1.0s(太慢拖沓)
-- [ ] 6. parallel() 缺失(多 Tween 应并行但串行跑了)
-- [ ] 7. Tween 未 kill(场景切换后泄漏,应 connect tree_exited)
+**Phase 2 — Audit (7 categories, return only file:line + evidence)**:
+- [ ] 3. TRANS_LINEAR used for UI animation (stiff, switch to TRANS_SINE/QUAD)
+- [ ] 4. Missing Ease (the default ease_in_out may be wrong; UI entrances want ease_out)
+- [ ] 5. Duration < 0.1s (too fast to see) or > 1.0s (too slow, drags)
+- [ ] 6. Missing parallel() (several Tweens should run in parallel but run in sequence)
+- [ ] 7. Tween never killed (leaks after scene change; connect tree_exited)
 
-**Phase 3 — Vet & prioritize(剔除误判)**:
-- [ ] 8. 重读每条 finding,剔除 by-design(如 LoadingScreen 故意用 LINEAR)
-- [ ] 9. 按 leverage 排序(影响用户体验大的优先)
+**Phase 3 — Vet & prioritize (drop false positives)**:
+- [ ] 8. Re-read every finding, drop by-design ones (e.g. a LoadingScreen using LINEAR on purpose)
+- [ ] 9. Sort by leverage (bigger impact on the player experience first)
 
-**Phase 4 — Write plans(自包含修复计划)**:
-- [ ] 10. 每条 finding 写一个 plan,内联精确值(如"TRANS_LINEAR → TRANS_SINE,Ease In → Ease Out,0.05s → 0.3s")
-- [ ] 11. plan 交接给 worker(任何 agent),按 plan 用 edit_script 逐条修
+**Phase 4 — Write plans (self-contained fix plans)**:
+- [ ] 10. One plan per finding with exact values inline (e.g. "TRANS_LINEAR → TRANS_SINE, Ease In → Ease Out, 0.05s → 0.3s")
+- [ ] 11. Hand the plans to a worker (any agent), who fixes them one by one with edit_script
 
-**常见偏离**:
-- advisor 直接改源码(越界:advisor 只读,改是 worker 的事)
-- plan 写模糊指令(漂移:必须内联精确值,不允许"用更柔和的 easing")
-- 把 by-design 当 bug 报(噪声:先 Vet 剔除故意的妥协)
+**Common deviations**:
+- The advisor edits source directly (out of bounds: the advisor is read-only, editing is the worker's job)
+- Plans with vague instructions (drift: exact values inline are required, no "use a softer easing")
+- Reporting by-design choices as bugs (noise: vet out deliberate trade-offs first)

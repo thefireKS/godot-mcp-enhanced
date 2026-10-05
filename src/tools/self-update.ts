@@ -89,7 +89,7 @@ async function handleCheck(args: Record<string, unknown>): Promise<ToolResult> {
   // M7：spec §4.3 — 无 project_path 参数 且 ALLOWED_PROJECT_PATHS 未配置时返提示
   const data: Record<string, unknown> = { npm, addons };
   if (!hasProjectArg && targetPaths.length === 0) {
-    data.hint = '未配置 ALLOWED_PROJECT_PATHS，无法扫描项目 addon。配置 ALLOWED_PROJECT_PATHS=/path1;/path2 或传 project_path 参数指定单个项目';
+    data.hint = 'ALLOWED_PROJECT_PATHS is not configured, can\'t scan project addons. Set ALLOWED_PROJECT_PATHS=/path1;/path2 or pass project_path for a single project';
   }
   return textResult(JSON.stringify(opsSuccess(data)));
 }
@@ -97,7 +97,7 @@ async function handleCheck(args: Record<string, unknown>): Promise<ToolResult> {
 async function handleUpdate(args: Record<string, unknown>): Promise<ToolResult> {
   const projectPath = args.project_path;
   if (typeof projectPath !== 'string' || !projectPath) {
-    return opsErrorResult('INVALID_PARAMS', 'update action 需要 project_path 参数');
+    return opsErrorResult('INVALID_PARAMS', 'The update action needs the project_path parameter');
   }
   // 降级保护：null（未安装/malformed）直 cp 修复；非 null 且 >包版本 才拒绝
   // I-1：readAddonVersion 内 isPathInAllowedRoots 若拒会 throw，包 try/catch 返结构化错误
@@ -111,12 +111,12 @@ async function handleUpdate(args: Record<string, unknown>): Promise<ToolResult> 
   }
   if (isInstalled && installed != null && compareVersion(installed, pkgVersion) > 0) {
     return opsErrorResult('DOWNGRADE_REFUSED',
-      `项目 addon 版本 ${installed} 比包版本 ${pkgVersion} 新，疑似降级，拒绝`);
+      `The project addon version ${installed} is newer than the package version ${pkgVersion}; looks like a downgrade, refusing`);
   }
   try {
     const { dest, verifyOk } = updateAddon(projectPath);
     if (!verifyOk) {
-      return opsErrorResult('VERIFY_FAILED', `addon 更新后 plugin.cfg 校验失败：${dest}`);
+      return opsErrorResult('VERIFY_FAILED', `plugin.cfg check failed after updating the addon: ${dest}`);
     }
     return textResult(JSON.stringify(opsSuccess({
       project_path: projectPath,

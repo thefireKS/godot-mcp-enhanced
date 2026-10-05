@@ -15,7 +15,7 @@ const addonSource = join(dirname(fileURLToPath(import.meta.url)), '..', '..', ..
 /** 读目标项目 addon 版本。正则复刻 version-sync.mjs:57。 */
 export function readAddonVersion(projectPath: string): { version: string | null; installed: boolean } {
   if (!isPathInAllowedRoots(projectPath)) {
-    throw new PathError('projectPath 不在 ALLOWED_PROJECT_PATHS（deny-by-default）');
+    throw new PathError('projectPath is not in ALLOWED_PROJECT_PATHS (deny-by-default)');
   }
   const cfg = join(projectPath, ...ADDON_REL, 'plugin.cfg');
   // S1: 校验 cfg 真实路径在 allowlist 内——堵 addons/ 子段符号链接越界读（信息泄漏）。
@@ -31,7 +31,7 @@ export function readAddonVersion(projectPath: string): { version: string | null;
 /** 包内 addon 源 cp 到目标项目。复刻 install-plugin.js:17-65 + 加门。 */
 export function updateAddon(projectPath: string): { dest: string; verifyOk: boolean } {
   if (!isPathInAllowedRoots(projectPath)) {
-    throw new PathError('projectPath 不在 ALLOWED_PROJECT_PATHS（deny-by-default）');
+    throw new PathError('projectPath is not in ALLOWED_PROJECT_PATHS (deny-by-default)');
   }
   const real = safeRealPath(validateProjectRoot(projectPath));  // project.godot 检查 + symlink 归一
   const dest = join(real, ...ADDON_REL);

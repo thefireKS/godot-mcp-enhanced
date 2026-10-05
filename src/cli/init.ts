@@ -63,10 +63,10 @@ export async function runInit(args: string[]): Promise<void> {
       writeFileSync(dest, f.content, 'utf-8');
     }
     console.log(`\n✓ Game project created at ${projectDir}`);
-    console.log(`  模板: ${GAME_TEMPLATES[template]!.title} — ${GAME_TEMPLATES[template]!.summary}`);
-    console.log('\n试玩与验证(qa 确定性套件,seed 锁随机):');
+    console.log(`  Template: ${GAME_TEMPLATES[template]!.title} — ${GAME_TEMPLATES[template]!.summary}`);
+    console.log('\nPlaytest and verify (deterministic qa suite, seed locks RNG):');
     console.log(`  cd ${name} && npx godot-mcp-enhanced qa run qa/${template}.qa.md --project .`);
-    console.log('调参:编辑 tuning-src/' + template + '.csv → csv_to_resources 重导 .tres → 重启生效(见 design/gdd)');
+    console.log('Tuning: edit tuning-src/' + template + '.csv → csv_to_resources re-imports the .tres → restart to apply (see design/gdd)');
     return;
   }
 

@@ -110,7 +110,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
       case 'cancel':
         return handleCancel(args);
       default:
-        return opsErrorResult('UNKNOWN_ACTION', `Unknown action: ${action}（可用：run/report/diff/status/cancel）`);
+        return opsErrorResult('UNKNOWN_ACTION', `Unknown action: ${action} (available: run/report/diff/status/cancel)`);
     }
   } catch (err) {
     // P2-17 残留点补修(2026-08-21 问题对账): 工具层 catch 直拼 err.message(常含
@@ -118,7 +118,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
     // (runtime-assert 顶层同款),完整错误只进 server 日志。
     getLogger().error('qa', `action=${action} failed: ${err instanceof Error ? (err.stack ?? err.message) : String(err)}`);
     const { safeMessage } = classifyError(err);
-    return opsErrorResult('QA_ERROR', `qa.${action} 失败: ${safeMessage}`);
+    return opsErrorResult('QA_ERROR', `qa.${action} failed: ${safeMessage}`);
   }
 }
 
@@ -135,27 +135,27 @@ async function handleRun(args: Record<string, unknown>, ctx: ToolContext): Promi
     const specAbs = resolve(args.spec_path);
     if (!isPathInAllowedRoots(specAbs)) {
       return opsErrorResult('INVALID_PATH',
-        `spec_path 不在 ALLOWED_PROJECT_PATHS 白名单内: ${specAbs}。把 spec 文件放进白名单根内，或改用 inline spec 参数。`);
+        `spec_path is not in the ALLOWED_PROJECT_PATHS whitelist: ${specAbs}. Put the spec file under a whitelisted root, or use the inline spec parameter.`);
     }
     try {
       specInput = readFileSync(specAbs, 'utf-8');
       specSource = 'file';
     } catch (err) {
-      return opsErrorResult('INVALID_PARAMS', `spec_path 不可读: ${err instanceof Error ? err.message : String(err)}`);
+      return opsErrorResult('INVALID_PARAMS', `spec_path unreadable: ${err instanceof Error ? err.message : String(err)}`);
     }
   } else {
-    return opsErrorResult('INVALID_PARAMS', 'run 需要 spec（inline 对象）或 spec_path（文件路径）');
+    return opsErrorResult('INVALID_PARAMS', 'run needs spec (inline object) or spec_path (file path)');
   }
 
   const parsed = parseQaSuite(specInput);
   if (!parsed.ok || !parsed.suite) {
-    return opsErrorResult('INVALID_SPEC', parsed.error ?? 'spec 解析失败');
+    return opsErrorResult('INVALID_SPEC', parsed.error ?? 'Failed to parse spec');
   }
   const suite = parsed.suite;
 
   const rawProject = (typeof args.project_path === 'string' && args.project_path) || suite.project_path;
   if (!rawProject) {
-    return opsErrorResult('INVALID_PARAMS', '缺少 project_path（工具参数或 spec 内至少提供一处）');
+    return opsErrorResult('INVALID_PARAMS', 'project_path missing (give it in the tool arguments or in the spec)');
   }
   let projectPath: string;
   try {
@@ -179,9 +179,9 @@ async function handleRun(args: Record<string, unknown>, ctx: ToolContext): Promi
     if (busy instanceof QaBusyError) {
       // opsErrorResult opts 不支持任意结构化字段，current_run_id 已内嵌于 QaBusyError.message
       const cur = activeWorkingRun();
-      const progress = cur ? `（进度 step ${cur.progress.step}/${cur.progress.total}）` : '';
+      const progress = cur ? ` (progress step ${cur.progress.step}/${cur.progress.total})` : '';
       return opsErrorResult('BUSY', `${busy.message}${progress}`, {
-        suggestion: `qa status(run_id:"${busy.currentRunId}") 轮询其完成后重试，或 qa cancel(run_id:"${busy.currentRunId}") 取消`,
+        suggestion: `Poll qa status(run_id:"${busy.currentRunId}") until it finishes and retry, or cancel it with qa cancel(run_id:"${busy.currentRunId}")`,
         retryable: true,
       });
     }
@@ -205,7 +205,7 @@ async function handleRun(args: Record<string, unknown>, ctx: ToolContext): Promi
       // （→ 外层 catch → QA_ERROR，行为与 PR-1a 前一致）；async 调用方已离开，由下方
       // record.done 的吞错 handler 接住（同时防 unhandled rejection）。
       // T2 审查 Minor-2：兜底也带 error（否则 tasks/result payload 只剩 run_id，不可诊断）。
-      finishRun(runId, 'failed', undefined, undefined, `suite 执行异常: ${err instanceof Error ? err.message : String(err)}`);
+      finishRun(runId, 'failed', undefined, undefined, `Suite execution error: ${err instanceof Error ? err.message : String(err)}`);
       throw err;
     });
   record.done = exec.then(() => undefined, () => undefined);
@@ -216,7 +216,7 @@ async function handleRun(args: Record<string, unknown>, ctx: ToolContext): Promi
       data: {
         run_id: runId, status: 'working',
         suite_name: suite.name, steps_total: suite.steps.length,
-        hint: `qa status(run_id:"${runId}") 轮询进度；qa report(report_path:"${runId}") 读结果；qa cancel(run_id:"${runId}") 取消`,
+        hint: `Poll progress with qa status(run_id:"${runId}"); read results with qa report(report_path:"${runId}"); cancel with qa cancel(run_id:"${runId}")`,
       },
     }));
     // PR-2 Task 4: _meta.relatedTask 回指(taskAugmented 客户端的协议入口,spec §3.2 组件 3)。
@@ -265,7 +265,7 @@ function handleReport(args: Record<string, unknown>): ToolResult {
     return textResult(JSON.stringify({ success: true, data: { report } }));
   } catch (err) {
     return opsErrorResult('REPORT_NOT_FOUND', err instanceof Error ? err.message : String(err),
-      { suggestion: `可用报告: ${listReports().slice(0, 10).join(', ') || '(无)'}` });
+      { suggestion: `Available reports: ${listReports().slice(0, 10).join(', ') || '(none)'}` });
   }
 }
 
@@ -278,12 +278,12 @@ function handleDiff(args: Record<string, unknown>): ToolResult {
     const base = readReport(baseRef);
     const head = readReport(headRef);
     if (base.run_id === head.run_id) {
-      return opsErrorResult('INVALID_PARAMS', `base 与 head 是同一份报告 (${base.run_id})`);
+      return opsErrorResult('INVALID_PARAMS', `base and head are the same report (${base.run_id})`);
     }
     return textResult(JSON.stringify({ success: true, data: diffReports(base, head) }));
   } catch (err) {
     return opsErrorResult('REPORT_NOT_FOUND', err instanceof Error ? err.message : String(err),
-      { suggestion: `可用报告: ${listReports().slice(0, 10).join(', ') || '(无)'}` });
+      { suggestion: `Available reports: ${listReports().slice(0, 10).join(', ') || '(none)'}` });
   }
 }
 
@@ -315,18 +315,18 @@ function handleStatus(args: Record<string, unknown>): ToolResult {
   const r = getRun(rid);
   if (!r) {
     return opsErrorResult('RUN_NOT_FOUND',
-      `run_id "${rid}" 不在运行注册表（server 可能已重启或已过期）。尝试 qa report(report_path:"${rid}") 读落盘报告。`);
+      `run_id "${rid}" is not in the run registry (the server may have restarted or it expired). Try qa report(report_path:"${rid}") to read the saved report.`);
   }
   return textResult(JSON.stringify({ success: true, data: { run: condenseRecord(r) } }));
 }
 
 function handleCancel(args: Record<string, unknown>): ToolResult {
   const rid = typeof args.run_id === 'string' && args.run_id ? args.run_id : '';
-  if (!rid) return opsErrorResult('INVALID_PARAMS', 'cancel 需要 run_id');
+  if (!rid) return opsErrorResult('INVALID_PARAMS', 'cancel needs run_id');
   const r = requestCancel(rid);
-  if (!r.ok) return opsErrorResult('INVALID_PARAMS', r.message ?? '取消失败');
+  if (!r.ok) return opsErrorResult('INVALID_PARAMS', r.message ?? 'Cancel failed');
   return textResult(JSON.stringify({
     success: true,
-    data: { run_id: rid, cancel_requested: true, note: '取消在当前步骤结束后生效，teardown 照常收尾' },
+    data: { run_id: rid, cancel_requested: true, note: 'Cancellation takes effect after the current step; teardown runs as usual' },
   }));
 }

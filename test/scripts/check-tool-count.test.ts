@@ -27,7 +27,7 @@ function writeAllFiles(root: string, n: number = TC, a: number = AC) {
     `进化为 ${n} 个 grouped tool\n→ ${n} 个 grouped tool`);
   mkdirSync(join(root, 'src', 'tools'), { recursive: true });
   writeFileSync(join(root, 'src', 'tools', 'rule-templates.ts'),
-    `提供 ${n} 个 MCP 工具（${a} 个 action）`);
+    `provides ${n} MCP tools (${a} actions)`);
   mkdirSync(join(root, '.claude', 'rules'), { recursive: true });
   writeFileSync(join(root, '.claude', 'rules', 'godot-mcp-core.md'),
     `提供 ${n} 个 MCP 工具（${a} 个 action）`);

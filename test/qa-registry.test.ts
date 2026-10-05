@@ -46,7 +46,7 @@ describe('qa run registry', () => {
   it('requestCancel 未知 run_id → ok:false', () => {
     const r = requestCancel('nope');
     expect(r.ok).toBe(false);
-    expect(r.message).toContain('不在运行注册表');
+    expect(r.message).toContain('not in the run registry');
   });
 
   it('updateProgress 更新 step/total/current 与 lastUpdatedAt', () => {

@@ -136,7 +136,7 @@ export async function runQaSuite(
         const json = parseToolJson(r ?? { content: [] });
         const ok = (json?.success === true) || text.includes('already registered');
         if (!ok) {
-          return failSetup(`game_bridge_install 失败: ${condense(text)}`);
+          return failSetup(`game_bridge_install failed: ${condense(text)}`);
         }
       }
 
@@ -152,31 +152,31 @@ export async function runQaSuite(
         }, ctx);
         const text = r?.content[0]?.type === 'text' ? r.content[0].text : '';
         if (!text.includes('Bridge ready')) {
-          return failSetup(`run_project 失败: ${condense(text)}`);
+          return failSetup(`run_project failed: ${condense(text)}`);
         }
         gameStarted = true;
       } else {
         // 连接已运行的游戏：ping 探活，给出可行动的错误
         const resp = await sendToBridge('ping', {}, o.step_timeout_ms);
         if (resp.error) {
-          return failSetup(`auto_run=false 但游戏 bridge 不可达 (ping: ${resp.error.message})。确认游戏已运行且已 game_bridge_install。`);
+          return failSetup(`auto_run=false but the game bridge is unreachable (ping: ${resp.error.message}). Make sure the game is running and game_bridge_install has been run.`);
         }
       }
 
       if (o.seed !== undefined) {
         const resp = await sendToBridge('playtest.seed', { seed: o.seed }, o.step_timeout_ms);
-        if (resp.error) return failSetup(`playtest.seed 失败: ${resp.error.message}`);
+        if (resp.error) return failSetup(`playtest.seed failed: ${resp.error.message}`);
       }
       if (o.fixed_delta_hz !== undefined) {
         const resp = await sendToBridge('playtest.fixed_delta', { hz: o.fixed_delta_hz }, o.step_timeout_ms);
-        if (resp.error) return failSetup(`playtest.fixed_delta 失败: ${resp.error.message}`);
+        if (resp.error) return failSetup(`playtest.fixed_delta failed: ${resp.error.message}`);
       }
 
       // errors baseline(I-2:仅含 errors 断言的套件采集;失败降级不 failSetup)
       if (suite.steps.some(s => s.type === 'assert' && s.assert === 'errors')) {
         const resp = await sendToBridge('get_errors', { since_seq: 0 }, o.step_timeout_ms);
         if (resp.error) {
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `get_errors baseline 采集失败(errors 断言将判 ERROR,旧 bridge 可能无错误捕获): ${resp.error.message}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `get_errors baseline capture failed (errors assertions will report ERROR; an old bridge may lack error capture): ${resp.error.message}`];
         } else {
           runState.errorsBaselineSeq = ((resp.result ?? {}) as { next_seq?: number }).next_seq ?? 0;
         }
@@ -186,7 +186,7 @@ export async function runQaSuite(
         // best-effort：旧 bridge 无此命令只记警告降级，不阻断套件（同 screenshot 降级哲学）
         const resp = await sendToBridge('recording.start', {}, o.step_timeout_ms);
         if (resp.error) {
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `recording.start 失败(录制证据不可用): ${resp.error.message}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `recording.start failed (recording evidence unavailable): ${resp.error.message}`];
         } else {
           recordStarted = true;
         }
@@ -235,24 +235,24 @@ export async function runQaSuite(
         try {
           const resp = await sendToBridge('watch.stop', {}, o.step_timeout_ms);
           if (resp.error) {
-            report.teardown_warnings = [...(report.teardown_warnings ?? []), `watch.stop 兜底失败: ${resp.error.message}`];
+            report.teardown_warnings = [...(report.teardown_warnings ?? []), `watch.stop fallback failed: ${resp.error.message}`];
           } else {
             runState.watchActive = false;
           }
         } catch (err) {
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `watch.stop 兜底异常: ${err instanceof Error ? err.message : String(err)}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `watch.stop fallback error: ${err instanceof Error ? err.message : String(err)}`];
         }
       }
       if (runState.monitorActive) {
         try {
           const resp = await sendToBridge('monitor.stop', {}, o.step_timeout_ms);
           if (resp.error) {
-            report.teardown_warnings = [...(report.teardown_warnings ?? []), `monitor.stop 兜底失败: ${resp.error.message}`];
+            report.teardown_warnings = [...(report.teardown_warnings ?? []), `monitor.stop fallback failed: ${resp.error.message}`];
           } else {
             runState.monitorActive = false;
           }
         } catch (err) {
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `monitor.stop 兜底异常: ${err instanceof Error ? err.message : String(err)}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `monitor.stop fallback error: ${err instanceof Error ? err.message : String(err)}`];
         }
       }
       // 录制 stop 必须在 stop_project 之前（杀游戏即断 bridge，之后取不到 events）。
@@ -260,7 +260,7 @@ export async function runQaSuite(
         try {
           const resp = await sendToBridge('recording.stop', {}, o.step_timeout_ms);
           if (resp.error) {
-            report.teardown_warnings = [...(report.teardown_warnings ?? []), `recording.stop 失败(录制证据丢失): ${resp.error.message}`];
+            report.teardown_warnings = [...(report.teardown_warnings ?? []), `recording.stop failed (recording evidence lost): ${resp.error.message}`];
           } else {
             const r = resp.result as { version?: number; duration_ms?: number; events?: unknown[] };
             if (r && Array.isArray(r.events)) {
@@ -268,7 +268,7 @@ export async function runQaSuite(
             }
           }
         } catch (err) {
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `recording.stop 异常(录制证据丢失): ${err instanceof Error ? err.message : String(err)}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `recording.stop error (recording evidence lost): ${err instanceof Error ? err.message : String(err)}`];
         }
       }
       // P2-14(2026-08-21 七维度审核): freeze 是套件主动施加的破坏性状态(tree.paused),
@@ -278,12 +278,12 @@ export async function runQaSuite(
         try {
           const resp = await sendToBridge('playtest.unfreeze', {}, o.step_timeout_ms);
           if (resp.error) {
-            report.teardown_warnings = [...(report.teardown_warnings ?? []), `playtest.unfreeze 兜底失败: ${resp.error.message}`];
+            report.teardown_warnings = [...(report.teardown_warnings ?? []), `playtest.unfreeze fallback failed: ${resp.error.message}`];
           } else {
             runState.frozenActive = false;
           }
         } catch (err) {
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `playtest.unfreeze 兜底异常: ${err instanceof Error ? err.message : String(err)}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `playtest.unfreeze fallback error: ${err instanceof Error ? err.message : String(err)}`];
         }
       }
       if (o.stop_after && gameStarted) {
@@ -291,7 +291,7 @@ export async function runQaSuite(
           await runtime.handleTool('runtime', { action: 'stop_project' }, ctx);
         } catch (err) {
           // Nit-1（审查）：append 模式（同函数其余 4 处一致）——recording.stop 已失败时不被覆盖
-          report.teardown_warnings = [...(report.teardown_warnings ?? []), `stop_project 失败: ${err instanceof Error ? err.message : String(err)}`];
+          report.teardown_warnings = [...(report.teardown_warnings ?? []), `stop_project failed: ${err instanceof Error ? err.message : String(err)}`];
         }
       }
     }
@@ -306,7 +306,7 @@ export async function runQaSuite(
         writeFileSync(p, JSON.stringify(pendingRecording), 'utf-8');
         report.recording_path = p;
       } catch (err) {
-        report.teardown_warnings = [...(report.teardown_warnings ?? []), `录制落盘失败: ${err instanceof Error ? err.message : String(err)}`];
+        report.teardown_warnings = [...(report.teardown_warnings ?? []), `Failed to save the recording: ${err instanceof Error ? err.message : String(err)}`];
       }
     }
   }
@@ -361,8 +361,8 @@ async function collectWatchEvents(runState: RunState, timeoutMs: number): Promis
   // watching:true,那是套件外订阅,消费会把别人的事件泄入断言造成假绿)
   if (!runState.watchActive) {
     return { error: r.watching === true
-      ? '本套件未 watch_start,拒绝消费套件外订阅(bridge 存在非本套件开启的活跃 watch)'
-      : '无活跃 watch 且无缓存事件,先 watch_start' };
+      ? 'This suite did not watch_start; refusing to consume a subscription from outside the suite (the bridge has an active watch not opened by this suite)'
+      : 'No active watch and no cached events; watch_start first' };
   }
   if (r.watching === true) return { events: (Array.isArray(r.events) ? r.events : []) as WatchEvent[] };
   const stop = await sendToBridge('watch.stop', {}, timeoutMs);
@@ -383,8 +383,8 @@ async function collectMonitorSamples(runState: RunState, timeoutMs: number): Pro
   // monitoring:true,那是套件外订阅,消费会把别人的样本泄入断言造成假绿)
   if (!runState.monitorActive) {
     return { error: r.monitoring === true
-      ? '本套件未 monitor_start,拒绝消费套件外订阅(bridge 存在非本套件开启的活跃 monitor)'
-      : '无活跃 monitor,先 monitor_start' };
+      ? 'This suite did not monitor_start; refusing to consume a subscription from outside the suite (the bridge has an active monitor not opened by this suite)'
+      : 'No active monitor; monitor_start first' };
   }
   if (r.monitoring === true) return { samples: (Array.isArray(r.samples) ? r.samples : []) as MonitorSample[] };
   const stop = await sendToBridge('monitor.stop', {}, timeoutMs);
@@ -417,7 +417,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       // error 会把截断报 PASSED。qa 是自动判定引擎,须显式判软失败。
       const seqResult = resp.result as Record<string, unknown> | undefined;
       if (step.method === 'send_input_sequence' && seqResult && seqResult.success === false) {
-        return err(`send_input_sequence 截断: ${JSON.stringify({
+        return err(`send_input_sequence truncated: ${JSON.stringify({
           wall_timeout: seqResult.wall_timeout,
           applied_count: seqResult.applied_count,
           all_applied: seqResult.all_applied,
@@ -441,7 +441,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       if (r.wait_completed === true) {
         return { status: 'PASSED', detail: `${step.method} satisfied in ${r.elapsed_ms}ms` };
       }
-      return { status: 'FAILED', detail: `${step.method} 未在 ${totalMs}ms 内满足 (last: ${condense(r)})` };
+      return { status: 'FAILED', detail: `${step.method} not satisfied within ${totalMs}ms (last: ${condense(r)})` };
     }
     case 'wait_frames': {
       const resp = await sendToBridge('playtest.step', { frames: step.frames }, computePlaytestTimeoutMs('playtest.step', undefined, o.step_timeout_ms));
@@ -480,7 +480,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       const pathErr = validateBridgePath({ path: step.path });
       if (pathErr) return err(pathErr);
       const resp = await sendToBridge('call_method', { path: step.path, method: step.method, args: step.args ?? [] }, o.step_timeout_ms);
-      if (resp.error) return err(`bridge: ${resp.error.message}（写方法需 GODOT_MCP_BRIDGE_EXTRA_METHODS 放行）`);
+      if (resp.error) return err(`bridge: ${resp.error.message} (write methods must be allowed via GODOT_MCP_BRIDGE_EXTRA_METHODS)`);
       return { status: 'PASSED', detail: condense(resp.result, 120) || `${step.method} ok` };
     }
     case 'assert': {
@@ -508,7 +508,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
         }
         const res = await fn(args);
         const json = parseToolJson(res);
-        if (!json) return err(`assert ${step.assert} 返回非 JSON: ${condense(res.content[0]?.type === 'text' ? res.content[0].text : '')}`);
+        if (!json) return err(`assert ${step.assert} returned non-JSON: ${condense(res.content[0]?.type === 'text' ? res.content[0].text : '')}`);
         if (json.success === false) {
           return err(`assert ${step.assert}: ${condense(json.error)}`);
         }
@@ -535,7 +535,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       if (step.assert === 'signal') return await execSignalAssert(step, runState, o);
       if (step.assert === 'errors') return await execErrorsAssert(step, runState, o);
       if (step.assert === 'monitor') return await execMonitorAssert(step, runState, o);
-      return err(`assert ${step.assert}: 未实现`);
+      return err(`assert ${step.assert}: not implemented`);
     }
     case 'screenshot': {
       // 真 bridge 契约（v0.30 e2e 实测纠正）：take_screenshot 把 PNG 存游戏侧
@@ -547,7 +547,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       if (resp.error) return err(`bridge: ${resp.error.message}`);
       const r = (resp.result ?? {}) as { success?: boolean; path?: string; size?: { x: number; y: number } };
       if (r.success !== true || typeof r.path !== 'string') {
-        return { status: 'FAILED', detail: `take_screenshot 未成功: ${condense(resp.result)}` };
+        return { status: 'FAILED', detail: `take_screenshot did not succeed: ${condense(resp.result)}` };
       }
       const gameSide = r.path;
       const local = resolveGameDataPath(projectPath, gameSide);
@@ -560,16 +560,16 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       }
       return {
         status: 'PASSED',
-        detail: `screenshot 留在游戏侧 ${gameSide}（user:// 无法解析到本机路径，报告目录无副本）`,
+        detail: `screenshot left on the game side ${gameSide} (user:// can't be resolved to a local path, no copy in the report directory)`,
       };
     }
     case 'watch_start': {
-      if (runState.watchActive) return err('本套件已有活跃 watch,先 watch_stop');
+      if (runState.watchActive) return err('This suite already has an active watch; watch_stop first');
       // 探测是否替换套件外开启的既有 watch(GD 侧静默替换,qa 需在 detail 注明)
       let replacedNote = '';
       const probe = await sendToBridge('watch.poll', {}, o.step_timeout_ms);
       const pr = (probe.result ?? {}) as { watching?: boolean };
-      if (!probe.error && pr.watching === true) replacedNote = ' (已替换套件外开启的既有 watch)';
+      if (!probe.error && pr.watching === true) replacedNote = ' (replaced an existing watch opened outside the suite)';
       const params: Record<string, unknown> = { node_path: step.node_path, signal_name: step.signal_name, push: false };
       if (step.max_events !== undefined) params.max_events = step.max_events;
       const resp = await sendToBridge('watch.start', params, o.step_timeout_ms);
@@ -581,7 +581,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
     case 'watch_stop': {
       // Important① 姊妹:判据用 === null 而非 truthy——0 事件的空缓存 [] 是 falsy,
       // 会让第二次 watch_stop 误报 ERROR 而到不了下方幂等 cached 分支
-      if (!runState.watchActive && runState.watchEventsCache === null) return err('无活跃 watch(未 watch_start 或已 stop)');
+      if (!runState.watchActive && runState.watchEventsCache === null) return err('No active watch (never watch_started, or already stopped)');
       // Task 3 审查 Minor③:已 stop 且缓存就绪 → 直接复用缓存,不重发 bridge stop
       // (GD 侧无活跃 watch 时 stop 仍返成功 result + 空 events,重发会把缓存覆盖为 [])
       if (!runState.watchActive && runState.watchEventsCache !== null) {
@@ -595,7 +595,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       return { status: 'PASSED', detail: `watch.stop ${runState.watchEventsCache.length} event(s)` };
     }
     case 'monitor_start': {
-      if (runState.monitorActive) return err('本套件已有活跃 monitor,先 monitor_stop');
+      if (runState.monitorActive) return err('This suite already has an active monitor; monitor_stop first');
       const params: Record<string, unknown> = { node_path: step.node_path, properties: step.properties };
       if (step.interval_frames !== undefined) params.interval_frames = step.interval_frames;
       const resp = await sendToBridge('monitor.start', params, o.step_timeout_ms);
@@ -604,7 +604,7 @@ async function execStep(step: QaStep, o: ResolvedOptions, runId: string, index: 
       return { status: 'PASSED', detail: `monitor.start ${step.node_path} [${step.properties.join(', ')}]` };
     }
     case 'monitor_stop': {
-      if (!runState.monitorActive) return err('无活跃 monitor(未 monitor_start 或已 stop)');
+      if (!runState.monitorActive) return err('No active monitor (never monitor_started, or already stopped)');
       const resp = await sendToBridge('monitor.stop', {}, o.step_timeout_ms);
       if (resp.error) return err(`bridge: ${resp.error.message}`);
       runState.monitorActive = false;
@@ -640,7 +640,7 @@ async function execSignalAssert(step: { min_count?: number; max_count?: number; 
 
 async function execErrorsAssert(step: { kinds?: string[]; max_count?: number }, runState: RunState, o: ResolvedOptions): Promise<StepOutcome> {
   if (runState.errorsBaselineSeq === null) {
-    return err('errors 断言不可用:baseline 采集失败(见 teardown_warnings,旧 bridge 无 get_errors)');
+    return err('errors assertion unavailable: baseline capture failed (see teardown_warnings; old bridge has no get_errors)');
   }
   const resp = await sendToBridge('get_errors', { since_seq: runState.errorsBaselineSeq }, o.step_timeout_ms);
   if (resp.error) return err(`bridge: ${resp.error.message}`);
@@ -654,7 +654,7 @@ async function execErrorsAssert(step: { kinds?: string[]; max_count?: number }, 
   const entries = hits.slice(0, 5).map(e => `${e.kind}: ${e.message.slice(0, 80)}`).join(' | ');
   return {
     status: 'FAILED',
-    detail: `新增 ${hits.length} 条(前 5: ${entries.slice(0, 160)})`,
+    detail: `${hits.length} new (first 5: ${entries.slice(0, 160)})`,
     mismatch: { new_errors: { expected: `≤ ${maxCount}`, actual: hits.length } },
   };
 }
@@ -663,21 +663,21 @@ async function execMonitorAssert(step: { property?: string; min?: number; max?: 
   // brief 签名为 property: string,但 QaStep 里 property 是 optional(zod 未按 assert 值差异化必填),
   // TS strict 下不可赋值——改为 optional + 运行时守卫(spec 层漏配时给出可行动 ERROR)
   const property = step.property;
-  if (!property) return err('monitor 断言需要 property');
+  if (!property) return err('monitor assertion needs property');
   const collected = await collectMonitorSamples(runState, o.step_timeout_ms);
   if ('error' in collected) return err(collected.error);
   const { samples, stoppedReason } = collected;
   // 数据完整性(不假绿):非空 stopped_reason 或任一样本带 error 键(node_lost 等)
   const badSample = samples.find(s => s.error !== undefined);
   if (stoppedReason || badSample) {
-    return err(`monitor 数据不完整: stopped_reason=${stoppedReason || badSample?.stopped_reason || badSample?.error}`);
+    return err(`monitor data incomplete: stopped_reason=${stoppedReason || badSample?.stopped_reason || badSample?.error}`);
   }
   // 提取数值序列(样本缺属性=数据不完整,ERROR)
   const series: Array<{ frame: number; value: number }> = [];
   for (const s of samples) {
     const v = s.values?.[property];
     if (typeof v !== 'number') {
-      return err(`样本缺属性 ${property} 或非数值(frame ${s.frame}: ${condense(v)})`);
+      return err(`sample is missing property ${property} or is non-numeric (frame ${s.frame}: ${condense(v)})`);
     }
     series.push({ frame: s.frame, value: v });
   }
@@ -686,10 +686,10 @@ async function execMonitorAssert(step: { property?: string; min?: number; max?: 
     const viol = series.find(p =>
       (step.min !== undefined && p.value < step.min) || (step.max !== undefined && p.value > step.max));
     if (viol) {
-      const range = `${step.min !== undefined ? `≥ ${step.min}` : ''}${step.min !== undefined && step.max !== undefined ? ' 且 ' : ''}${step.max !== undefined ? `≤ ${step.max}` : ''}`;
+      const range = `${step.min !== undefined ? `≥ ${step.min}` : ''}${step.min !== undefined && step.max !== undefined ? ' and ' : ''}${step.max !== undefined ? `≤ ${step.max}` : ''}`;
       return {
         status: 'FAILED',
-        detail: `monitor ${property} 越界(首个违规 frame ${viol.frame})`,
+        detail: `monitor ${property} out of range (first violation at frame ${viol.frame})`,
         mismatch: { [property]: { expected: range, actual: viol.value } },
       };
     }
@@ -717,7 +717,7 @@ async function execMonitorAssert(step: { property?: string; min?: number; max?: 
       });
       return {
         status: 'FAILED',
-        detail: `monitor ${property} 违反 ${step.monotonic}(首个违规 frame ${series[violIdx]?.frame})`,
+        detail: `monitor ${property} violates ${step.monotonic} (first violation at frame ${series[violIdx]?.frame})`,
         mismatch: { [`${property}_monotonic`]: { expected: step.monotonic, actual: `frame ${series[violIdx! - 1]?.frame}=${series[violIdx! - 1]?.value} → frame ${series[violIdx]?.frame}=${series[violIdx]?.value}` } },
       };
     }

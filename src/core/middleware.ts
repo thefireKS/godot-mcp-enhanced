@@ -211,7 +211,7 @@ export function createRateLimitMiddleware(
         return {
           rejected: true,
           error: errorResult(
-            `RATE_LIMITED: 超过 ${maxPerWindow} 次/${windowMs}ms 调用上限。AI 调用循环可能失控,请检查流程。`,
+            `RATE_LIMITED: more than ${maxPerWindow} calls per ${windowMs}ms. The AI call loop may be running away, check the flow.`,
           ),
         };
       }

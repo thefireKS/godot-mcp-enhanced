@@ -20,17 +20,17 @@ import { findPreviousReport, diffReports, type QaReport } from '../tools/qa/repo
 import { appendAuditLine, isAuditEnabled } from '../core/audit-log.js';
 
 function usage(): void {
-  console.log(`godot-mcp-enhanced qa — QA 测试套件（夜间跑批）
+  console.log(`godot-mcp-enhanced qa — QA test suites (nightly batch)
 
-用法:
-  qa run <spec> [--project <path>] [--json]   执行套件（.json 或含 \`\`\`qa-spec 围栏的 .md）
+Usage:
+  qa run <spec> [--project <path>] [--json]   run a suite (.json, or .md with a \`\`\`qa-spec fence)
   qa nightly <spec-dir> [--project <path>] [--json]
-                                              跑目录下全部 *.json/*.md spec，每套件与
-                                              上次同套件结果 diff，汇总回归清单
-  qa report [latest|prev|<run_id>]            读报告（默认 latest）
-  qa diff [base] [head]                       回归对比（默认 prev vs latest）
+                                              runs every *.json/*.md spec in the directory, diffs each suite
+                                              against its previous result, and summarises regressions
+  qa report [latest|prev|<run_id>]            read a report (default latest)
+  qa diff [base] [head]                       regression diff (default prev vs latest)
 
-退出码: run/nightly 按套件结果 0=全 PASSED / 1=有 FAILED；参数错误 2。`);
+Exit codes: run/nightly by suite result 0 = all PASSED / 1 = some FAILED; bad arguments 2.`);
 }
 
 function parseFlag(rest: string[], name: string): { value?: string; positional: string[] } {
@@ -143,11 +143,11 @@ export async function runQa(args: string[]): Promise<void> {
     try {
       files = readdirSync(specDir).filter(f => f.endsWith('.json') || f.endsWith('.md')).sort();
     } catch (err) {
-      console.error(`spec 目录不可读: ${specDir} (${err instanceof Error ? err.message : String(err)})`);
+      console.error(`spec directory unreadable: ${specDir} (${err instanceof Error ? err.message : String(err)})`);
       process.exit(2);
     }
     if (files.length === 0) {
-      console.error(`目录内无 spec 文件(*.json / *.md): ${specDir}`);
+      console.error(`No spec files (*.json / *.md) in directory: ${specDir}`);
       process.exit(2);
     }
 
@@ -202,14 +202,14 @@ export async function runQa(args: string[]): Promise<void> {
         console.log(`[${i + 1}/${files.length}] ${f}: ${s.status} (${s.passed}/${s.total} passed, ${(s.duration_ms / 1000).toFixed(1)}s)`);
         console.log(`  report: ${data.report.md_path}`);
         if (diff) {
-          console.log(`  vs 上次 ${diff.base_run_id}: ${diff.verdict} (regressions:${diff.regressions.length} fixed:${diff.fixed.length} added:${diff.added.length} removed:${diff.removed.length})`);
+          console.log(`  vs previous ${diff.base_run_id}: ${diff.verdict} (regressions:${diff.regressions.length} fixed:${diff.fixed.length} added:${diff.added.length} removed:${diff.removed.length})`);
           for (const r of diff.regressions) {
             console.log(`    REGRESSION  ${r.case}${r.head_detail ? ` — ${r.head_detail.slice(0, 120)}` : ''}`);
           }
         } else if (baselineBroken) {
-          console.error(`  vs 上次: (基线/head 报告读取失败，跳过 diff——检查 qa-reports 目录 JSON 完整性)`);
+          console.error(`  vs previous: (failed to read the baseline/head report, diff skipped — check the JSON in the qa-reports directory)`);
         } else {
-          console.log('  vs 上次: (首次运行，无基线)');
+          console.log('  vs previous: (first run, no baseline)');
         }
       }
     }
@@ -218,7 +218,7 @@ export async function runQa(args: string[]): Promise<void> {
     if (asJson) {
       console.log(JSON.stringify({ suites: results.length, passed: passedCount, failed: results.length - passedCount, regressions, fixed, results }, null, 2));
     } else {
-      console.log(`\nnightly 汇总: ${results.length} 套件 · ${passedCount} PASSED / ${results.length - passedCount} FAILED · 回归 ${regressions} · 修复 ${fixed}`);
+      console.log(`\nnightly summary: ${results.length} suites · ${passedCount} PASSED / ${results.length - passedCount} FAILED · regressions ${regressions} · fixed ${fixed}`);
     }
     process.exit(anyFailed ? 1 : 0);
   }

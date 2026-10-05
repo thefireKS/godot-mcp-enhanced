@@ -108,7 +108,7 @@ const RULES = [
     file: 'src/tools/rule-templates.ts',
     checks: [
       { re: /130\+\s*工具/, negate: true, desc: 'rule-templates.ts 不应残留 130+（防 setup_project_rules 下游污染）' },
-      { re: /提供\s*(\d+)\s*个 MCP 工具（(\d+)\s*个 action/, expectKey: 'toolCount', desc: 'rule-templates.ts:24 工具数（分发模板源）', expect2Key: 'actionCount', desc2: 'rule-templates.ts:24 action 数' },
+      { re: /provides\s*(\d+)\s*MCP tools\s*\((\d+)\s*actions/, expectKey: 'toolCount', desc: 'rule-templates.ts:24 工具数（分发模板源）', expect2Key: 'actionCount', desc2: 'rule-templates.ts:24 action 数' },
     ],
   },
   {

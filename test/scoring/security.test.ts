@@ -85,7 +85,7 @@ describe('collectSecurity', () => {
     writeFileSync(AUDIT, Buffer.alloc(10 * 1024 * 1024 + 1));
     const r = collectSecurity(AUDIT);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('过大');
+    expect(r.detail).toContain('too large');
   });
 
   it('severity 字段非数字类型 → na(A3:防污染致扣分 NaN)', () => {
@@ -95,6 +95,6 @@ describe('collectSecurity', () => {
     }));
     const r = collectSecurity(AUDIT);
     expect(r.status).toBe('na');
-    expect(r.detail).toContain('类型异常');
+    expect(r.detail).toContain('wrong type');
   });
 });

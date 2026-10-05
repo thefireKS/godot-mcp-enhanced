@@ -374,7 +374,7 @@ export async function handleTool(
     const projectPath = requireProjectPath(args);
     const action = args.action as string;
     if (!(ACTIONS as readonly string[]).includes(action)) {
-      return opsErrorResult('INVALID_ACTION', `未知操作: ${action}。支持: ${ACTIONS.join(', ')}`);
+      return opsErrorResult('INVALID_ACTION', `Unknown operation: ${action}. Supported: ${ACTIONS.join(', ')}`);
     }
 
     const godot = await ctx.findGodot();
@@ -383,7 +383,7 @@ export async function handleTool(
 
     switch (action) {
       case 'raycast': {
-        if (!args.from || !args.to) return opsErrorResult('INVALID_VECTOR', 'raycast 需要 from 和 to 参数');
+        if (!args.from || !args.to) return opsErrorResult('INVALID_VECTOR', 'raycast needs the from and to parameters');
         const from = validateVector3(args.from);
         const to = validateVector3(args.to);
         const mask = args.collision_mask as number | undefined;
@@ -394,19 +394,19 @@ export async function handleTool(
         break;
       }
       case 'body_info': {
-        if (!args.body_path) return opsErrorResult('INVALID_PATH', 'body_info 需要 body_path 参数');
+        if (!args.body_path) return opsErrorResult('INVALID_PATH', 'body_info needs the body_path parameter');
         const bodyPath = normalizeNodePath(args.body_path as string);
         script = genBodyInfoScript(bodyPath);
         break;
       }
       case 'diagnose': {
-        if (!args.body_path) return opsErrorResult('INVALID_PATH', 'diagnose 需要 body_path 参数');
+        if (!args.body_path) return opsErrorResult('INVALID_PATH', 'diagnose needs the body_path parameter');
         const bodyPath = normalizeNodePath(args.body_path as string);
         script = genDiagnosePhysicsScript(bodyPath);
         break;
       }
       case 'query_spatial': {
-        if (!args.center) return opsErrorResult('INVALID_VECTOR', 'query_spatial 需要 center 参数');
+        if (!args.center) return opsErrorResult('INVALID_VECTOR', 'query_spatial needs the center parameter');
         const center = validateVector3(args.center);
         const radius = typeof args.radius === 'number' ? Math.max(0.1, args.radius) : 10.0;
         const mask = args.collision_mask as number | undefined;

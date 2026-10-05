@@ -29,7 +29,7 @@ export function computeScore(
     if (threshold !== undefined && dims[k].score < threshold) {
       hardFails.push({
         dimension: k,
-        reason: `${k} 得分 ${dims[k].score} 低于硬否决线 ${threshold}`,
+        reason: `${k} scored ${dims[k].score}, below the hard veto line ${threshold}`,
         threshold,
         actual: dims[k].score,
       });

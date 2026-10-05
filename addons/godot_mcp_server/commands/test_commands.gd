@@ -20,33 +20,33 @@ func setup(plugin: EditorPlugin, undo_manager: Node = null) -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"test_assert": {
-			"description": "对当前场景做节点/属性/信号/数量类断言。",
+			"description": "Run node/property/signal/count assertions on the current scene.",
 			"params": [
-				CommandHelpers.doc_param("assertion_type", "String", true, "断言类型 node_exists/property_equals/signal_connected/node_count"),
-				CommandHelpers.doc_param("path", "String", false, "目标节点路径"),
-				CommandHelpers.doc_param("property", "String", false, "property_equals 时属性名"),
-				CommandHelpers.doc_param("expected", "JSON", false, "property_equals 时期望值"),
-				CommandHelpers.doc_param("target", "String", false, "signal_connected 时目标节点路径"),
-				CommandHelpers.doc_param("signal", "String", false, "signal_connected 时信号名"),
-				CommandHelpers.doc_param("method", "String", false, "signal_connected 时目标方法名"),
-				CommandHelpers.doc_param("parent", "String", false, "node_count 时父节点路径"),
-				CommandHelpers.doc_param("count", "int", false, "node_count 时期望子节点数默认 -1"),
+				CommandHelpers.doc_param("assertion_type", "String", true, "Assertion type node_exists/property_equals/signal_connected/node_count"),
+				CommandHelpers.doc_param("path", "String", false, "Target node path"),
+				CommandHelpers.doc_param("property", "String", false, "Property name for property_equals"),
+				CommandHelpers.doc_param("expected", "JSON", false, "Expected value for property_equals"),
+				CommandHelpers.doc_param("target", "String", false, "Target node path for signal_connected"),
+				CommandHelpers.doc_param("signal", "String", false, "Signal name for signal_connected"),
+				CommandHelpers.doc_param("method", "String", false, "Target method name for signal_connected"),
+				CommandHelpers.doc_param("parent", "String", false, "Parent node path for node_count"),
+				CommandHelpers.doc_param("count", "int", false, "Expected child count for node_count, default -1"),
 			],
 		},
 		"test_run": {
-			"description": "按名称过滤运行测试套件并聚合结果。",
+			"description": "Run test suites filtered by name and aggregate the results.",
 			"params": [
-				CommandHelpers.doc_param("suite", "String", false, "suite 名子串过滤"),
-				CommandHelpers.doc_param("test_name", "String", false, "测试名子串过滤"),
-				CommandHelpers.doc_param("exclude_test_name", "String", false, "要排除的测试名子串"),
-				CommandHelpers.doc_param("verbose", "bool", false, "详细输出默认 false"),
+				CommandHelpers.doc_param("suite", "String", false, "Suite name substring filter"),
+				CommandHelpers.doc_param("test_name", "String", false, "Test name substring filter"),
+				CommandHelpers.doc_param("exclude_test_name", "String", false, "Test name substrings to exclude"),
+				CommandHelpers.doc_param("verbose", "bool", false, "Verbose output, default false"),
 			],
 		},
 		"test_manage": {
-			"description": "查看上次测试结果或重置 runner(op 默认 results_get)。",
+			"description": "Show the last test results or reset the runner (op defaults to results_get).",
 			"params": [
-				CommandHelpers.doc_param("verbose", "bool", false, "详细输出默认 false"),
-				CommandHelpers.doc_param("op", "String", false, "操作名默认 results_get"),
+				CommandHelpers.doc_param("verbose", "bool", false, "Verbose output, default false"),
+				CommandHelpers.doc_param("op", "String", false, "Operation name, default results_get"),
 			],
 		},
 	}

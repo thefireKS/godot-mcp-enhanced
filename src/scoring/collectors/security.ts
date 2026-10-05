@@ -38,27 +38,27 @@ const SEV_FIELDS: Array<keyof AuditVulnCounts> = ['info', 'low', 'moderate', 'hi
  */
 export function collectSecurity(auditJsonPath: string): DimensionResult {
   if (!existsSync(auditJsonPath)) {
-    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json 不存在: ${auditJsonPath}` };
+    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json does not exist: ${auditJsonPath}` };
   }
   const size = statSync(auditJsonPath).size;
   if (size > MAX_REPORT_BYTES) {
-    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json 过大: ${size} bytes > ${MAX_REPORT_BYTES}` };
+    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json too large: ${size} bytes > ${MAX_REPORT_BYTES}` };
   }
   let report: AuditReport;
   try {
     report = JSON.parse(readFileSync(auditJsonPath, 'utf8'));
   } catch (e) {
-    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json 解析失败: ${(e as Error).message}` };
+    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `Failed to parse audit json: ${(e as Error).message}` };
   }
   const v = report.metadata?.vulnerabilities;
   if (!v) {
-    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: 'audit json 无 metadata.vulnerabilities' };
+    return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: 'audit json has no metadata.vulnerabilities' };
   }
   // A3:severity 字段存在但非有限数字 → 视为污染,na(防 'corrupt' 等非数字类型致扣分 NaN 传播)
   for (const k of SEV_FIELDS) {
     const val = v[k];
     if (val !== undefined && val !== null && (typeof val !== 'number' || !Number.isFinite(val))) {
-      return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json 字段 ${String(k)} 类型异常` };
+      return { score: NA_SCORE, weight: WEIGHTS.security, status: 'na', detail: `audit json field ${String(k)} has the wrong type` };
     }
   }
   const counts = { info: v.info ?? 0, low: v.low ?? 0, moderate: v.moderate ?? 0, high: v.high ?? 0, critical: v.critical ?? 0 };

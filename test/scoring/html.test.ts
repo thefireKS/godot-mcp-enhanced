@@ -105,8 +105,8 @@ describe('renderScoreHtml', () => {
 
   it('硬否决/未验证渲染', () => {
     const html = renderScoreHtml(makeScore());
-    expect(html).toContain('硬否决');
-    expect(html).toContain('未验证');
+    expect(html).toContain('Hard vetoes');
+    expect(html).toContain('Unverified');
     expect(html).toContain('flaky, performance');
   });
 });

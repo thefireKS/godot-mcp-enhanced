@@ -409,17 +409,17 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
         // Build sections
         const sections: Array<[string, string]> = [];
         const builders: Array<[string, () => string | null]> = [
-          ['## 引擎版本', () => buildEngineVersion(config)],
-          ['## 渲染器', () => buildRenderer(config)],
-          ['## 项目关键路径', () => buildKeyPaths(p)],
-          ['## 主场景', () => buildMainScene(config)],
+          ['## Engine version', () => buildEngineVersion(config)],
+          ['## Renderer', () => buildRenderer(config)],
+          ['## Key project paths', () => buildKeyPaths(p)],
+          ['## Main scene', () => buildMainScene(config)],
           ['## Autoload', () => buildAutoloads(config)],
           ['## Input Map', () => buildInputMap(config)],
-          ['## 物理设置', () => buildPhysics(config)],
-          ['## 层级名称', () => buildLayerNames(config)],
-          ['## MCP 规则映射', () => buildMcpMapping()],
-          ['## GDScript 类型规范', () => buildTypeGuide()],
-          ['## 代码最佳实践', () => buildBestPractices()],
+          ['## Physics settings', () => buildPhysics(config)],
+          ['## Layer names', () => buildLayerNames(config)],
+          ['## MCP rule mapping', () => buildMcpMapping()],
+          ['## GDScript typing conventions', () => buildTypeGuide()],
+          ['## Code best practices', () => buildBestPractices()],
         ];
 
         for (const [header, builder] of builders) {
@@ -484,7 +484,7 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
           try {
             manifest = JSON.parse(readFileSync(manifestPath, 'utf-8')) as RulesManifest;
           } catch {
-            actions.push('rules-manifest: 损坏，按无 manifest 处理（adopt，不覆盖任何规则文件）');
+            actions.push('rules-manifest: corrupted, treated as missing (adopt, no rule files overwritten)');
             manifest = null;
           }
         }
@@ -516,9 +516,9 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
           const dev = countDeviations(adopted, Object.fromEntries(
             diskFiles.map(f => [f.filename, hashContent(currentTemplates[f.filename]!)]),
           ));
-          actions.push(`rules-manifest: 已采纳 ${diskFiles.length} 个文件（版本 ${mcpVersion}）`);
+          actions.push(`rules-manifest: adopted ${diskFiles.length} files (version ${mcpVersion})`);
           if (dev > 0) {
-            actions.push(`rules-manifest: ${dev} 个文件与当前模板不符（历史遗留或本地修改无法区分），如需对齐调 rules_mode=overwrite`);
+            actions.push(`rules-manifest: ${dev} files differ from the current templates (legacy and local edits can't be told apart); call with rules_mode=overwrite to align`);
           }
         } else {
           // reconcile（spec §3.6）：按二维判定 + mode 决策
@@ -542,18 +542,18 @@ export async function handleTool(name: string, args: Record<string, unknown>, ct
           }
           if (plan.shouldWriteFiles) {
             writeAtomic(manifestPath, JSON.stringify(plan.newManifest, null, 2));
-            if (written.length > 0) actions.push(`rules: 更新 ${written.length} 个文件（${written.join(', ')}）`);
-            if (warned.length > 0) actions.push(`rules: 保留 ${warned.length} 个用户动过的文件（${warned.join(', ')}）— 版本过时但本地有修改，未覆盖；如需强制对齐调 rules_mode=overwrite`);
+            if (written.length > 0) actions.push(`rules: updated ${written.length} files (${written.join(', ')})`);
+            if (warned.length > 0) actions.push(`rules: kept ${warned.length} user-modified files (${warned.join(', ')}) — outdated but locally changed, not overwritten; call with rules_mode=overwrite to force`);
           } else {
             // check 模式：报告分类
             const byClass: Record<string, string[]> = {};
             for (const [fn, fp] of Object.entries(plan.actions)) {
               (byClass[fp.classification] ??= []).push(fn);
             }
-            if (byClass['pure-upgrade']) actions.push(`rules: ${byClass['pure-upgrade'].length} 个文件可更新（版本过时）— 传 rules_mode=update 更新`);
-            if (byClass['stale-and-modified']) actions.push(`rules: ${byClass['stale-and-modified'].length} 个文件版本过时且本地已修改 — update 会保留，overwrite 会覆盖`);
-            if (byClass['local-modified']) actions.push(`rules: ${byClass['local-modified'].length} 个文件本地已修改（版本最新）`);
-            if (byClass['latest'] && Object.keys(byClass).length === 1) actions.push('rules: 全部最新');
+            if (byClass['pure-upgrade']) actions.push(`rules: ${byClass['pure-upgrade'].length} files can be updated (outdated) — pass rules_mode=update`);
+            if (byClass['stale-and-modified']) actions.push(`rules: ${byClass['stale-and-modified'].length} files are outdated and locally modified — update keeps them, overwrite replaces them`);
+            if (byClass['local-modified']) actions.push(`rules: ${byClass['local-modified'].length} files are locally modified (version current)`);
+            if (byClass['latest'] && Object.keys(byClass).length === 1) actions.push('rules: all up to date');
           }
         }
       }

@@ -25,13 +25,13 @@ export function renderScoreReport(score: ScoreJson): string {
   const total = Object.keys(score.dimensions).length;
   const verified = total - score.unverified.length;
   const lines: string[] = [];
-  lines.push('# 质量评分报告');
+  lines.push('# Quality score report');
   lines.push('');
-  lines.push(`**总分 ${score.total} / 100**  ${overall}  (partial: ${verified}/${total} 维已验证)  · ${score.generatedAt}`);
+  lines.push(`**Total ${score.total} / 100**  ${overall}  (partial: ${verified}/${total} dimensions verified)  · ${score.generatedAt}`);
   lines.push('');
-  lines.push('## 维度明细');
+  lines.push('## Dimensions');
   lines.push('');
-  lines.push('| 维度 | 分数 | 权重 | 状态 | 关键指标 |');
+  lines.push('| Dimension | Score | Weight | Status | Key metrics |');
   lines.push('|---|---|---|---|---|');
   for (const name of DIM_ORDER) {
     const d = score.dimensions[name];
@@ -39,20 +39,20 @@ export function renderScoreReport(score: ScoreJson): string {
     lines.push(`| ${escapeMarkdown(name)} | ${escapeMarkdown(scoreCell)} | ${escapeMarkdown(d.weight)} | ${escapeMarkdown(STATUS_BADGE[d.status] ?? d.status)} | ${escapeMarkdown(dimMetric(name, d))} |`);
   }
   lines.push('');
-  lines.push('## 硬否决');
+  lines.push('## Hard vetoes');
   if (score.hardFails.length === 0) {
-    lines.push('(无)');
+    lines.push('(none)');
   } else {
     for (const hf of score.hardFails) {
       lines.push(`- ${escapeMarkdown(hf.dimension)}: ${escapeMarkdown(hf.reason)}(${hf.actual} < ${hf.threshold})`);
     }
   }
   lines.push('');
-  lines.push('## 未验证维度');
+  lines.push('## Unverified dimensions');
   if (score.unverified.length === 0) {
-    lines.push('(无)');
+    lines.push('(none)');
   } else {
-    lines.push(score.unverified.map(escapeMarkdown).join(', ') + ' — M3c-e 接入');
+    lines.push(score.unverified.map(escapeMarkdown).join(', ') + ' — wired in M3c-e');
   }
   lines.push('');
   return lines.join('\n');

@@ -454,7 +454,7 @@ describe('project-tools handleTool — setup_project_rules', () => {
     const claudeMdPath = join(dir, 'CLAUDE.md');
     expect(existsSync(claudeMdPath)).toBe(true);
     const claudeMd = readFileSync(claudeMdPath, 'utf-8');
-    expect(claudeMd).toContain('## MCP 规则映射');
+    expect(claudeMd).toContain('## MCP rule mapping');
     expect(claudeMd).toContain('.claude/rules/godot-mcp.md');
     // Verify all detailed rule files are listed in mapping table
     expect(claudeMd).toContain('godot-mcp-core.md');
@@ -577,7 +577,7 @@ describe('project-tools handleTool — setup_project_rules', () => {
 
     // Verify CLAUDE.md still has rules section
     const claudeMd = readFileSync(join(dir, 'CLAUDE.md'), 'utf-8');
-    expect(claudeMd).toContain('## MCP 规则映射');
+    expect(claudeMd).toContain('## MCP rule mapping');
   });
 
   it('creates .claude/rules/godot-mcp.md', async () => {
@@ -599,7 +599,7 @@ describe('project-tools handleTool — setup_project_rules', () => {
     const rules = readFileSync(rulesPath, 'utf-8');
     // 插值后必须是具体版本号（如 0.18.2+），不能残留 {{MCP_VERSION}}
     expect(rules).not.toContain('{{MCP_VERSION}}');
-    expect(rules).toMatch(/适用于 godot-mcp-enhanced \d+\.\d+\.\d+\+/);
+    expect(rules).toMatch(/For godot-mcp-enhanced \d+\.\d+\.\d+\+/);
   });
 
   it('creates .godot-mcp-manifest.json with rules_installed_at_version (T6)', async () => {
@@ -663,7 +663,7 @@ describe('project-tools handleTool — setup_project_rules', () => {
     expect(rules).toBe('用户重要规则');
 
     // 2) actions 报告应包含"损坏"字样（catch 分支日志）
-    expect(parsed.actions.some(a => typeof a === 'string' && a.includes('损坏'))).toBe(true);
+    expect(parsed.actions.some(a => typeof a === 'string' && a.includes('corrupted'))).toBe(true);
   });
 
   it('setup_project_rules is non-readonly via TOOL_META', () => {

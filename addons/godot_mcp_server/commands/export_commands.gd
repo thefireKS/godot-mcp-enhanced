@@ -10,19 +10,19 @@ func setup(plugin: EditorPlugin) -> void:
 func get_command_docs() -> Dictionary:
 	return {
 		"export_list_presets": {
-			"description": "列出项目所有导出预设。",
+			"description": "List all export presets of the project.",
 			"params": [],
 		},
 		"export_get_preset": {
-			"description": "返回指定导出预设的详情。",
+			"description": "Details of an export preset.",
 			"params": [
-				CommandHelpers.doc_param("name", "String", true, "导出预设名"),
+				CommandHelpers.doc_param("name", "String", true, "Export preset name"),
 			],
 		},
 		"export_build": {
-			"description": "按指定预设构建导出产物。",
+			"description": "Build the export with a preset.",
 			"params": [
-				CommandHelpers.doc_param("preset", "String", true, "导出预设名须存在"),
+				CommandHelpers.doc_param("preset", "String", true, "Export preset name, must exist"),
 			],
 		},
 	}

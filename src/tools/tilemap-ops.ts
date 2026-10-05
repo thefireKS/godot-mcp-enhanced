@@ -376,12 +376,12 @@ export async function handleTool(
     let scenePath: string | undefined;
     if (args.scene_path !== undefined && args.scene_path !== null) {
       if (String(args.scene_path).trim() === '') {
-        return opsErrorResult('INVALID_PARAMS', 'scene_path 非法: 空字符串(省略该参数则用主场景)');
+        return opsErrorResult('INVALID_PARAMS', 'Invalid scene_path: empty string (omit the parameter to use the main scene)');
       }
       try {
         scenePath = resolveWithinRoot(projectPath, normalizeUserProjectPath(args.scene_path as string));
       } catch (err) {
-        return opsErrorResult('INVALID_PARAMS', `scene_path 非法: ${getErrorMessage(err)}`);
+        return opsErrorResult('INVALID_PARAMS', `Invalid scene_path: ${getErrorMessage(err)}`);
       }
     }
     let script: string;

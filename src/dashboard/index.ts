@@ -36,22 +36,22 @@ function parseArgs(args: string[]): { filter?: string; help: boolean } {
 
 function showHelp(): void {
   console.log(`
-godot-mcp-dashboard — MCP Server 实时监控面板
+godot-mcp-dashboard — live MCP server monitoring dashboard
 
-用法:
-  godot-mcp-dashboard [选项]
+Usage:
+  godot-mcp-dashboard [options]
 
-选项:
-  --filter=<关键词>  只显示匹配模块/工具名的日志
-  --help, -h         显示帮助信息
+Options:
+  --filter=<keyword>  show only logs matching a module/tool name
+  --help, -h         show help
 
-快捷键:
-  ↑/↓    滚动日志流
-  Space  暂停/恢复
-  f      输入过滤关键词
-  l      切换日志级别 (ALL → INFO → WARN → ERROR)
-  c      清空当前日志显示
-  q      退出面板
+Keys:
+  ↑/↓    scroll the log stream
+  Space  pause/resume
+  f      type a filter keyword
+  l      cycle log level (ALL → INFO → WARN → ERROR)
+  c      clear the current log view
+  q      quit the dashboard
 `);
 }
 
@@ -145,7 +145,7 @@ async function main(): Promise<void> {
       const { mkdirSync } = await import('node:fs');
       mkdirSync(logDir, { recursive: true });
     } catch {
-      console.error(`无法创建日志目录: ${logDir}`);
+      console.error(`Cannot create log directory: ${logDir}`);
       process.exit(1);
     }
   }

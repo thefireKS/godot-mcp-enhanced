@@ -122,14 +122,14 @@ describe('manage_tools', () => {
     const data = JSON.parse((result!.content as any)[0].text);
     expect(data.success).toBe(true);
     expect(data.data.editor).toBeNull();
-    expect(data.data.bridge.detail).toContain('无需重连');
+    expect(data.data.bridge.detail).toContain('no reconnect needed');
   });
 
   it('reconnect 注入 reconnectEditor → 返回其结果', async () => {
-    setReconnectEditor(async () => ({ connected: true, detail: '手动重连完成' }));
+    setReconnectEditor(async () => ({ connected: true, detail: 'Manual reconnect done' }));
     const result = await handleTool('manage_tools', { action: 'reconnect' }, {} as any);
     const data = JSON.parse((result!.content as any)[0].text);
-    expect(data.data.editor).toEqual({ reconnected: true, detail: '手动重连完成' });
+    expect(data.data.editor).toEqual({ reconnected: true, detail: 'Manual reconnect done' });
   });
 
   it('sync 无 provider → status 为 unknown', async () => {
@@ -181,7 +181,7 @@ describe('buildConnectionStatus / buildReconnectEditor 工厂', () => {
     const fn = buildReconnectEditor(() => ec as any);
     const r = await fn();
     expect(ec.connect).not.toHaveBeenCalled();
-    expect(r).toEqual({ connected: true, detail: '已连接' });
+    expect(r).toEqual({ connected: true, detail: 'Connected' });
   });
 
   it('buildReconnectEditor: 未连接 → 调 connect', async () => {
@@ -219,7 +219,7 @@ describe('buildConnectionStatus / buildReconnectEditor 工厂', () => {
     const fn = buildReconnectEditor(() => null, rebuild);
     const r = await fn();
     expect(r.connected).toBe(false);
-    expect(r.detail).toContain('重建失败');
+    expect(r.detail).toContain('Rebuild failed');
   });
 
   it('buildReconnectEditor: connect 抛错 → 调 requestReconnect 启动后台重连(防一次性失败卡死) [C-RECONNECT-1]', async () => {
@@ -235,7 +235,7 @@ describe('buildConnectionStatus / buildReconnectEditor 工厂', () => {
     expect(ec.connect).toHaveBeenCalledOnce();
     expect(ec.requestReconnect).toHaveBeenCalledOnce();
     expect(r.connected).toBe(false);
-    expect(r.detail).toContain('后台');
+    expect(r.detail).toContain('Background');
   });
 
   it('buildReconnectEditor: connect 抛错 + ec 无 requestReconnect(向后兼容) → 不崩,仅返回失败', async () => {
@@ -247,6 +247,6 @@ describe('buildConnectionStatus / buildReconnectEditor 工厂', () => {
     const fn = buildReconnectEditor(() => ec as any);
     const r = await fn();
     expect(r.connected).toBe(false);
-    expect(r.detail).toContain('重连失败');
+    expect(r.detail).toContain('Reconnect failed');
   });
 });

@@ -123,7 +123,7 @@ describe('runQaSuite happy path', () => {
     expect(report.summary).toMatchObject({ total: 4, passed: 4, failed: 0, errors: 0, skipped: 0, status: 'PASSED' });
     expect(report.steps.map(x => x.status)).toEqual(['PASSED', 'PASSED', 'PASSED', 'PASSED']);
     // PROJECT 是虚构路径 → user:// 解析不到本地文件 → 诚实降级（记录游戏侧路径，不伪造证据）
-    expect(report.steps[3]!.detail).toContain('留在游戏侧');
+    expect(report.steps[3]!.detail).toContain('left on the game side');
     expect(report.steps[3]!.evidence?.screenshot_path).toBeUndefined();
   });
 
@@ -224,7 +224,7 @@ describe('失败语义', () => {
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[0]!.status).toBe('FAILED');
-    expect(report.steps[0]!.detail).toContain('未在');
+    expect(report.steps[0]!.detail).toContain('not satisfied within');
   });
 });
 
@@ -233,7 +233,7 @@ describe('setup / teardown', () => {
     vi.mocked(bridgeHandleTool).mockResolvedValue(textResult('Error: Bridge script not found at /x'));
     const s = suite({ steps: [{ type: 'sleep', ms: 100 }] });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
-    expect(report.setup_error).toContain('game_bridge_install 失败');
+    expect(report.setup_error).toContain('game_bridge_install failed');
     expect(report.steps[0]!.skip_reason).toContain('setup'); // 初始 SKIPPED 无 skip_reason → 用状态断言
     expect(report.steps[0]!.status).toBe('SKIPPED');
     expect(report.summary.status).toBe('FAILED');
@@ -244,7 +244,7 @@ describe('setup / teardown', () => {
     vi.mocked(runtimeHandleTool).mockResolvedValue(textResult('Error: Bridge not ready (timeout). Game stopped.'));
     const s = suite({ steps: [{ type: 'sleep', ms: 100 }] });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
-    expect(report.setup_error).toContain('run_project 失败');
+    expect(report.setup_error).toContain('run_project failed');
     expect(report.summary.status).toBe('FAILED');
   });
 
@@ -270,7 +270,7 @@ describe('setup / teardown', () => {
     });
     const s = suite({ steps: [{ type: 'sleep', ms: 100 }] });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
-    expect(report.teardown_warnings?.[0]).toContain('stop_project 失败');
+    expect(report.teardown_warnings?.[0]).toContain('stop_project failed');
     expect(report.summary.status).toBe('PASSED');
   });
 });
@@ -471,7 +471,7 @@ describe('record_on_failure（QA 收尾批①）', () => {
     });
     const r = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(r.summary.status).toBe('PASSED');
-    expect(r.teardown_warnings?.some(w => w.includes('recording.start 失败'))).toBe(true);
+    expect(r.teardown_warnings?.some(w => w.includes('recording.start failed'))).toBe(true);
     expect(r.recording_path).toBeUndefined();
   });
 
@@ -518,7 +518,7 @@ describe('qa runner: watch/monitor 控制步骤(Task PR-1a)', () => {
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[1]!.status).toBe('ERROR');
-    expect(report.steps[1]!.detail).toContain('已有活跃 watch');
+    expect(report.steps[1]!.detail).toContain('already has an active watch');
   });
 
   it('watch_start 时探测到套件外既有 watch → detail 注明已替换', async () => {
@@ -534,7 +534,7 @@ describe('qa runner: watch/monitor 控制步骤(Task PR-1a)', () => {
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[0]!.status).toBe('PASSED');
-    expect(report.steps[0]!.detail).toContain('已替换');
+    expect(report.steps[0]!.detail).toContain('replaced');
   });
 
   it('步骤中断后(aborted)teardown 对未 stop 的 watch 兜底补 stop', async () => {
@@ -733,7 +733,7 @@ describe('qa runner: signal/monitor 断言(Task PR-1a)', () => {
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[1]!.status).toBe('ERROR');
     // Minor③(m5 弱断言补 detail):错误消息指明缺失的属性名(可行动)
-    expect(report.steps[1]!.detail).toContain('缺属性');
+    expect(report.steps[1]!.detail).toContain('missing property');
   });
 });
 
@@ -799,7 +799,7 @@ describe('qa runner: monitor 单调四档(审查 I-3:每档满足→PASSED/违�
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[1]!.status).toBe('FAILED');
-    expect(report.steps[1]!.mismatch?.health).toEqual({ expected: '≥ 60 且 ≤ 100', actual: 200 });
+    expect(report.steps[1]!.mismatch?.health).toEqual({ expected: '≥ 60 and ≤ 100', actual: 200 });
     expect(report.steps[1]!.detail).toContain('frame 2');
   });
 });
@@ -866,7 +866,7 @@ describe('qa runner: Task 3 审查 Minor 修复/补测(watch_stop 幂等 + monit
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[1]!.status).toBe('ERROR');
-    expect(report.steps[1]!.detail).toContain('已有活跃 monitor');
+    expect(report.steps[1]!.detail).toContain('already has an active monitor');
   });
 
   it('monitor_stop detail 带 sample_count(Minor③)', async () => {
@@ -931,7 +931,7 @@ describe('qa runner: Task 4 审查 Important 修复(空缓存/套件外拒绝)',
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[0]!.status).toBe('ERROR');
-    expect(report.steps[0]!.detail).toContain('套件外');
+    expect(report.steps[0]!.detail).toContain('outside the suite');
   });
 
   it('Important②:从未 monitor_start 但 bridge 有套件外活跃 monitor → 拒绝消费 ERROR(防假绿)', async () => {
@@ -950,7 +950,7 @@ describe('qa runner: Task 4 审查 Important 修复(空缓存/套件外拒绝)',
     });
     const report = await runQaSuite(s, PROJECT, makeCtx(), 'inline');
     expect(report.steps[0]!.status).toBe('ERROR');
-    expect(report.steps[0]!.detail).toContain('套件外');
+    expect(report.steps[0]!.detail).toContain('outside the suite');
   });
 });
 

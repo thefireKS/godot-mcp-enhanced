@@ -15,26 +15,26 @@ import { mergeSections as mergeSectionsGeneric } from './shared/section-merge.js
 
 // AGENTS.md 的 MCP 管控段 header 白名单（## 级，供幂等合并判定）
 export const AGENTS_SECTION_IDS: Set<string> = new Set([
-  '## 项目信息',
-  '## Godot MCP 通用规则',
-  '## Godot MCP 核心决策树',
-  '## Godot MCP 编辑器模式',
+  '## Project info',
+  '## Godot MCP general rules',
+  '## Godot MCP core decision tree',
+  '## Godot MCP editor mode',
   '## Godot MCP Game Bridge',
-  '## Godot MCP UI 布局',
-  '## Godot MCP 录制回放',
-  '## Godot MCP 引擎特性',
-  '## Godot MCP GDScript 规范',
-  '## Godot MCP 最佳实践',
+  '## Godot MCP UI layout',
+  '## Godot MCP recording and replay',
+  '## Godot MCP engine quirks',
+  '## Godot MCP GDScript conventions',
+  '## Godot MCP best practices',
 ]);
 
 // 段 header → 规则模板键（base 用特殊标记 __base__）
 const SECTION_TO_TEMPLATE: Array<[string, string]> = [
-  ['## Godot MCP 核心决策树', 'godot-mcp-core.md'],
-  ['## Godot MCP 编辑器模式', 'godot-mcp-editor.md'],
+  ['## Godot MCP core decision tree', 'godot-mcp-core.md'],
+  ['## Godot MCP editor mode', 'godot-mcp-editor.md'],
   ['## Godot MCP Game Bridge', 'godot-mcp-bridge.md'],
-  ['## Godot MCP UI 布局', 'godot-mcp-ui.md'],
-  ['## Godot MCP 录制回放', 'godot-mcp-recording.md'],
-  ['## Godot MCP 引擎特性', 'godot-mcp-engine-quirks.md'],
+  ['## Godot MCP UI layout', 'godot-mcp-ui.md'],
+  ['## Godot MCP recording and replay', 'godot-mcp-recording.md'],
+  ['## Godot MCP engine quirks', 'godot-mcp-engine-quirks.md'],
 ];
 
 /**
@@ -63,15 +63,15 @@ function stripFrontmatter(content: string): string {
 
 /** 剥离开头的 "> 适用于 godot-mcp-enhanced ..." 版本引用行（base 段保留自己的一次）。 */
 function stripVersionQuote(content: string): string {
-  return content.replace(/^> 适用于 godot-mcp-enhanced[^\n]*\n+/, '');
+  return content.replace(/^> (?:适用于|For) godot-mcp-enhanced[^\n]*\n+/, '');
 }
 
 /** AGENTS.md 内联说明段（替代指向 .claude/rules/ 的映射表——ZCode 下该目录不生效）。 */
 function buildInlineMapping(): string {
   return [
-    '> ZCode 不读取 `.claude/rules/` 目录。上方各段（通用规则 / 核心决策树 /',
-    '> 编辑器模式 / Game Bridge / UI 布局 / 录制回放 / 引擎特性）已全部内联到本文件，',
-    '> 是 godot-mcp-enhanced 规则在 ZCode 下的唯一来源。',
+    '> ZCode does not read the `.claude/rules/` directory. The sections above (general rules / core decision tree /',
+    '> editor mode / Game Bridge / UI layout / recording and replay / engine quirks) are all inlined into this file,',
+    '> which is the only source of the godot-mcp-enhanced rules under ZCode.',
   ].join('\n');
 }
 
@@ -99,9 +99,9 @@ export function buildAgentsMdSections(
   ];
   const metaLines = metaBuilders.map(b => b()).filter((v): v is string => v !== null);
   if (metaLines.length > 0) {
-    sections.push(['## 项目信息', metaLines.join('\n') + '\n\n' + buildInlineMapping()]);
+    sections.push(['## Project info', metaLines.join('\n') + '\n\n' + buildInlineMapping()]);
   } else {
-    sections.push(['## 项目信息', buildInlineMapping()]);
+    sections.push(['## Project info', buildInlineMapping()]);
   }
 
   // ── base 规则（GODOT_MCP_RULES，H2 → 降级为 H3）──
@@ -109,8 +109,8 @@ export function buildAgentsMdSections(
   // parseSections 误判为顶层新段（不在 AGENTS_SECTION_IDS → 当用户段保留），破坏幂等合并。
   const baseContent = GODOT_MCP_RULES
     .replace(/\{\{MCP_VERSION\}\}/g, mcpVersion)
-    .replace(/^# Godot MCP 开发规则\n+/, '');
-  sections.push(['## Godot MCP 通用规则', demoteHeadings(baseContent).trim()]);
+    .replace(/^# Godot MCP (?:开发规则|development rules)\n+/, '');
+  sections.push(['## Godot MCP general rules', demoteHeadings(baseContent).trim()]);
 
   // ── 各子系统规则模板（剥离 frontmatter + 版本引用，降级 H2→H3/H3→H4）──
   for (const [header, templateKey] of SECTION_TO_TEMPLATE) {
@@ -121,8 +121,8 @@ export function buildAgentsMdSections(
   }
 
   // ── GDScript 规范 + 最佳实践（builders 直接产出，无标题需降级）──
-  sections.push(['## Godot MCP GDScript 规范', buildTypeGuide()]);
-  sections.push(['## Godot MCP 最佳实践', buildBestPractices()]);
+  sections.push(['## Godot MCP GDScript conventions', buildTypeGuide()]);
+  sections.push(['## Godot MCP best practices', buildBestPractices()]);
 
   return sections;
 }

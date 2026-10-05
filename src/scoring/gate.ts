@@ -15,12 +15,12 @@ export interface GateResult {
 export function evaluateGate(score: ScoreJson): GateResult {
   const reasons: string[] = [];
   if (!Number.isFinite(score.total)) {
-    reasons.push(`总分无效(${score.total})— 门禁 fail-closed`);
+    reasons.push(`Invalid total score (${score.total}) — gate fails closed`);
   } else if (score.total < PASS_LINE) {
-    reasons.push(`总分 ${score.total} < ${PASS_LINE}(pass 线)`);
+    reasons.push(`Total score ${score.total} < ${PASS_LINE} (pass line)`);
   }
   for (const hf of score.hardFails) {
-    reasons.push(`硬否决 ${hf.dimension}: ${hf.reason}(${hf.actual} < ${hf.threshold})`);
+    reasons.push(`Hard veto ${hf.dimension}: ${hf.reason} (${hf.actual} < ${hf.threshold})`);
   }
   return { passed: reasons.length === 0, reasons };
 }

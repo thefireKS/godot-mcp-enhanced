@@ -1,23 +1,23 @@
 ---
 name: godot-mcp-bridge-e2e
-description: "bridge e2e 运行时验证 game_bridge_install run_project wait_for_bridge game_query ping game_input game_wait take_screenshot frame-verify 录制 回归测试 输入模拟 —— 当你需要验证运行时行为、做 E2E 测试、模拟输入或回归测试时使用"
+description: "bridge e2e, runtime verification, game_bridge_install, run_project, wait_for_bridge, game_query ping, game_input, game_wait, take_screenshot, frame-verify, recording, regression tests, input simulation — use when you need to verify runtime behaviour, run E2E tests, simulate input or run regression tests"
 ---
 
-## 运行时验证 / E2E 流程
+## Runtime verification / E2E flow
 
-把"安装 Bridge → 启动游戏 → 连接 → 模拟输入 → 留证"串成可遵循的 checklist，避免遗漏前置步骤。工具细节见 `godot-mcp-bridge.md` 与 `godot-mcp-recording.md`。
+Turns "install the bridge → start the game → connect → simulate input → keep evidence" into a checklist so no precondition is skipped. Tool details in `godot-mcp-bridge.md` and `godot-mcp-recording.md`.
 
-**何时用**：需要验证运行时行为、做 E2E 测试、模拟输入、回归测试、Bug 复现时。
+**When to use**: to verify runtime behaviour, run E2E tests, simulate input, run regression tests, reproduce bugs.
 
-**checklist**：
-- [ ] 1. `game_bridge_install(project_path)` — 一次性安装 Bridge autoload（端口 9081，写 project.godot）
-- [ ] 2. `run_project(project_path, wait_for_bridge=true)` — 启动游戏并等 Bridge 就绪（`bridge_timeout` 默认 10s）
-- [ ] 3. `game_query(method="ping")` — 确认连接（期望 `status: "ok"`）；未连排查：未 install / 游戏没运行 / 密钥权限
-- [ ] 4. 操作 + 验证：`game_input`（send_key/send_mouse_click/send_text）模拟输入 → `game_wait`（wait_for_node/wait_for_property）等状态变化
-- [ ] 5. 留证：`take_screenshot`（**GPU viewport 真渲染**，非 headless 空白）/ 或 `frame-verify`（反作弊退化检测）
+**Checklist**:
+- [ ] 1. `game_bridge_install(project_path)` — one-off install of the bridge autoload (port 9081, writes project.godot)
+- [ ] 2. `run_project(project_path, wait_for_bridge=true)` — start the game and wait for the bridge (`bridge_timeout` default 10s)
+- [ ] 3. `game_query(method="ping")` — confirm the connection (expect `status: "ok"`); if not connected check: not installed / game not running / secret permissions
+- [ ] 4. Act + verify: simulate input with `game_input` (send_key/send_mouse_click/send_text) → wait for state changes with `game_wait` (wait_for_node/wait_for_property)
+- [ ] 5. Keep evidence: `take_screenshot` (**real GPU viewport rendering**, not a blank headless one) / or `frame-verify` (anti-cheating degradation detection)
 
-**常见偏离**：
-- 忘记 `game_bridge_install`（query/input 直接报 BRIDGE_NOT_CONNECTED）
-- 游戏没运行就 query（Bridge 只在游戏运行时监听）
-- 用 headless `screenshot` 做运行时视觉确认（headless 用 RendererDummy，2D/3D 均空白）→ 必须用 bridge `take_screenshot`
-- 节点路径不用绝对路径（`game_write`/`game_wait` 的 `path` 必须以 `/root/` 开头）
+**Common deviations**:
+- Forgetting `game_bridge_install` (query/input fail straight away with BRIDGE_NOT_CONNECTED)
+- Querying before the game runs (the bridge only listens while the game runs)
+- Using headless `screenshot` for runtime visual checks (headless uses RendererDummy, 2D/3D are blank) → use bridge `take_screenshot`
+- Not using absolute node paths (the `path` of `game_write`/`game_wait` must start with `/root/`)

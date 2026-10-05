@@ -35,7 +35,7 @@ export function genUiImportSingleScript(
   const npLookup = `\tif "${np}" != "":
 \t\tvar _n = _mcp_get_scene_node("${np}")
 \t\tif _n == null:
-\t\t\t_mcp_output("error", "Node not found (post-persist): ${np} —— build 已持久化,可重跑 ui_measure_layout")
+\t\t\t_mcp_output("error", "Node not found (post-persist): ${np} — the build is already persisted, you can re-run ui_measure_layout")
 \t\t\t_mcp_done()
 \t\t\treturn
 \t\t_target = _n
@@ -50,7 +50,7 @@ ${genStyleExpectInit(styleExpect)}\t# --- reload(spec §6 B-1:绕过 ResourceCac
 \t\t_mcp_scene_instance = null
 \tvar _rl = ResourceLoader.load("${sp}", "", ResourceLoader.CACHE_MODE_IGNORE)
 \tif _rl == null or not (_rl is PackedScene):
-\t\t_mcp_output("error", "Scene reload failed (post-persist): ${sp} —— build 已持久化,可重跑 ui_measure_layout")
+\t\t_mcp_output("error", "Scene reload failed (post-persist): ${sp} — the build is already persisted, you can re-run ui_measure_layout")
 \t\t_mcp_done()
 \t\treturn
 \t_mcp_scene_instance = _rl.instantiate()
@@ -64,20 +64,20 @@ ${npLookup}\tprocess_frame.connect(_on_measure_frame)
   const buildBlock = genUiBuildLayoutScript(scenePath, parentPath, tree, viewport, true)
     .replace(/\t_mcp_output\("layout_built"[\s\S]*?\t_mcp_done\(\)\n$/, '\tcall_deferred("_measure_go")\n');
   if (!buildBlock.endsWith('\tcall_deferred("_measure_go")\n')) {
-    throw new Error('ui-import-single: build 尾部锚点(layout_built+_mcp_done)替换未命中——genUiBuildLayoutScript 结构变更需同步本模板');
+    throw new Error('ui-import-single: replacing the build tail anchor (layout_built+_mcp_done) found no match — when genUiBuildLayoutScript changes structure, update this template');
   }
 
   // ② measure 核心截取。锚点守卫同上:indexOf -1 会让 slice 静默产出损坏脚本。
   const measureFull = genUiMeasureScript(scenePath, parentPath, 16, styleExpect);
   const anchorIdx = measureFull.indexOf('var _frames := 0');
   if (anchorIdx < 0) {
-    throw new Error('ui-import-single: ui-measure 截取锚点 "var _frames := 0" 缺失——genUiMeasureScript 结构变更需同步本模板');
+    throw new Error('ui-import-single: ui-measure cut anchor "var _frames := 0" missing — when genUiMeasureScript changes structure, update this template');
   }
   const measureCore = measureFull
     .slice(anchorIdx)
     .replace(/\nfunc _initialize\(\):[\s\S]*?(?=\nfunc _on_measure_frame)/, '\n');
   if (measureCore.includes('func _initialize')) {
-    throw new Error('ui-import-single: measure _initialize 剥离未命中(锚点 regex 失配)——genUiMeasureScript 结构变更需同步本模板');
+    throw new Error('ui-import-single: stripping measure _initialize found no match (anchor regex mismatch) — when genUiMeasureScript changes structure, update this template');
   }
 
   return `${buildBlock}${measureCore}${measureGo}`;

@@ -55,7 +55,7 @@ describe('renderScoreReport', () => {
 
   it('na 维显示"未接入"', () => {
     const md = renderScoreReport(makeScore());
-    expect(md).toContain('未接入');
+    expect(md).toContain('Not wired');
   });
 
   it('hardFails 非空时列出', () => {
@@ -63,14 +63,14 @@ describe('renderScoreReport', () => {
       pass: false,
       hardFails: [{ dimension: 'security', reason: '低于硬否决线', threshold: 60, actual: 40 }],
     }));
-    expect(md).toContain('硬否决');
+    expect(md).toContain('Hard vetoes');
     expect(md).toContain('security');
     expect(md).toContain('40 < 60');
   });
 
   it('未验证维度列出 + 标注 M3c-e', () => {
     const md = renderScoreReport(makeScore());
-    expect(md).toContain('flaky, performance, gdscript — M3c-e 接入');
+    expect(md).toContain('flaky, performance, gdscript — wired in M3c-e');
   });
 
   it('gdscript 有值时关键指标显示 err/warn 计数', () => {

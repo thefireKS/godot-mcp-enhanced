@@ -210,14 +210,14 @@ export function suggestRollback(entry: AuditEntry): RollbackSuggestion {
   if (entry.action.includes('create') && files.length > 0) {
     return {
       supported: true,
-      suggestions: [`可删除本次创建的文件: ${files.join(', ')}`],
+      suggestions: [`Files created by this operation can be deleted: ${files.join(', ')}`],
     };
   }
   // project.godot setting:从 before_values 恢复(需阶段2 工具上报)
   if (entry.tool === 'project' && entry.details?.before_values) {
     return {
       supported: true,
-      suggestions: ['从 audit details.before_values 恢复 project.godot 配置项'],
+      suggestions: ['Restore the project.godot settings from audit details.before_values'],
     };
   }
   // destructive/delete:不可自动
@@ -228,14 +228,14 @@ export function suggestRollback(entry: AuditEntry): RollbackSuggestion {
   ) {
     return {
       supported: false,
-      suggestions: ['删除/破坏性操作无法自动恢复,用 Git/外部备份还原'],
+      suggestions: ['Deletions/destructive operations cannot be restored automatically; use Git or an external backup'],
     };
   }
   // 其余(write/modify):靠 Git
   return {
     supported: false,
     suggestions: [
-      `${entry.tool}.${entry.action}: 查 Git diff 还原(affected: ${files.join(', ') || '无记录'})`,
+      `${entry.tool}.${entry.action}: restore from the Git diff (affected: ${files.join(', ') || 'not recorded'})`,
     ],
   };
 }

@@ -169,7 +169,7 @@ describe('规则 1: 类型推断', () => {
   it('显式 type 优先(白名单内)', () => {
     const { tree, warnings } = tr(geo([n('A', 0, 0, 100, 40, { type: 'LineEdit' })]));
     expect(findNode(tree, 'A')!.type).toBe('LineEdit');
-    expect(warnings.some(w => w.includes('降级'))).toBe(false);
+    expect(warnings.some(w => w.includes('downgraded'))).toBe(false);
   });
 
   it("flow:'row' → Panel 壳 + HBoxContainer(_Flow)", () => {
@@ -313,7 +313,7 @@ describe('规则 4: 透明壳(self_modulate,禁 modulate 级联)', () => {
     expect(p.styleboxes).toEqual([
       { slot: 'panel', box: { bg_color: [16 / 255, 20 / 255, 31 / 255, 1] } },
     ]);
-    expect(warnings.some(w => w.includes('近似'))).toBe(false);
+    expect(warnings.some(w => w.includes('nearly equal'))).toBe(false);
   });
 
   it('有 text 无 bg(Label)→ 不设 self_modulate(负例)', () => {
@@ -363,7 +363,7 @@ describe('规则 4: 透明壳(self_modulate,禁 modulate 级联)', () => {
   it('非白名单 type(降级 Panel)无 bg → 灰底翻转 warning + 降级 warning 并存', () => {
     const { tree, warnings } = tr(geo([n('Custom', 0, 0, 100, 50, { type: 'Foo' })]));
     expect(findNode(tree, 'Custom')!.type).toBe('Panel');
-    expect(warnings.some(w => w.includes('Custom') && w.includes('降级为 Panel'))).toBe(true);
+    expect(warnings.some(w => w.includes('Custom') && w.includes('downgraded to Panel'))).toBe(true);
     expect(warnings.some(w => w.includes('Custom') && w.includes('gray panel stylebox'))).toBe(true);
   });
 
@@ -436,9 +436,9 @@ describe('规则 6/7: 字号与行高钳制预警', () => {
 
   it('rect.h < fontSize*1.5 → warning 含"钳制";足够高则无(负例)', () => {
     const r1 = tr(geo([n('S', 0, 0, 200, 18, { text: 'x', fontSize: 16 })]));
-    expect(r1.warnings.some(w => w.includes('钳制'))).toBe(true);
+    expect(r1.warnings.some(w => w.includes('clamped'))).toBe(true);
     const r2 = tr(geo([n('B', 0, 0, 200, 48, { text: 'x', fontSize: 16 })]));
-    expect(r2.warnings.some(w => w.includes('钳制'))).toBe(false);
+    expect(r2.warnings.some(w => w.includes('clamped'))).toBe(false);
   });
 
   // 规则 7 同族(引擎下限,2026-08-16 Task 3 集成验收裁定):Godot 4.7 默认主题
@@ -498,12 +498,12 @@ describe('规则 11: 白名单过滤', () => {
   it('非白名单 type → Panel 降级 + warning', () => {
     const { tree, warnings } = tr(geo([n('W', 0, 0, 50, 50, { type: 'MagicWidget' })]));
     expect(findNode(tree, 'W')!.type).toBe('Panel');
-    expect(warnings.some(w => w.includes('MagicWidget') && w.includes('降级'))).toBe(true);
+    expect(warnings.some(w => w.includes('MagicWidget') && w.includes('downgraded'))).toBe(true);
   });
 
   it('白名单 type 不产生降级 warning(负例)', () => {
     const { warnings } = tr(geo([n('L', 0, 0, 50, 50, { type: 'Label', text: 'x' })]));
-    expect(warnings.some(w => w.includes('降级'))).toBe(false);
+    expect(warnings.some(w => w.includes('downgraded'))).toBe(false);
   });
 });
 
@@ -594,13 +594,13 @@ describe('StyleBox 通道翻译(PR-1)', () => {
   it('未映射控件(LineEdit)带 bg → warning + 忽略(不产 stylebox)', () => {
     const { tree, warnings } = tr(geo([n('LE', 0, 0, 100, 24, { type: 'LineEdit', bg: '#123456' })]));
     expect(findNode(tree, 'LE')!.styleboxes).toBeUndefined();
-    expect(warnings.some(w => w.includes('LE') && w.includes('样式槽位'))).toBe(true);
+    expect(warnings.some(w => w.includes('LE') && w.includes('style slot'))).toBe(true);
   });
 
   it('fill 给非 ProgressBar → warning + 忽略', () => {
     const { tree, warnings } = tr(geo([n('LB', 0, 0, 40, 20, { text: 'x', fill: '#ff0000' })]));
     expect(findNode(tree, 'LB')!.styleboxes).toBeUndefined();
-    expect(warnings.some(w => w.includes('fill 仅 ProgressBar'))).toBe(true);
+    expect(warnings.some(w => w.includes('fill is only supported on ProgressBar'))).toBe(true);
   });
 
   it('规则 7:ProgressBar h<27 无条件预警(带 override 仍被钳,实测 23/27)', () => {
@@ -678,8 +678,8 @@ describe('flow_expect(PR-2,spec §4.2)', () => {
     // brief 原选择器 includes('flow') 会先命中 flow 子节点 min_size 提示(树构造期先 push),
     // 改用 flow_verify 精确定位 B-2 文案;后续断言语义不变。
     const w = r.warnings.find(x => x.includes('flow_verify'))!;
-    expect(w).toContain('直接子节点');
-    expect(w).not.toContain('screenshot diff 兜底');
+    expect(w).toContain('direct flow children');
+    expect(w).not.toContain('screenshot diff fallback');
   });
 });
 
@@ -690,30 +690,30 @@ describe('fill-only 灰底 warning(PR-2 顺手项 3/4,PR-1 终审转来)', () =>
     const r = translateGeometry(geo([
       { name: 'P', rect: { x: 0, y: 0, w: 100, h: 50 }, type: 'Panel', fill: '#3ddc84' },
     ]) as never);
-    const w = r.warnings.find(x => x.includes('fill 仅 ProgressBar'))!;
-    expect(w).toContain('灰底');
+    const w = r.warnings.find(x => x.includes('fill is only supported on ProgressBar'))!;
+    expect(w).toContain('grey background');
     expect(r.tree.children![0]!.styleboxes).toBeUndefined(); // 无 override 产出
   });
   it('推断布局壳 fill-only:同样灰底声明(透明壳被 fill 输入阻断)', () => {
     const r = translateGeometry(geo([
       { name: 'Shell', rect: { x: 0, y: 0, w: 100, h: 50 }, fill: '#3ddc84' },
     ]) as never);
-    const w = r.warnings.find(x => x.includes('fill 仅 ProgressBar'))!;
-    expect(w).toContain('灰底');
+    const w = r.warnings.find(x => x.includes('fill is only supported on ProgressBar'))!;
+    expect(w).toContain('grey background');
     expect(r.tree.children![0]!.properties?.self_modulate).toBeUndefined(); // 未设透明壳(fill 阻断推断壳路径,properties 可能整体不存在,用可选链)
   });
   it('fill+bg(显式 Panel):仅 fill 忽略 warning,无灰底声明(有 override 不灰底)', () => {
     const r = translateGeometry(geo([
       { name: 'P', rect: { x: 0, y: 0, w: 100, h: 50 }, type: 'Panel', bg: '#1a1f2e', fill: '#3ddc84' },
     ]) as never);
-    const w = r.warnings.find(x => x.includes('fill 仅 ProgressBar'))!;
-    expect(w).not.toContain('灰底');
+    const w = r.warnings.find(x => x.includes('fill is only supported on ProgressBar'))!;
+    expect(w).not.toContain('grey background');
   });
   it('fill-only Label:fill 忽略 warning 无灰底措辞(Label 默认主题透明,非灰底)', () => {
     const r = translateGeometry(geo([
       { name: 'L', rect: { x: 0, y: 0, w: 100, h: 30 }, text: 'x', fill: '#3ddc84' },
     ]) as never);
-    const w = r.warnings.find(x => x.includes('fill 仅 ProgressBar'))!;
-    expect(w).not.toContain('灰底');
+    const w = r.warnings.find(x => x.includes('fill is only supported on ProgressBar'))!;
+    expect(w).not.toContain('grey background');
   });
 });

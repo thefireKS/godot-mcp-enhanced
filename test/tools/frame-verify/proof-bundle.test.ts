@@ -56,7 +56,7 @@ describe('proof-bundle', () => {
   it('archiveFrame 超 100MB 配额抛错(B3:防撑爆磁盘)', () => {
     const run = createProofRun(tmp);
     run.bytes = 100 * 1024 * 1024; // 已满配额
-    expect(() => archiveFrame(run, 0, Buffer.from([1]))).toThrow(/配额超限/);
+    expect(() => archiveFrame(run, 0, Buffer.from([1]))).toThrow(/quota exceeded/);
   });
 
   it('cleanupProofRun 删除 run 目录(B1:验证后回收)', () => {
@@ -75,6 +75,6 @@ describe('proof-bundle', () => {
     expect(run.bytes).toBe(1024);
     // 预填到配额边缘,再 record 一个超限文件 → 抛错
     run.bytes = MAX_PROOF_BYTES;
-    expect(() => recordFrameBytes(run, f)).toThrow(/配额超限/);
+    expect(() => recordFrameBytes(run, f)).toThrow(/quota exceeded/);
   });
 });
